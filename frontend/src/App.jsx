@@ -1,20 +1,22 @@
-import { Routes, Route } from "react-router-dom";
-
-import LoginPage from "./pages/LoginPage.jsx";
+// src/App.jsx
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import DashboardPage from "./pages/DashboardPage.jsx";
-import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
   return (
-    <>
-      <Toaster />
+    <BrowserRouter>
+      <Toaster position="top-right" />
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Routes>
-    </>
+    </BrowserRouter>
   );
 }
 
