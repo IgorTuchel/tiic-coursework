@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import api from "../lib/api";
 
 function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -11,6 +12,8 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let res = await api.get("/ping");
+    toast.success("API Response: " + JSON.stringify(res.data));
     toast.success("Submission: " + JSON.stringify(form));
   };
 
