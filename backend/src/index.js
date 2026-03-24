@@ -3,6 +3,7 @@ import cors from "cors";
 import userRouter from "./routes/userRoutes.js";
 import { errorHandlingMiddleware } from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
+import { startup } from "./config/startup.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get("/ping", (_, res) => {
 app.use("/users", userRouter);
 
 app.listen(3000, async () => {
+  await startup();
   console.log("Server up at localhost:3000");
 });
 
