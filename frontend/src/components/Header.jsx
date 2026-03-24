@@ -47,10 +47,10 @@ function Header() {
         >
           Tool Check
         </NavLink>
-      
 
-         <NavLink
-          to="/check-tools"
+        {/* Fixed: now points to /users */}
+        <NavLink
+          to="/users"
           className={({ isActive }) =>
             isActive ? "text-white font-semibold" : "text-slate-400 hover:text-white"
           }
