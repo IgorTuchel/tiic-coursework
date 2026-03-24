@@ -46,11 +46,16 @@ function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen flex bg-slate-950 text-slate-100">
-      <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
-        <div className="text-sm font-semibold tracking-widest text-slate-900 mb-4">
-          AR
-        </div>
-        <h1 className="text-4xl font-semibold mb-2">Inspectra</h1>
+     <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
+       <div className="flex items-center gap-3 mb-6">
+         <img 
+           src={logo} 
+           alt="inseactra logo" 
+           className="w-16 h-16 object-contain"
+         />
+         <h1 className="text-4xl font-semibold text-slate-900">inseactra</h1>
+       </div>
+   
         <p className="text-slate-900/80 text-lg mb-8">
           Choose a new password for your maintenance console.
         </p>

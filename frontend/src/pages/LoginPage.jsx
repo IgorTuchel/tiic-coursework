@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../lib/api"
+import logo from '../assets/hero.png';
 
 
 function LoginPage() {
@@ -36,36 +37,44 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-slate-950 text-slate-100">
-      <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
-        <div className="text-sm font-semibold tracking-widest text-slate-900 mb-4">
-          AR
+  <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
+    <div className="flex items-center gap-3 mb-6">
+      <img 
+        src={logo} 
+        alt="inseactra logo" 
+        className="w-16 h-16 object-contain"
+      />
+      <h1 className="text-4xl font-semibold text-slate-900">inseactra</h1>
+    </div>
+
+    <p className="text-slate-900/80 text-lg mb-8">
+      Maintenance Console
+    </p>
+    <p className="max-w-md text-slate-900/80">
+      Secure access for authorised maintenance staff. Monitor active
+      faults, schedule interventions, and keep tool kits in top shape from
+      a single pane of glass.
+    </p>
+  </div>
+
+  <div className="flex-1 flex items-center justify-center p-6 md:p-10">
+    <div className="w-full max-w-md">
+      <div className="mb-8 md:hidden">
+        <div className="flex items-center gap-2 mb-3">
+          <img 
+            src={logo} 
+            alt="inseactra logo" 
+            className="w-12 h-12 object-contain"
+          />
+          <h1 className="text-3xl font-semibold text-slate-100">inseactra</h1>
         </div>
-        <h1 className="text-4xl font-semibold mb-2">Inspectra</h1>
-        <p className="text-slate-900/80 text-lg mb-8">
-          Maintenance Console
-        </p>
-        <p className="max-w-md text-slate-900/80">
-          Secure access for authorised maintenance staff. Monitor active
-          faults, schedule interventions, and keep tool kits in top shape from
-          a single pane of glass.
-        </p>
+        <p className="text-slate-400 text-sm">Maintenance Console</p>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-6 md:p-10">
-        <div className="w-full max-w-md">
-          <div className="mb-8 md:hidden">
-            <div className="text-xs font-semibold tracking-widest text-sky-400 mb-2">
-              AR
-            </div>
-            <h1 className="text-3xl font-semibold">Inspectra</h1>
-            <p className="text-slate-400 text-sm">Maintenance Console</p>
-          </div>
-
-          <h2 className="text-2xl font-semibold mb-1">Sign in</h2>
-          <p className="text-sm text-slate-400 mb-6">
-            Use your work email and maintenance console password.
-          </p>
-
+      <h2 className="text-2xl font-semibold mb-1">Sign in</h2>
+      <p className="text-sm text-slate-400 mb-6">
+        Use your work email and maintenance console password.
+      </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
