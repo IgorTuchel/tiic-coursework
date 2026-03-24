@@ -14,4 +14,16 @@ const Status = db.define("Status", {
   },
 });
 
+Status.afterSync(async () => {
+  await Status.bulkCreate(
+    [
+      { statusName: "active" }, // User can use the app
+      { statusName: "pending" }, // User has been registered but awaitng to setup password
+      { statusName: "suspended" }, // User has been suspended (Cant use app)
+      { statusName: "deactivated" }, // User has been deactivated (Cant use app)
+    ],
+    { ignoreDuplicates: true },
+  );
+});
+
 export default Status;
