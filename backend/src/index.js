@@ -1,7 +1,11 @@
 import express from "express";
 import cors from "cors";
 import userRouter from "./routes/userRoutes.js";
-import { errorHandlingMiddleware } from "./middleware/errorHandler.js";
+import {
+  errorHandlingMiddleware,
+  ForbiddenError,
+  StatusCodes,
+} from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
 import { startup } from "./config/startup.js";
 
@@ -18,7 +22,7 @@ app.use(
 );
 
 // Default health check, we'll remove later.
-app.get("/ping", (_, res) => {
+app.get("/ping", (req, res) => {
   res.status(200).json({ status: "up", message: "Pong!" });
 });
 

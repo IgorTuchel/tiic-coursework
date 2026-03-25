@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { db } from "../config/db.js";
+import { db } from "../../config/db.js";
 
 const Status = db.define("Status", {
   statusID: {
@@ -18,7 +18,7 @@ Status.afterSync(async () => {
   await Status.bulkCreate(
     [
       { statusName: "active" }, // User can use the app
-      { statusName: "pending" }, // User has been registered but awaitng to setup password
+      { statusName: "pending" }, // User has been registered but awaitng to setup password (cant use app)
       { statusName: "suspended" }, // User has been suspended (Cant use app)
       { statusName: "deactivated" }, // User has been deactivated (Cant use app)
     ],
