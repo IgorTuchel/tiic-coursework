@@ -1,6 +1,8 @@
 import { verifyDbIntegrity } from "./db.js";
 import cfg from "./config.js";
 import { appendToErrorLog } from "../utils/errorWriter.js";
+import { verifyResendConnection } from "./resend.js";
+import { sendEmailWithResend } from "../services/sendEmail.js";
 
 const startupMessage = `
 ===========================
@@ -24,18 +26,37 @@ let errorLog = [];
 
 export async function startup() {
   console.log(startupMessage);
-  let { message, successful, data } = await verifyDbIntegrity();
-  if (!successful) {
+  let {
+    message: dbMessage,
+    successful: dbSuccessful,
+    data: dbData,
+  } = await verifyDbIntegrity();
+  if (!dbSuccessful) {
     errorLog.push(
       "Startup error: " +
-        message +
+        dbMessage +
         "\nDatabase Status:\n" +
-        Object.keys(data)
-          .map((item) => `- ${item}: ${data[item]}`)
+        Object.keys(dbData)
+          .map((item) => `- ${item}: ${dbData[item]}`)
           .join("\n"),
     );
   }
-  console.log(message);
+  console.log(dbMessage);
+
+  let {
+    message: resendMessage,
+    successful: resendSuccessful,
+    data: resendData,
+  } = await verifyResendConnection();
+  if (!resendSuccessful) {
+    errorLog.push(
+      "Startup error: " +
+        resendMessage +
+        "\nResend API Error:\n" +
+        JSON.stringify(resendData.error, null, 2),
+    );
+  }
+  console.log(resendMessage);
 
   if (errorLog.length > 0) {
     await appendToErrorLog(cfg.errorLogFile, errorLog.join("\n"));
