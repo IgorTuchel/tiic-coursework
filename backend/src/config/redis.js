@@ -19,6 +19,13 @@ const redisClient = createClient({
   url: "redis://" + cfg.redisHost + ":" + cfg.redisPort,
 });
 
+/**
+ * Verifies the Redis connection by attempting to connect, ping, and perform a simple set/get operation.
+ * @async
+ * @function verifyRedisConnection
+ * @returns {Promise<{message: string, successful: boolean, data: object}>} An object containing the verification result.
+ * @description This function is designed to be called during the application startup process to ensure Redis is operational before proceeding.
+ */
 export async function verifyRedisConnection() {
   try {
     await redisClient.connect();
