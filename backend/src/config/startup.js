@@ -3,6 +3,7 @@ import cfg from "./config.js";
 import { appendToErrorLog } from "../utils/errorWriter.js";
 import { verifyResendConnection } from "./resend.js";
 import { sendEmailWithResend } from "../services/sendEmail.js";
+import { verifyRedisConnection } from "./redis.js";
 
 const startupMessage = `
 ===========================
@@ -57,6 +58,21 @@ export async function startup() {
     );
   }
   console.log(resendMessage);
+
+  let {
+    message: redisMessage,
+    successful: redisSuccessful,
+    data: redisData,
+  } = await verifyRedisConnection();
+  if (!redisSuccessful) {
+    errorLog.push(
+      "Startup error: " +
+        redisMessage +
+        "\nRedis Connection Error:\n" +
+        JSON.stringify(redisData.error, null, 2),
+    );
+  }
+  console.log(redisMessage);
 
   if (errorLog.length > 0) {
     await appendToErrorLog(cfg.errorLogFile, errorLog.join("\n"));

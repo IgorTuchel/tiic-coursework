@@ -46,8 +46,8 @@ const cfg = {
   resendApiKey: getFromEnv("RESEND_API_KEY"),
   resendSender: getFromEnv("RESEND_SENDER"),
 
-  //   redisHost: getFromEnv("REDIS_HOST"),
-  //   redisPort: getFromEnv("REDIS_PORT"),
+  redisHost: getFromEnv("REDIS_HOST"),
+  redisPort: getFromEnv("REDIS_PORT"),
 
   errorLogFile: await generateErrorLog(),
 };
