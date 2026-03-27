@@ -27,15 +27,18 @@ function DashboardPage() {
 
       {/* Main Content */}
       <div className="grid gap-6 md:grid-cols-[2fr,1.2fr]">
+        
         {/* Fault List */}
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow">
+        {/* Added min-w-0 to prevent table from breaking the grid on mobile */}
+        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow min-w-0">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-100">Fault List</h2>
             <span className="text-xs text-slate-500">Live feed from AR markers</span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto w-full pb-2">
+            {/* Added whitespace-nowrap so text doesn't squish together */}
+            <table className="w-full text-sm whitespace-nowrap">
               <thead className="text-slate-400 border-b border-slate-800">
                 <tr>
                   <th className="text-left py-2 pr-4">Marker</th>
@@ -88,14 +91,15 @@ function DashboardPage() {
         </section>
 
         {/* AR Marker Activity */}
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col shadow">
+        {/* Added min-w-0 here as well for consistency */}
+        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col shadow min-w-0">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-100">AR Marker Activity</h2>
             <span className="text-xs text-slate-500">Last 24 hours</span>
           </div>
 
           <div className="flex-1 flex items-center justify-center">
-            <div className="h-40 w-full rounded-lg border border-dashed border-slate-700 flex items-center justify-center text-xs text-slate-500">
+            <div className="h-40 w-full rounded-lg border border-dashed border-slate-700 flex items-center justify-center text-xs text-slate-500 text-center px-4">
               Add your AR marker activity chart or mini-map here.
             </div>
           </div>
