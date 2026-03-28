@@ -8,7 +8,7 @@ import CheckToolsPage from "./pages/CheckToolsPage";
 import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import UserManagementPage from "./pages/UserManagementPage"; // <-- new import
+import UserManagementPage from "./pages/UserManagementPage"; 
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/ar" element={<ArMaintenancePage />} />
         <Route path="/check-tools" element={<CheckToolsPage />} />
-        <Route path="/users" element={<UserManagementPage />} /> {/* <-- new route */}
+        <Route path="/users" element={<UserManagementPage />} /> 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Routes>

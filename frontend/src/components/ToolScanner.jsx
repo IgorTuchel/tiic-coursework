@@ -72,7 +72,7 @@ function ToolScanner() {
       <h3 className="text-lg font-semibold">Tool Check</h3>
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
-      {/* NEW: Responsive video wrapper */}
+      {/* Responsive video wrapper */}
       <div className="relative w-full max-w-md aspect-video rounded-md overflow-hidden border border-slate-700 bg-black">
         <video
           ref={videoRef}
@@ -81,8 +81,9 @@ function ToolScanner() {
           muted
           className="w-full h-full object-cover"
         />
+        
 
-        {/* NEW: Responsive Red box overlay */}
+        {/* Responsive Red box overlay */}
         <div className="absolute top-1/2 left-1/2 w-[70%] h-[60%] -translate-x-1/2 -translate-y-1/2 border-2 sm:border-4 border-red-500/80 pointer-events-none rounded-md shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]" />
       </div>
 

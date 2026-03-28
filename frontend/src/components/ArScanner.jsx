@@ -38,11 +38,11 @@ function ArScanner({ selectedMarkerId, onMarkerChange }) {
 
   return (
     <div className="ar-scanner flex flex-col items-center gap-4 w-full">
-      <h3 className="text-lg font-semibold">AR Scanner</h3>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      <h3 className="text-lg font-semibold text-slate-100">AR Scanner</h3>
+      {error && <p className="text-rose-500 text-sm">{error}</p>}
 
-      {/* NEW: Responsive video wrapper */}
-      <div className="relative w-full max-w-md aspect-video rounded-md overflow-hidden border border-slate-700 bg-black">
+      {/* Responsive video wrapper */}
+      <div className="relative w-full max-w-md aspect-video rounded-md overflow-hidden border border-slate-700 bg-slate-800">
         <video
           ref={videoRef}
           playsInline
@@ -51,8 +51,8 @@ function ArScanner({ selectedMarkerId, onMarkerChange }) {
           className="w-full h-full object-cover"
         />
 
-        {/* NEW: Responsive Red box overlay */}
-        <div className="absolute top-1/2 left-1/2 w-[70%] h-[60%] -translate-x-1/2 -translate-y-1/2 border-2 sm:border-4 border-red-500/80 pointer-events-none rounded-md shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]" />
+        {/* FIX: Red box now uses inset-0 to snap to the exact edges of the container */}
+        <div className="absolute inset-0 border-2 sm:border-4 border-red-500/80 pointer-events-none rounded-md" />
       </div>
 
       <p className="text-sm text-slate-400 text-center mt-1 px-2">
@@ -66,8 +66,8 @@ function ArScanner({ selectedMarkerId, onMarkerChange }) {
             onClick={() => handleMarkerClick(marker)}
             className={`px-3 py-1.5 rounded-md text-sm font-medium border transition-colors ${
               selectedMarkerId === marker.id
-                ? "bg-red-500 text-white border-red-500"
-                : "bg-slate-800 text-slate-300 border-slate-600 hover:bg-slate-700"
+                ? "bg-rose-500 text-white border-rose-500"
+                : "bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white"
             }`}
           >
             {marker.name}
