@@ -69,11 +69,11 @@ function ToolScanner() {
 
   return (
     <div className="tool-scanner flex flex-col items-center gap-4 w-full">
-      <h3 className="text-lg font-semibold">Tool Check</h3>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      <h3 className="text-lg font-semibold text-slate-100">Tool Check</h3>
+      {error && <p className="text-rose-500 text-sm">{error}</p>}
 
       {/* Responsive video wrapper */}
-      <div className="relative w-full max-w-md aspect-video rounded-md overflow-hidden border border-slate-700 bg-black">
+      <div className="relative w-full max-w-md aspect-video rounded-md overflow-hidden border border-slate-700 bg-slate-800">
         <video
           ref={videoRef}
           playsInline
@@ -81,10 +81,9 @@ function ToolScanner() {
           muted
           className="w-full h-full object-cover"
         />
-        
 
-        {/* Responsive Red box overlay */}
-        <div className="absolute top-1/2 left-1/2 w-[70%] h-[60%] -translate-x-1/2 -translate-y-1/2 border-2 sm:border-4 border-red-500/80 pointer-events-none rounded-md shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]" />
+        {/* Red box snaps to edges using inset-0 */}
+        <div className="absolute inset-0 border-2 sm:border-4 border-red-500/80 pointer-events-none rounded-md" />
       </div>
 
       <p className="text-sm text-slate-400 mt-1 text-center px-2">

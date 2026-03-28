@@ -41,10 +41,10 @@ function LoginPage() {
     <div className="flex items-center gap-3 mb-6">
       <img 
         src={logo} 
-        alt="inseactra logo" 
+        alt="inspectra logo" 
         className="w-16 h-16 object-contain"
       />
-      <h1 className="text-4xl font-semibold text-slate-900">inseactra</h1>
+      <h1 className="text-4xl font-semibold text-slate-900">inspectra</h1>
     </div>
 
     <p className="text-slate-900/80 text-lg mb-8">
@@ -63,10 +63,10 @@ function LoginPage() {
         <div className="flex items-center gap-2 mb-3">
           <img 
             src={logo} 
-            alt="inseactra logo" 
+            alt="inspectra logo" 
             className="w-12 h-12 object-contain"
           />
-          <h1 className="text-3xl font-semibold text-slate-100">inseactra</h1>
+          <h1 className="text-3xl font-semibold text-slate-100">inspectra</h1>
         </div>
         <p className="text-slate-400 text-sm">Maintenance Console</p>
       </div>
