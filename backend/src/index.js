@@ -1,13 +1,10 @@
 import express from "express";
 import cors from "cors";
 import userRouter from "./routes/userRoutes.js";
-import {
-  errorHandlingMiddleware,
-  ForbiddenError,
-  StatusCodes,
-} from "./middleware/errorHandler.js";
+import { errorHandlingMiddleware } from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
 import { startup } from "./config/startup.js";
+import cfg from "./config/config.js";
 
 const app = express();
 
@@ -28,9 +25,9 @@ app.get("/ping", (req, res) => {
 
 app.use("/users", userRouter);
 
-app.listen(3000, async () => {
+app.listen(cfg.port, async () => {
   await startup();
-  console.log("Server up at localhost:3000");
+  console.log(`Server up at localhost:${cfg.port}`);
 });
 
 app.use(errorHandlingMiddleware);
