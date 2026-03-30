@@ -25,7 +25,7 @@ const User = db.define("User", {
     type: Sequelize.STRING,
     allowNull: true,
   },
-  role: {
+  roleID: {
     type: Sequelize.UUID,
     allowNull: false,
     references: {
@@ -38,7 +38,7 @@ const User = db.define("User", {
     allowNull: false,
     defaultValue: false,
   },
-  status: {
+  statusID: {
     type: Sequelize.UUID,
     allowNull: false,
     references: {

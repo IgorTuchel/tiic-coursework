@@ -2,14 +2,33 @@ import express from "express";
 import cors from "cors";
 import userRouter from "./routes/userRoutes.js";
 import { errorHandlingMiddleware } from "./middleware/errorHandler.js";
-import cookieParser from "cookie-parser";
 import { startup } from "./config/startup.js";
 import cfg from "./config/config.js";
+import { RedisStore } from "connect-redis";
+import session from "express-session";
 
 const app = express();
+const redisStore = new RedisStore({
+  client: startup.redisClient,
+  prefix: "app-session:",
+});
 
 app.use(express.json());
-app.use(cookieParser());
+
+app.use(
+  session({
+    store: redisStore,
+    secret: cfg.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60, // 1 hour
+    },
+  }),
+);
 
 app.use(
   cors({

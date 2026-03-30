@@ -45,6 +45,7 @@ const cfg = {
 
   resendApiKey: getFromEnv("RESEND_API_KEY"),
   resendSender: getFromEnv("RESEND_SENDER"),
+  sessionSecret: getFromEnv("SESSION_SECRET"),
 
   redisHost: getFromEnv("REDIS_HOST"),
   redisPort: getFromEnv("REDIS_PORT"),
