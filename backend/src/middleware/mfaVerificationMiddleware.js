@@ -8,7 +8,6 @@
 
 import cfg from "../config/config.js";
 import redisClient from "../config/redis.js";
-import User from "../models/appdb/users.js";
 import { sendEmailWithResend, emailTemplates } from "../services/sendEmail.js";
 import { HTTPCodes } from "../utils/json.js";
 

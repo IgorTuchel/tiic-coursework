@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import { db } from "../../config/db.js";
 import Roles from "./roles.js";
+import Status from "./status.js";
 
 const User = db.define("User", {
   userID: {

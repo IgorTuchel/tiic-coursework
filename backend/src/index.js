@@ -6,6 +6,7 @@ import { startup } from "./config/startup.js";
 import cfg from "./config/config.js";
 import { RedisStore } from "connect-redis";
 import session from "express-session";
+import { handlerLogin } from "./handlers/handlerLogin.js";
 
 const app = express();
 const redisStore = new RedisStore({
@@ -43,6 +44,7 @@ app.get("/ping", (req, res) => {
 });
 
 app.use("/users", userRouter);
+app.use("/login", handlerLogin);
 
 app.listen(cfg.port, async () => {
   await startup();
