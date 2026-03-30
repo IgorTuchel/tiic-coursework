@@ -1,0 +1,39 @@
+import cfg from "../config/config.js";
+import redisClient from "../config/redis.js";
+import { emailTemplates, sendEmailWithResend } from "./sendEmail.js";
+import User from "../models/appdb/users.js";
+import crypto from "crypto";
+
+export async function newUserRegistration(userID) {
+  const dbUser = await User.findByPk(userID);
+  if (!dbUser) {
+    return { success: false, message: "User not found" };
+  }
+
+  const code = crypto.randomBytes(20).toString("hex");
+  await redisClient.setEx(`newUser:${code}`, 3600, dbUser.userID); // Code valid for 1 hour
+  await sendEmailWithResend(
+    dbUser.email,
+    cfg.resendSender,
+    "Complete Your Registration",
+    emailTemplates.setupAccount.replace(
+      "{{LINK}}",
+      `${cfg.activateAccountUrl}?id=${code}`,
+    ),
+  );
+  return { success: true, message: "Registration email sent" };
+}
+
+export async function verifyNewUser(code) {
+  const storedUserID = await redisClient.get(`newUser:${code}`);
+  if (!storedUserID) {
+    return { success: false, message: "Invalid or expired url parameter" };
+  }
+
+  await redisClient.del(`newUser:${code}`);
+  return {
+    success: true,
+    message: "Account activated successfully",
+    userID: storedUserID,
+  };
+}

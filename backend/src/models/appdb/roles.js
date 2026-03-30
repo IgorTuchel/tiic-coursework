@@ -12,6 +12,11 @@ const Roles = db.define("Roles", {
     allowNull: false,
     unique: true,
   },
+  isAdmin: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   canManageUsers: {
     type: Sequelize.BOOLEAN,
     allowNull: false,
@@ -89,6 +94,7 @@ Roles.afterSync(async () => {
     [
       {
         roleName: "Admin",
+        isAdmin: true,
         canManageUsers: true,
         canManageRoles: true,
         canViewSecurityLogs: true,
@@ -106,6 +112,7 @@ Roles.afterSync(async () => {
       },
       {
         roleName: "Security Analyst",
+        isAdmin: false,
         canManageUsers: false,
         canManageRoles: false,
         canViewSecurityLogs: true,
@@ -124,6 +131,7 @@ Roles.afterSync(async () => {
       },
       {
         roleName: "Engineer",
+        isAdmin: false,
         canManageUsers: false,
         canManageRoles: false,
         canViewSecurityLogs: false,
@@ -141,6 +149,7 @@ Roles.afterSync(async () => {
       },
       {
         roleName: "Authorized Personnel",
+        isAdmin: false,
         canManageUsers: false,
         canManageRoles: false,
         canViewSecurityLogs: false,

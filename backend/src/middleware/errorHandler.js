@@ -15,6 +15,14 @@ export async function errorHandlingMiddleware(err, req, res, next) {
     );
   }
 
+  if (err?.type === "entity.parse.failed") {
+    return respondWithErrorJson(
+      res,
+      HTTPCodes.BAD_REQUEST,
+      "Invalid JSON payload",
+      StatusCodes.BAD_REQUEST,
+    );
+  }
   console.log("Unexpected Error!", err.stack);
 }
 

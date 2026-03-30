@@ -8,6 +8,17 @@
 
 import resendClient from "../config/resend.js";
 
+const setupAccountTemplate = `
+Hello,
+<br/><br/>
+Your account has been created successfully. Please use the following link to set up your password and access your account:
+<br/><br/>
+<a href="{{LINK}}">Set Up Your Account</a>
+This link will be valid for 30 minutes.
+<br/><br/>
+Thank you!
+`;
+
 const verificationTemplate = `
 Hello,
 <br/><br/>
@@ -40,6 +51,7 @@ If you did not request this, please ignore this email.
 export const emailTemplates = {
   verification: verificationTemplate,
   resetPassword: resetPasswrordTemplate,
+  setupAccount: setupAccountTemplate,
 };
 
 /**
@@ -87,7 +99,6 @@ export async function sendEmailWithResend(to, from, subject, htmlBody) {
     html: htmlBody,
   });
   if (error) {
-    console.log("Error sending email with Resend:", error);
     return { success: false, data: "Failed to send email." };
   }
   return { success: true, data: data };

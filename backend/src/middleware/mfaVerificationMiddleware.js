@@ -111,7 +111,7 @@ async function verifyCode(userID, code) {
  *   console.log("MFA enabled:", result.data.mfaEnabled);
  * }
  */
-export async function handleMFA(mfaCode, userID) {
+export async function handleMFA(mfaCode, userID, email) {
   if (mfaCode) {
     if (mfaCode.length !== 6) {
       return {
@@ -122,18 +122,22 @@ export async function handleMFA(mfaCode, userID) {
         },
       };
     }
-    const verified = await verifyCode(userID, mfaCode);
-    if (!verified) {
+    const success = await verifyCode(userID, mfaCode);
+    if (!success) {
       return {
         success: false,
-        data: { code: HTTPCodes.BAD_REQUEST, message: "Invalid MFA code." },
+        data: {
+          code: HTTPCodes.BAD_REQUEST,
+          message: "Invalid MFA code, code might have expired.",
+        },
       };
     }
     return {
       success: true,
     };
   }
-  const { success, _ } = await createVerificationCode(userID, dbUser.email);
+
+  const { success, _ } = await createVerificationCode(userID, email);
   if (!success) {
     return {
       success: false,

@@ -11,7 +11,7 @@
  * @param {Response} res - Express response object.
  * @param {number} code - HTTP status code to send.
  * @param {string} msg - Error message.
- * @param {number} statusCode - The status code for the error.
+ * @param {string} statusCode - The status code for the error.
  */
 export async function respondWithErrorJson(res, code, msg, statusCode) {
   respondWithJson(res, code, { error: msg, statusCode: statusCode });

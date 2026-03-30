@@ -6,6 +6,7 @@
  * @module config/db
  */
 import { Sequelize } from "sequelize";
+import cfg from "./config.js";
 
 /**
  * The configured Sequelize instance for the main application database.
@@ -103,6 +104,7 @@ async function syncDb() {
     logDbSyncStatus = true;
     return { dbSyncStatus, logDbSyncStatus };
   } catch (err) {
+    console.error("Error during database synchronization:", err);
     return { dbSyncStatus, logDbSyncStatus };
   }
 }

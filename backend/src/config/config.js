@@ -47,6 +47,9 @@ const cfg = {
   resendSender: getFromEnv("RESEND_SENDER"),
   sessionSecret: getFromEnv("SESSION_SECRET"),
 
+  resetPasswordUrl: getFromEnv("RESET_PASSWORD_URL"),
+  activateAccountUrl: getFromEnv("ACTIVATE_ACCOUNT_URL"),
+
   redisHost: getFromEnv("REDIS_HOST"),
   redisPort: getFromEnv("REDIS_PORT"),
 

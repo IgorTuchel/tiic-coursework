@@ -1,16 +1,19 @@
 import express from "express";
 import cors from "cors";
-import userRouter from "./routes/userRoutes.js";
+import globalRouter from "./routes/globalRoutes.js";
 import { errorHandlingMiddleware } from "./middleware/errorHandler.js";
 import { startup } from "./config/startup.js";
 import cfg from "./config/config.js";
 import { RedisStore } from "connect-redis";
 import session from "express-session";
-import { handlerLogin } from "./handlers/handlerLogin.js";
+import redisClient from "./config/redis.js";
+import { sanitiseInputMiddleware } from "./middleware/sanitiseMiddleware.js";
+
+await startup();
 
 const app = express();
 const redisStore = new RedisStore({
-  client: startup.redisClient,
+  client: redisClient,
   prefix: "app-session:",
 });
 
@@ -38,16 +41,9 @@ app.use(
   }),
 );
 
-// Default health check, we'll remove later.
-app.get("/ping", (req, res) => {
-  res.status(200).json({ status: "up", message: "Pong!" });
-});
-
-app.use("/users", userRouter);
-app.use("/login", handlerLogin);
+app.use("/", sanitiseInputMiddleware, globalRouter);
 
 app.listen(cfg.port, async () => {
-  await startup();
   console.log(`Server up at localhost:${cfg.port}`);
 });
 

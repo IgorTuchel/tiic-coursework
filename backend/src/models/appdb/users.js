@@ -20,11 +20,11 @@ const User = db.define("User", {
   },
   firstName: {
     type: Sequelize.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   lastName: {
     type: Sequelize.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   roleID: {
     type: Sequelize.UUID,
