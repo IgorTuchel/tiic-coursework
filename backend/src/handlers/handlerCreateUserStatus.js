@@ -1,3 +1,8 @@
+/**
+ * @file handlerCreateUserStatus.js
+ * @description Express handler for creating a new user status.
+ * @module handlers/handlerCreateUserStatus
+ */
 import {
   BadRequestError,
   InternalServerError,
@@ -5,6 +10,19 @@ import {
 import { HTTPCodes, respondWithJson } from "../utils/json.js";
 import Status from "../models/appdb/status.js";
 
+/**
+ * Handler for creating a new user status.
+ * Expects a JSON body with a "name" field for the status name.
+ * Returns the created status object on success.
+ * Throws a BadRequestError if the name is missing, or an InternalServerError if creation fails.
+ * @function handlerCreateUserStatus
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ * @throws {BadRequestError} If the status name is not provided in the request body.
+ * @throws {InternalServerError} If there is an error creating the user status in the database.
+ */
 export async function handlerCreateUserStatus(req, res) {
   const { name } = req.body;
 

@@ -37,7 +37,7 @@ const Roles = db.define("Roles", {
     allowNull: false,
     defaultValue: false,
   },
-  canWorkOnReports: {
+  canAssignReports: {
     type: Sequelize.BOOLEAN,
     allowNull: false,
     defaultValue: false,
@@ -52,12 +52,27 @@ const Roles = db.define("Roles", {
     allowNull: false,
     defaultValue: false,
   },
+  canWorkOnReports: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   canSuggestFaults: {
     type: Sequelize.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   },
-  cabAssignReports: {
+  canManageFaults: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  canViewAllFaults: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  canAssignFaults: {
     type: Sequelize.BOOLEAN,
     allowNull: false,
     defaultValue: false,
@@ -83,7 +98,10 @@ Roles.afterSync(async () => {
         canManageReports: true,
         canManageTools: true,
         canSuggestFaults: true,
-        cabAssignReports: true,
+        canAssignReports: true,
+        canManageFaults: true,
+        canViewAllFaults: true,
+        canAssignFaults: true,
         mfaRequired: true,
       },
       {
@@ -97,7 +115,11 @@ Roles.afterSync(async () => {
         canManageReports: false,
         canManageTools: false,
         canSuggestFaults: false,
-        cabAssignReports: false,
+        canAssignReports: false,
+        canManageFaults: false,
+        canViewAllFaults: false,
+        canAssignFaults: false,
+
         mfaRequired: true,
       },
       {
@@ -111,7 +133,10 @@ Roles.afterSync(async () => {
         canManageReports: false,
         canManageTools: false,
         canSuggestFaults: true,
-        cabAssignReports: false,
+        canAssignReports: false,
+        canManageFaults: true,
+        canViewAllFaults: true,
+        canAssignFaults: true,
         mfaRequired: false,
       },
       {
@@ -125,7 +150,10 @@ Roles.afterSync(async () => {
         canManageReports: false,
         canManageTools: false,
         canSuggestFaults: true,
-        cabAssignReports: false,
+        canAssignReports: false,
+        canManageFaults: false,
+        canViewAllFaults: false,
+        canAssignFaults: false,
         mfaRequired: false,
       },
     ],
