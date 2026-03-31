@@ -1,4 +1,5 @@
-import { db } from "../../config/db";
+import { db } from "../../config/db.js";
+import { Sequelize } from "sequelize";
 
 const SeverityLevel = db.define("SeverityLevel", {
   severityLevelID: {

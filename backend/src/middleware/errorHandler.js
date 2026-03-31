@@ -24,6 +24,12 @@ export async function errorHandlingMiddleware(err, req, res, next) {
     );
   }
   console.log("Unexpected Error!", err.stack);
+  return respondWithErrorJson(
+    res,
+    HTTPCodes.INTERNAL_SERVER_ERROR,
+    "An unexpected error occurred",
+    StatusCodes.INTERNAL_SERVER_ERROR,
+  );
 }
 
 /**

@@ -1,6 +1,7 @@
-import { db } from "../../config/db";
-import MaintenanceReport from "./maintenanceReport";
-import User from "./users";
+import { db } from "../../config/db.js";
+import MaintenanceReport from "./maintenanceReport.js";
+import User from "./users.js";
+import { Sequelize } from "sequelize";
 
 const maintenanceReportAssign = db.define("MaintenanceReportAssign", {
   maintenanceReportID: {

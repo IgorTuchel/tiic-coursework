@@ -1,7 +1,8 @@
-import { db } from "../../config/db";
-import ReportStatus from "./reportStatus";
-import SeverityLevel from "./severityLevel";
-import User from "./users";
+import { db } from "../../config/db.js";
+import ReportStatus from "./reportStatus.js";
+import SeverityLevel from "./severityLevel.js";
+import User from "./users.js";
+import { Sequelize } from "sequelize";
 
 const FaultReport = db.define("FaultReport", {
   faultReportID: {
@@ -38,14 +39,6 @@ const FaultReport = db.define("FaultReport", {
     allowNull: false,
     references: {
       model: User,
-      key: "userID",
-    },
-  },
-  assignedTo: {
-    type: Sequelize.UUID,
-    allowNull: true,
-    references: {
-      model: "User",
       key: "userID",
     },
   },

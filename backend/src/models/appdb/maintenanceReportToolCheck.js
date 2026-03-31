@@ -1,6 +1,7 @@
-import MaintenanceReport from "./maintenanceReport";
-import ToolCheck from "./toolCheck";
-import { db } from "../../config/db";
+import MaintenanceReport from "./maintenanceReport.js";
+import ToolCheck from "./toolCheck.js";
+import { db } from "../../config/db.js";
+import { Sequelize } from "sequelize";
 
 const MaintenanceReportToolCheck = db.define("MaintenanceReportToolCheck", {
   maintenanceReportID: {

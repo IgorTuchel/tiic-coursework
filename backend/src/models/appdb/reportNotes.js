@@ -1,5 +1,6 @@
-import { db } from "../../config/db";
-import User from "./users";
+import { db } from "../../config/db.js";
+import User from "./users.js";
+import { Sequelize } from "sequelize";
 
 const ReportNotes = db.define("ReportNotes", {
   reportNoteID: {

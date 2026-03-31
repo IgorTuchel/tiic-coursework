@@ -9,6 +9,7 @@ import { newUserRegistration } from "../services/newAccount.js";
 import Status from "../models/appdb/status.js";
 import Roles from "../models/appdb/roles.js";
 
+// TEMPORARY - This will be replaced with an admin creating a user and sending them an email to set up their account
 export async function handlerCreateUser(req, res) {
   const { firstName, lastName, email, mfaEnabled } = req.body;
 
@@ -37,16 +38,18 @@ export async function handlerCreateUser(req, res) {
       true,
     );
   }
-  const rolee = await Roles.findOne({ where: { roleName: "Admin" } });
+
+  // TEMP
+  const role = await Roles.findOne({ where: { roleName: "Admin" } });
   const newUser = await User.create({
     firstName,
     lastName,
     email,
-    roleID: rolee.roleID,
+    roleID: role.roleID,
     statusID: pendingStatus.statusID,
     mfaEnabled: mfaEnabled || false,
   });
-
+  // END TEMP
   if (!newUser) {
     throw new InternalServerError(req, "Failed to create user");
   }
