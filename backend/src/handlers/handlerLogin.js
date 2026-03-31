@@ -51,6 +51,15 @@ export async function handlerLogin(req, res) {
     );
   }
 
+  if (!password) {
+    throw new BadRequestError(
+      req,
+      "Password is required",
+      StatusCodes.BAD_REQUEST,
+      true,
+    );
+  }
+
   // Check if passwords match
   const passwordMatch = await comparePassword(password, dbUser.passwordHash);
   if (!passwordMatch) {
