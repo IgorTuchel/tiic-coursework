@@ -5,7 +5,7 @@ import { handlerActivateAccount } from "../handlers/handlerActivateAccount.js";
 const router = express.Router();
 
 router.use("/users", userRouter);
-router.use("/login", handlerLogin);
+router.post("/login", handlerLogin);
 router.post("/activate-account", handlerActivateAccount);
 
 export default router;
