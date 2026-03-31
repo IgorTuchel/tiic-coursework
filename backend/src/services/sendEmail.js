@@ -14,7 +14,7 @@ Hello,
 Your account has been created successfully. Please use the following link to set up your password and access your account:
 <br/><br/>
 <a href="{{LINK}}">Set Up Your Account</a>
-This link will be valid for 30 minutes.
+This link will be valid for 60 minutes.
 <br/><br/>
 Thank you!
 `;

@@ -41,6 +41,15 @@ export async function handlerLogin(req, res) {
     where: { statusID: dbUser.statusID },
   });
 
+  if (!accountStatus) {
+    throw new InternalServerError(
+      req,
+      "User account status not found",
+      StatusCodes.LOGIN_FAILURE,
+      true,
+    );
+  }
+
   if (accountStatus.statusName === "pending") {
     await newUserRegistration(dbUser.userID); // Resend the registration email
     throw new ForbiddenError(
@@ -111,7 +120,7 @@ export async function handlerLogin(req, res) {
         throw new BadRequestError(
           req,
           data.message,
-          StatusCodes.LOGIN_FAILURE_MFA_INVALID,
+          StatusCodes.LOGIN_FAILURE,
           true,
         );
       }
