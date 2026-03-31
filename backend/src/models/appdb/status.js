@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import { db } from "../../config/db.js";
+import { Sequelize } from "sequelize";
 
 const Status = db.define("Status", {
   statusID: {

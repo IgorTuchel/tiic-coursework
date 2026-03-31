@@ -1,6 +1,7 @@
 import { db } from "../../config/db.js";
 import ReportNotes from "./reportNotes.js";
 import MaintenanceReport from "./maintenanceReport.js";
+import { Sequelize } from "sequelize";
 
 const maintenanceReportNotes = db.define("MaintenanceReportNotes", {
   reportNoteID: {

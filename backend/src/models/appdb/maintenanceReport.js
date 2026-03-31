@@ -1,7 +1,8 @@
-import { db } from "../../config/db";
-import ReportStatus from "./reportStatus";
-import SeverityLevel from "./severityLevel";
-import User from "./users";
+import { db } from "../../config/db.js";
+import ReportStatus from "./reportStatus.js";
+import SeverityLevel from "./severityLevel.js";
+import User from "./users.js";
+import { Sequelize } from "sequelize"; 
 
 const MaintenanceReport = db.define("MaintenanceReport", {
   maintenanceReportID: {
