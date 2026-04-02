@@ -9,11 +9,10 @@ import { newUserRegistration } from "../services/newAccount.js";
 import Status from "../models/appdb/status.js";
 import Roles from "../models/appdb/roles.js";
 
-// TEMPORARY - This will be replaced with an admin creating a user and sending them an email to set up their account
 export async function handlerCreateUser(req, res) {
-  const { firstName, lastName, email, mfaEnabled } = req.body;
+  const { firstName, lastName, email, mfaEnabled, roleID } = req.body;
 
-  if (!firstName || !lastName || !email) {
+  if (!firstName || !lastName || !email || !roleID) {
     throw new BadRequestError(req, "Missing required fields");
   }
 
@@ -39,8 +38,30 @@ export async function handlerCreateUser(req, res) {
     );
   }
 
-  // TEMP
-  const role = await Roles.findOne({ where: { roleName: "Admin" } });
+  const role = await Roles.findOne({ where: { roleID: roleID } });
+  if (!role) {
+    throw new BadRequestError(
+      req,
+      "Invalid roleID provided",
+      StatusCodes.BAD_REQUEST,
+      true,
+    );
+  }
+
+  if (role.isAdmin) {
+    const isUserAdmin = await Roles.findOne({
+      where: { roleID: req.session.roleID },
+    });
+    if (!isUserAdmin.isAdmin) {
+      throw new BadRequestError(
+        req,
+        "Only admin users can be assigned the admin role",
+        StatusCodes.BAD_REQUEST,
+        true,
+      );
+    }
+  }
+
   const newUser = await User.create({
     firstName,
     lastName,
@@ -49,12 +70,13 @@ export async function handlerCreateUser(req, res) {
     statusID: pendingStatus.statusID,
     mfaEnabled: mfaEnabled || false,
   });
-  // END TEMP
+
   if (!newUser) {
     throw new InternalServerError(req, "Failed to create user");
   }
   const { success, message } = await newUserRegistration(newUser.userID);
   if (!success) {
+    await newUser.destroy();
     throw new InternalServerError(
       req,
       message,
@@ -63,5 +85,14 @@ export async function handlerCreateUser(req, res) {
     );
   }
 
-  respondWithJson(res, HTTPCodes.CREATED, { data: newUser });
+  const createdUser = {
+    email: newUser.email,
+    firstName: newUser.firstName,
+    lastName: newUser.lastName,
+    roleID: newUser.roleID,
+    mfaEnabled: newUser.mfaEnabled,
+    statusID: newUser.statusID,
+  };
+
+  respondWithJson(res, HTTPCodes.CREATED, { data: createdUser });
 }

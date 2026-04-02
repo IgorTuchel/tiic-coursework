@@ -53,6 +53,7 @@ const cfg = {
   redisHost: getFromEnv("REDIS_HOST"),
   redisPort: getFromEnv("REDIS_PORT"),
 
+  adminEmail: getFromEnv("ADMIN_EMAIL"),
   errorLogFile: await generateErrorLog(),
 };
 

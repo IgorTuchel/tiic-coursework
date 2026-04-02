@@ -133,28 +133,32 @@ export async function handlerLogin(req, res) {
     }
   }
 
-  // Set the user's session
-  req.session.regenerate((err) => {
-    if (err) {
-      console.error("Session regeneration error:", err);
-      throw new InternalServerError(
-        req,
-        "Failed to create session",
-        StatusCodes.LOGIN_FAILURE,
-        true,
-      );
-    }
-    req.session.userID = dbUser.userID;
-    req.session.roleID = dbUser.roleID;
-
-    respondWithJson(res, HTTPCodes.OK, {
-      message: "Login successful",
-      data: {
-        email: dbUser.email,
-        role: dbRole.roleName,
-        firstName: dbUser.firstName,
-        lastName: dbUser.lastName,
-      },
+  // Set user sessuib
+  await new Promise((resolve, reject) => {
+    req.session.regenerate((err) => {
+      if (err)
+        return reject(
+          new InternalServerError(
+            req,
+            "Failed to create session",
+            StatusCodes.LOGIN_FAILURE,
+            true,
+          ),
+        );
+      resolve();
     });
+  });
+
+  req.session.userID = dbUser.userID;
+  req.session.roleID = dbUser.roleID;
+
+  return respondWithJson(res, HTTPCodes.OK, {
+    message: "Login successful",
+    data: {
+      email: dbUser.email,
+      role: dbRole.roleName,
+      firstName: dbUser.firstName,
+      lastName: dbUser.lastName,
+    },
   });
 }

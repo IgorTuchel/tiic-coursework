@@ -1,6 +1,7 @@
 import FaultReport from "./faultReport.js";
 import User from "./users.js";
 import { Sequelize } from "sequelize";
+import { db } from "../../config/db.js";
 
 const FaultReportAssign = db.define("FaultReportAssign", {
   userID: {
