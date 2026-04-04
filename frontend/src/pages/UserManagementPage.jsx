@@ -5,7 +5,7 @@ import UserList from "../components/UserList.jsx";
 import AccessControlInfo from "../components/AccessControlInfo.jsx";
 import MainLayout from "../layouts/MainLayout.jsx";
 
-// Page for FR14–FR15: user accounts and role-based access control (frontend)
+// Page for FR14–FR15: user accounts and role-based access control 
 function UserManagementPage() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);

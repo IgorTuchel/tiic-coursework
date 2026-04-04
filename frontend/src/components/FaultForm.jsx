@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast"; // Import the toast library
 
 function FaultForm({ markerId, onCreated }) {
   const [form, setForm] = useState({
@@ -8,7 +9,6 @@ function FaultForm({ markerId, onCreated }) {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -31,12 +31,16 @@ function FaultForm({ markerId, onCreated }) {
       console.log("Create fault (mock)", payload);
       onCreated && onCreated({ id: Date.now().toString(), ...payload, status: "open" });
 
+      // Reset form
       setForm({ title: "", description: "", severity: "medium" });
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      
+      // Trigger the global success toast
+      toast.success(`Fault successfully logged for Marker #${markerId}!`);
+
     } catch (err) {
       console.error(err);
       setError("Failed to create fault.");
+      toast.error("Failed to save fault."); // Error toast
     } finally {
       setSaving(false);
     }
@@ -94,13 +98,8 @@ function FaultForm({ markerId, onCreated }) {
         </label>
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-rose-500 text-sm">{error}</p>}
 
-      {showSuccess && (
-        <div className="text-green-400 bg-slate-800 border border-green-500 rounded px-3 py-2 text-sm">
-          ✅ Fault successfully logged for Marker #{markerId}!
-        </div>
-      )}
 
       <button
         type="submit"

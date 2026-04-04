@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast"; 
 
 const INITIAL_TOOLS = [
   { id: 1, name: "Torque Wrench", required: true, scanned: false },
@@ -57,6 +58,9 @@ function ToolScanner() {
             prevTools.map((t) => (t.required ? { ...t, scanned: true } : t))
           );
           setIsScanning(false);
+          // Trigger the global success toast
+          toast.success("Required tools successfully verified!");
+          
           return 0;
         }
         return prev - 1;

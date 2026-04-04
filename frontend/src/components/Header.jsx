@@ -7,7 +7,7 @@ function Header() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-  // NEW: Security Check! Only admins get to see the user management stuff.
+  // Only admins get to see the user management stuff.
   const isAdmin = username === "SystemAdministrator";
 
   const handleLogout = () => {
@@ -59,7 +59,7 @@ function Header() {
               Tool Check
             </NavLink>
             
-            {/* FIX: The Users tab is now protected! */}
+            {/* The Users tab is now protected! */}
             {isAdmin && (
               <NavLink to="/users" className={({ isActive }) => isActive ? "text-white font-semibold border-b-2 border-sky-500 pb-1" : "text-slate-400 hover:text-white pb-1 transition-colors"}>
                 Users
@@ -86,7 +86,7 @@ function Header() {
           <NavLink to="/ar" onClick={() => setOpen(false)} className="text-slate-300 py-2 hover:text-white transition-colors">AR Scanner</NavLink>
           <NavLink to="/check-tools" onClick={() => setOpen(false)} className="text-slate-300 py-2 hover:text-white transition-colors">Tool Check</NavLink>
           
-          {/* FIX: Mobile Users tab is also protected! */}
+          {/* Mobile Users tab is also protected! */}
           {isAdmin && (
             <NavLink to="/users" onClick={() => setOpen(false)} className="text-slate-300 py-2 hover:text-white transition-colors">Users</NavLink>
           )}

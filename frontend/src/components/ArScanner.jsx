@@ -51,7 +51,7 @@ function ArScanner({ selectedMarkerId, onMarkerChange }) {
           className="w-full h-full object-cover"
         />
 
-        {/* FIX: Red box now uses inset-0 to snap to the exact edges of the container */}
+        {/* Red box now uses inset-0 to snap to the exact edges of the container */}
         <div className="absolute inset-0 border-2 sm:border-4 border-red-500/80 pointer-events-none rounded-md" />
       </div>
 
