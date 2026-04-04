@@ -90,18 +90,37 @@ function DashboardPage() {
           </div>
         </section>
 
-        {/* AR Marker Activity */}
-        {/* Added min-w-0 here as well for consistency */}
+        {/* AR Marker Activity Chart */}
         <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col shadow min-w-0">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-slate-100">AR Marker Activity</h2>
-            <span className="text-xs text-slate-500">Last 24 hours</span>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-sm font-semibold text-slate-100">Marker Activity</h2>
+            <span className="text-xs text-slate-500">Last 7 Days</span>
           </div>
 
-          <div className="flex-1 flex items-center justify-center">
-            <div className="h-40 w-full rounded-lg border border-dashed border-slate-700 flex items-center justify-center text-xs text-slate-500 text-center px-4">
-              Add your AR marker activity chart or mini-map here.
-            </div>
+          {/* FIX: Removed flex-1 and wrappers. Forced a hard height (h-48) so percentages work perfectly. */}
+          <div className="h-48 w-full flex items-end justify-between gap-2 border-b border-slate-800">
+            {[40, 70, 45, 90, 65, 30, 80].map((height, i) => (
+              <div 
+                key={i}
+                className="w-full max-w-[2.5rem] bg-sky-500/20 hover:bg-sky-500/40 border-t border-x border-sky-500/30 rounded-t-md transition-all duration-300 relative group"
+                style={{ height: `${height}%` }}
+              >
+                {/* Tooltip */}
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-slate-200 text-xs px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  {height} alerts
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex justify-between w-full mt-3 text-xs text-slate-500 font-medium px-1 sm:px-3">
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+            <span>Sun</span>
           </div>
         </section>
       </div>
