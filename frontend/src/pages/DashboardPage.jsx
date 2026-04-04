@@ -97,7 +97,7 @@ function DashboardPage() {
             <span className="text-xs text-slate-500">Last 7 Days</span>
           </div>
 
-          {/* FIX: Removed flex-1 and wrappers. Forced a hard height (h-48) so percentages work perfectly. */}
+          {/* Removed flex-1 and wrappers. Forced a hard height so percentages work perfectly. */}
           <div className="h-48 w-full flex items-end justify-between gap-2 border-b border-slate-800">
             {[40, 70, 45, 90, 65, 30, 80].map((height, i) => (
               <div 

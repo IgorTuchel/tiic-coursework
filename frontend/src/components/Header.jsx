@@ -2,12 +2,16 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 function Header() {
+  // For the prototype, we assume the username IS the role if no proper auth is set up yet
   const username = localStorage.getItem("username") || "SystemAdministrator";
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  // NEW: Security Check! Only admins get to see the user management stuff.
+  const isAdmin = username === "SystemAdministrator";
+
   const handleLogout = () => {
-    // Add your auth logout logic here later
+    localStorage.removeItem("username");
     navigate("/");
   };
 
@@ -15,7 +19,6 @@ function Header() {
     <header className="border-b border-slate-800 bg-slate-900 sticky top-0 z-50">
       <div className="px-4 sm:px-6 py-4 flex items-center justify-between">
         
-        {/* FIX: Replaced broken image with reliable SVG logo and explicit text colors */}
         <Link to="/dashboard" className="flex items-center gap-3 group">
           <svg
             width="28"
@@ -55,9 +58,13 @@ function Header() {
             <NavLink to="/check-tools" className={({ isActive }) => isActive ? "text-white font-semibold border-b-2 border-sky-500 pb-1" : "text-slate-400 hover:text-white pb-1 transition-colors"}>
               Tool Check
             </NavLink>
-            <NavLink to="/users" className={({ isActive }) => isActive ? "text-white font-semibold border-b-2 border-sky-500 pb-1" : "text-slate-400 hover:text-white pb-1 transition-colors"}>
-              Users
-            </NavLink>
+            
+            {/* FIX: The Users tab is now protected! */}
+            {isAdmin && (
+              <NavLink to="/users" className={({ isActive }) => isActive ? "text-white font-semibold border-b-2 border-sky-500 pb-1" : "text-slate-400 hover:text-white pb-1 transition-colors"}>
+                Users
+              </NavLink>
+            )}
           </nav>
 
           {/* Desktop User Info & Logout */}
@@ -78,7 +85,11 @@ function Header() {
           <NavLink to="/dashboard" onClick={() => setOpen(false)} className="text-slate-300 py-2 hover:text-white transition-colors">Dashboard</NavLink>
           <NavLink to="/ar" onClick={() => setOpen(false)} className="text-slate-300 py-2 hover:text-white transition-colors">AR Scanner</NavLink>
           <NavLink to="/check-tools" onClick={() => setOpen(false)} className="text-slate-300 py-2 hover:text-white transition-colors">Tool Check</NavLink>
-          <NavLink to="/users" onClick={() => setOpen(false)} className="text-slate-300 py-2 hover:text-white transition-colors">Users</NavLink>
+          
+          {/* FIX: Mobile Users tab is also protected! */}
+          {isAdmin && (
+            <NavLink to="/users" onClick={() => setOpen(false)} className="text-slate-300 py-2 hover:text-white transition-colors">Users</NavLink>
+          )}
 
           <div className="mt-2 pt-4 border-t border-slate-800 flex flex-col gap-3">
             <div className="text-xs text-slate-400">
