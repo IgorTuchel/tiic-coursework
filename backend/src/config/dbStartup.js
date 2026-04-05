@@ -119,16 +119,49 @@ export async function registerHooks() {
         mfaEnabled: false,
       },
     });
-    console.log(
-      "Created Admin User:",
-      newUser.email,
-      " with ID:",
-      newUser.userID,
-      " and RoleID:",
-      newUser.roleID,
-      " and StatusID:",
-      newUser.statusID,
-      " and Password AdminPassword123!",
-    );
+    if (created) {
+      console.log(
+        "Created Admin User:",
+        newUser.email,
+        " with ID:",
+        newUser.userID,
+        " and RoleID:",
+        newUser.roleID,
+        " and StatusID:",
+        newUser.statusID,
+        " and Password AdminPassword123!",
+      );
+    }
+    const engineerRole = await Roles.findOne({
+      where: { roleName: "Engineer" },
+    });
+    if (!engineerRole) {
+      throw new Error("Engineer role not found during database initialization");
+    }
+    const [newEngineerUser, engineerCreated] = await User.findOrCreate({
+      where: { email: cfg.engineerEmail },
+      defaults: {
+        firstName: "Engineer",
+        lastName: "User",
+        email: cfg.engineerEmail,
+        passwordHash: await hashPassword("Password123!"),
+        roleID: engineerRole.roleID,
+        statusID: userStatus.statusID,
+        mfaEnabled: false,
+      },
+    });
+    if (engineerCreated) {
+      console.log(
+        "Created Engineer User:",
+        newEngineerUser.email,
+        " with ID:",
+        newEngineerUser.userID,
+        " and RoleID:",
+        newEngineerUser.roleID,
+        " and StatusID:",
+        newEngineerUser.statusID,
+        " and Password Password123!",
+      );
+    }
   });
 }

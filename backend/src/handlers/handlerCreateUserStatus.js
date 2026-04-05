@@ -30,8 +30,14 @@ export async function handlerCreateUserStatus(req, res) {
     throw new BadRequestError(req, "Status name is required");
   }
 
+  const existingStatus = await Status.findOne({ where: { statusName: name } });
+  if (existingStatus) {
+    throw new BadRequestError(req, "Status name already exists");
+  }
+
   const newStatus = await Status.create({ statusName: name });
   if (!newStatus) {
+    console.error("Failed to create user status:", newStatus);
     throw new InternalServerError(req, "Failed to create user status");
   }
 

@@ -25,5 +25,5 @@ export async function handlerGetUserStatus(req, res) {
     throw new InternalServerError(req, "Failed to retrieve user statuses");
   }
 
-  respondWithJson(res, HTTPCodes.OK, { data: status });
+  respondWithJson(res, HTTPCodes.OK, { success: true, data: status });
 }

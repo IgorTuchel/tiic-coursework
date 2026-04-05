@@ -15,7 +15,6 @@ import { newUserRegistration } from "../services/newAccount.js";
 
 export async function handlerLogin(req, res) {
   const { email, password, mfaCode = "" } = req.body;
-
   if (!email) {
     throw new BadRequestError(
       req,
