@@ -1,14 +1,13 @@
 import express from "express";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
 import statusRouter from "./statusRoutes.js";
 import { handlerCreateUser } from "../handlers/handlerCreateUser.js";
 import { handlerGetUserById } from "../handlers/handlerGetUserById.js";
 import { handlerGetSelf } from "../handlers/handlerGetSelf.js";
+import { permissionGuard } from "../middleware/permissionGuard.js";
+import { handlerGetAllUsers } from "../handlers/handlerGetAllUsers.js";
 const router = express.Router();
 
-router.get("/", (_, res) => {
-  respondWithJson(res, HTTPCodes.OK, { message: "OK" });
-});
+router.get("/", permissionGuard("canViewAllUsers"), handlerGetAllUsers);
 
 router.get("/self", handlerGetSelf);
 

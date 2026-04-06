@@ -8,8 +8,12 @@ import { permissionGuard } from "../middleware/permissionGuard.js";
 const router = express.Router();
 
 router.get("/", permissionGuard("canManageUsers"), handlerGetUserStatus);
-router.post("/", handlerCreateUserStatus);
-router.delete("/:id", handlerDeleteUserStatus);
-router.put("/:id", handlerUpdateUserStatus);
+router.post("/", permissionGuard("canManageUsers"), handlerCreateUserStatus);
+router.delete(
+  "/:id",
+  permissionGuard("canManageUsers"),
+  handlerDeleteUserStatus,
+);
+router.put("/:id", permissionGuard("canManageUsers"), handlerUpdateUserStatus);
 
 export default router;
