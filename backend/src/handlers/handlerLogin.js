@@ -158,6 +158,8 @@ export async function handlerLogin(req, res) {
       role: dbRole.roleName,
       firstName: dbUser.firstName,
       lastName: dbUser.lastName,
+      mfaEnabled: dbUser.mfaEnabled,
+      createdAt: dbUser.createdAt,
     },
   });
 }
