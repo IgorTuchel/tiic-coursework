@@ -31,7 +31,12 @@ router.put("/self", protectedRoute, handlerUpdateSelf);
 router.use("/status", statusRouter);
 
 router.get("/:id", protectedRoute, handlerGetUserById);
-
+router.delete(
+  "/:id",
+  protectedRoute,
+  permissionGuard("canManageUsers"),
+  handlerDeactivateAccount,
+);
 router.put(
   "/:id",
   protectedRoute,
