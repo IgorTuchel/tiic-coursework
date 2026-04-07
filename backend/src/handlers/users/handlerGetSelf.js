@@ -1,7 +1,7 @@
-import User from "../models/appdb/users.js";
-import { UnauthorizedError } from "../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
-import Roles from "../models/appdb/roles.js";
+import User from "../../models/appdb/users.js";
+import { UnauthorizedError } from "../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../utils/json.js";
+import Roles from "../../models/appdb/roles.js";
 
 export async function handlerGetSelf(req, res) {
   if (!req.session?.userID) {

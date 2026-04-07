@@ -4,9 +4,9 @@
  * @module handlers/handlerDeleteUserStatus
  */
 
-import { BadRequestError } from "../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
-import Status from "../models/appdb/status.js";
+import { BadRequestError } from "../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../utils/json.js";
+import Status from "../../models/appdb/status.js";
 
 /**
  * Handler for deleting a user status.

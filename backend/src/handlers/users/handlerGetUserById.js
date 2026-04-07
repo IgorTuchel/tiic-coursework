@@ -1,10 +1,10 @@
 import {
   BadRequestError,
   UnauthorizedError,
-} from "../middleware/errorHandler.js";
-import Roles from "../models/appdb/roles.js";
-import User from "../models/appdb/users.js";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
+} from "../../middleware/errorHandler.js";
+import Roles from "../../models/appdb/roles.js";
+import User from "../../models/appdb/users.js";
+import { HTTPCodes, respondWithJson } from "../../utils/json.js";
 
 export async function handlerGetUserById(req, res) {
   const { id } = req.params;

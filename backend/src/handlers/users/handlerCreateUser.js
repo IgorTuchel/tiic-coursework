@@ -1,13 +1,13 @@
-import User from "../models/appdb/users.js";
+import User from "../../models/appdb/users.js";
 import {
   BadRequestError,
   InternalServerError,
   StatusCodes,
-} from "../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
-import { newUserRegistration } from "../services/newAccount.js";
-import Status from "../models/appdb/status.js";
-import Roles from "../models/appdb/roles.js";
+} from "../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../utils/json.js";
+import { newUserRegistration } from "../../services/newAccount.js";
+import Status from "../../models/appdb/status.js";
+import Roles from "../../models/appdb/roles.js";
 
 export async function handlerCreateUser(req, res) {
   const { firstName, lastName, email, mfaEnabled, roleID } = req.body;

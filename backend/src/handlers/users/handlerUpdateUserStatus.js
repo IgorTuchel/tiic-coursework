@@ -4,9 +4,9 @@
  * @module handlers/handlerUpdateUserStatus
  */
 
-import { BadRequestError } from "../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
-import Status from "../models/appdb/status.js";
+import { BadRequestError } from "../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../utils/json.js";
+import Status from "../../models/appdb/status.js";
 
 /**
  * Handler for updating an existing user status.

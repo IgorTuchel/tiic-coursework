@@ -1,19 +1,36 @@
-import { handlerCreateUserStatus } from "../handlers/handlerCreateUserStatus.js";
-import { handlerGetUserStatus } from "../handlers/handlerGetUserStatus.js";
-import { handlerDeleteUserStatus } from "../handlers/handlerDeleteUserStatus.js";
-import { handlerUpdateUserStatus } from "../handlers/handlerUpdateUserStatus.js";
+import { handlerCreateUserStatus } from "../handlers/users/handlerCreateUserStatus.js";
+import { handlerGetUserStatus } from "../handlers/users/handlerGetUserStatus.js";
+import { handlerDeleteUserStatus } from "../handlers/users/handlerDeleteUserStatus.js";
+import { handlerUpdateUserStatus } from "../handlers/users/handlerUpdateUserStatus.js";
 import express from "express";
 import { permissionGuard } from "../middleware/permissionGuard.js";
+import { protectedRoute } from "../middleware/protectedRoute.js";
 
 const router = express.Router();
 
-router.get("/", permissionGuard("canManageUsers"), handlerGetUserStatus);
-router.post("/", permissionGuard("canManageUsers"), handlerCreateUserStatus);
+router.get(
+  "/",
+  protectedRoute,
+  permissionGuard("canManageUsers"),
+  handlerGetUserStatus,
+);
+router.post(
+  "/",
+  protectedRoute,
+  permissionGuard("canManageUsers"),
+  handlerCreateUserStatus,
+);
 router.delete(
   "/:id",
+  protectedRoute,
   permissionGuard("canManageUsers"),
   handlerDeleteUserStatus,
 );
-router.put("/:id", permissionGuard("canManageUsers"), handlerUpdateUserStatus);
+router.put(
+  "/:id",
+  protectedRoute,
+  permissionGuard("canManageUsers"),
+  handlerUpdateUserStatus,
+);
 
 export default router;

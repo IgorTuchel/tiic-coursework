@@ -6,9 +6,9 @@
 import {
   BadRequestError,
   InternalServerError,
-} from "../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
-import Status from "../models/appdb/status.js";
+} from "../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../utils/json.js";
+import Status from "../../models/appdb/status.js";
 
 /**
  * Handler for creating a new user status.

@@ -4,9 +4,9 @@
  * @module handlers/handlerGetUserStatus
  */
 
-import { InternalServerError } from "../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
-import Status from "../models/appdb/status.js";
+import { InternalServerError } from "../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../utils/json.js";
+import Status from "../../models/appdb/status.js";
 
 /**
  * Handler for retrieving all user statuses.
