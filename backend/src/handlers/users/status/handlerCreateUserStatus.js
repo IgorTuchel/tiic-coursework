@@ -6,9 +6,10 @@
 import {
   BadRequestError,
   InternalServerError,
-} from "../../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../../utils/json.js";
-import Status from "../../models/appdb/status.js";
+} from "../../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../../utils/json.js";
+import Status from "../../../models/appdb/status.js";
+import { invalidateUserStatusesCache } from "../../../services/cacheDb.js";
 
 /**
  * Handler for creating a new user status.
@@ -40,6 +41,8 @@ export async function handlerCreateUserStatus(req, res) {
     console.error("Failed to create user status:", newStatus);
     throw new InternalServerError(req, "Failed to create user status");
   }
+
+  await invalidateUserStatusesCache();
 
   respondWithJson(res, HTTPCodes.OK, { data: newStatus });
 }

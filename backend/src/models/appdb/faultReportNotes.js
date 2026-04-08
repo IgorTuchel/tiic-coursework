@@ -3,7 +3,7 @@ import ReportNotes from "./reportNotes.js";
 import { Sequelize } from "sequelize";
 import faultReportID from "./faultReport.js";
 
-const faultReportNotes = db.define("FaultReportNotes", {
+const FaultReportNotes = db.define("FaultReportNotes", {
   faultReportID: {
     type: Sequelize.UUID,
     allowNull: false,
@@ -22,4 +22,4 @@ const faultReportNotes = db.define("FaultReportNotes", {
   },
 });
 
-export default faultReportNotes;
+export default FaultReportNotes;

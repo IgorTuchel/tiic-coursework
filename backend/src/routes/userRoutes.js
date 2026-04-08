@@ -1,5 +1,5 @@
 import express from "express";
-import statusRouter from "./statusRoutes.js";
+import statusRouter from "./userStatusRoutes.js";
 import { handlerCreateUser } from "../handlers/users/handlerCreateUser.js";
 import { handlerGetUserById } from "../handlers/users/handlerGetUserById.js";
 import { handlerGetSelf } from "../handlers/users/handlerGetSelf.js";
@@ -10,6 +10,9 @@ import {
   handlerUpdateUser,
 } from "../handlers/users/handlerUpdateUser.js";
 import { protectedRoute } from "../middleware/protectedRoute.js";
+import { handlerDeactivateAccount } from "../handlers/users/handlerDeactivateAccount.js";
+import rolesRouter from "./userRolesRouter.js";
+
 const router = express.Router();
 
 router.get(
@@ -29,8 +32,14 @@ router.get("/self", protectedRoute, handlerGetSelf);
 router.put("/self", protectedRoute, handlerUpdateSelf);
 
 router.use("/status", statusRouter);
+router.use("/roles", rolesRouter);
 
-router.get("/:id", protectedRoute, handlerGetUserById);
+router.get(
+  "/:id",
+  protectedRoute,
+  permissionGuard("canViewAllUsers"),
+  handlerGetUserById,
+);
 router.delete(
   "/:id",
   protectedRoute,

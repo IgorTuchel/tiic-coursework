@@ -1,7 +1,6 @@
-import User from "../../models/appdb/users.js";
 import { UnauthorizedError } from "../../middleware/errorHandler.js";
 import { HTTPCodes, respondWithJson } from "../../utils/json.js";
-import Roles from "../../models/appdb/roles.js";
+import { getUserRoleByID, getUserByID } from "../../services/cacheDb.js";
 
 export async function handlerGetSelf(req, res) {
   if (!req.session?.userID) {
@@ -12,32 +11,25 @@ export async function handlerGetSelf(req, res) {
     throw new UnauthorizedError(req, "User role not found");
   }
 
-  const userRole = await Roles.findOne({
-    where: { roleID: req.session.roleID },
-  });
-
-  if (!userRole) {
-    throw new UnauthorizedError(req, "User role not found");
+  const userRole = await getUserRoleByID(req.session.roleID);
+  if (!userRole.success) {
+    throw new UnauthorizedError(req, userRole.message);
   }
 
-  const user = await User.findOne({
-    where: { userID: req.session.userID },
-    attributes: { exclude: ["passwordHash", "userID", "roleID"] },
-  });
-
-  if (!user) {
-    throw new UnauthorizedError(req, "User not found");
+  const user = await getUserByID(req.session.userID);
+  if (!user.success) {
+    throw new UnauthorizedError(req, user.message);
   }
 
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
     data: {
-      email: user.email,
-      role: userRole.roleName,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      mfaEnabled: user.mfaEnabled,
-      createdAt: user.createdAt,
+      email: user.data.email,
+      role: userRole.data.roleName,
+      firstName: user.data.firstName,
+      lastName: user.data.lastName,
+      mfaEnabled: user.data.mfaEnabled,
+      createdAt: user.data.createdAt,
     },
   });
 }

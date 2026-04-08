@@ -9,6 +9,13 @@ import {
 } from "../../middleware/errorHandler.js";
 import { HTTPCodes, respondWithJson } from "../../utils/json.js";
 import { handleMFA } from "../../middleware/mfaVerificationMiddleware.js";
+import {
+  getUserByID,
+  getUserRoleByID,
+  getUserStatusByID,
+  invalidateUserCache,
+} from "../../services/cacheDb.js";
+
 export async function handlerUpdateUser(req, res) {
   const { id } = req.params;
   const { firstName, lastName, mfaEnabled, roleID, statusID } = req.body;
@@ -26,21 +33,19 @@ export async function handlerUpdateUser(req, res) {
     );
   }
 
-  const user = await User.findOne({ where: { userID: id } });
-  if (!user) {
+  const user = await getUserByID(id);
+  if (!user.success) {
     throw new NotFoundError(req, "User not found");
   }
 
   if (roleID) {
-    const role = await Roles.findOne({ where: { roleID } });
-    if (!role) {
+    const role = await getUserRoleByID(roleID);
+    if (!role.success) {
       throw new BadRequestError(req, "Invalid roleID provided");
     }
-    if (role.isAdmin) {
-      const isUserAdmin = await Roles.findOne({
-        where: { roleID: req.session.roleID },
-      });
-      if (!isUserAdmin?.isAdmin) {
+    if (role.data.isAdmin) {
+      const isUserAdmin = await getUserRoleByID(req.session.roleID);
+      if (!isUserAdmin.success || !isUserAdmin.data.isAdmin) {
         throw new BadRequestError(
           req,
           "Only admin users can be assigned the admin role",
@@ -52,15 +57,19 @@ export async function handlerUpdateUser(req, res) {
   }
 
   if (statusID) {
-    const status = await Status.findOne({ where: { statusID } });
-    if (!status) {
+    const status = await getUserStatusByID(statusID);
+    if (!status.success) {
       throw new BadRequestError(req, "Invalid statusID provided");
     }
-    if (statusID != user.statusID) {
-      const usersCurrentStatus = await Status.findOne({
-        where: { statusID: user.statusID },
-      });
-      if (usersCurrentStatus?.statusName === "pending") {
+    if (statusID != user.data.statusID) {
+      const usersCurrentStatus = await getUserStatusByID(user.data.statusID);
+      if (!usersCurrentStatus.success) {
+        throw new InternalServerError(
+          req,
+          "Failed to retrieve user's current status",
+        );
+      }
+      if (usersCurrentStatus.data.statusName === "pending") {
         throw new BadRequestError(
           req,
           "Cannot update user that is not set up yet",
@@ -81,26 +90,29 @@ export async function handlerUpdateUser(req, res) {
       );
     }
   }
+  await User.update(
+    {
+      firstName: firstName || user.data.firstName,
+      lastName: lastName || user.data.lastName,
+      mfaEnabled: mfaEnabled !== undefined ? mfaEnabled : user.data.mfaEnabled,
+      roleID: roleID || user.data.roleID,
+      statusID: statusID || user.data.statusID,
+    },
+    { where: { userID: id } },
+  );
 
-  user.firstName = firstName || user.firstName;
-  user.lastName = lastName || user.lastName;
-  user.mfaEnabled =
-    mfaEnabled !== undefined ? user.mfaEnabled : user.mfaEnabled;
-  user.roleID = roleID || user.roleID;
-  user.statusID = statusID || user.statusID;
-
-  const updatedUser = await user.save();
+  await invalidateUserCache(id);
 
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
     message: "User updated successfully",
     data: {
-      email: updatedUser.email,
-      firstName: updatedUser.firstName,
-      lastName: updatedUser.lastName,
-      mfaEnabled: updatedUser.mfaEnabled,
-      roleID: updatedUser.roleID,
-      statusID: updatedUser.statusID,
+      email: user.data.email,
+      firstName: firstName || user.data.firstName,
+      lastName: lastName || user.data.lastName,
+      mfaEnabled: mfaEnabled !== undefined ? mfaEnabled : user.data.mfaEnabled,
+      roleID: roleID || user.data.roleID,
+      statusID: statusID || user.data.statusID,
     },
   });
 }
@@ -117,8 +129,8 @@ export async function handlerUpdateSelf(req, res) {
     );
   }
 
-  const user = await User.findOne({ where: { userID: req.session.userID } });
-  if (!user) {
+  const user = await getUserByID(req.session.userID);
+  if (!user.success) {
     throw new NotFoundError(req, "User not found");
   }
 
@@ -131,11 +143,11 @@ export async function handlerUpdateSelf(req, res) {
         true,
       );
     }
-    if (mfaEnabled === !user.mfaEnabled) {
+    if (mfaEnabled === !user.data.mfaEnabled) {
       const { success, data } = await handleMFA(
         mfaCode,
-        user.userID,
-        user.email,
+        user.data.userID,
+        user.data.email,
       );
       if (!success) {
         if (data.code === HTTPCodes.FORBIDDEN) {
@@ -164,21 +176,25 @@ export async function handlerUpdateSelf(req, res) {
     }
   }
 
-  user.firstName = firstName || user.firstName;
-  user.lastName = lastName || user.lastName;
-  user.mfaEnabled =
-    mfaEnabled !== undefined ? user.mfaEnabled : user.mfaEnabled;
+  await User.update(
+    {
+      firstName: firstName || user.data.firstName,
+      lastName: lastName || user.data.lastName,
+      mfaEnabled: mfaEnabled !== undefined ? mfaEnabled : user.data.mfaEnabled,
+    },
+    { where: { userID: req.session.userID } },
+  );
 
-  const updatedUser = await user.save();
+  await invalidateUserCache(req.session.userID);
 
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
     message: "User updated successfully",
     data: {
-      email: updatedUser.email,
-      firstName: updatedUser.firstName,
-      lastName: updatedUser.lastName,
-      mfaEnabled: updatedUser.mfaEnabled,
+      email: user.data.email,
+      firstName: firstName || user.data.firstName,
+      lastName: lastName || user.data.lastName,
+      mfaEnabled: mfaEnabled !== undefined ? mfaEnabled : user.data.mfaEnabled,
     },
   });
 }

@@ -4,9 +4,10 @@
  * @module handlers/handlerUpdateUserStatus
  */
 
-import { BadRequestError } from "../../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../../utils/json.js";
-import Status from "../../models/appdb/status.js";
+import { BadRequestError } from "../../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../../utils/json.js";
+import Status from "../../../models/appdb/status.js";
+import { invalidateUserStatusesCache } from "../../../services/cacheDb.js";
 
 /**
  * Handler for updating an existing user status.
@@ -39,6 +40,8 @@ export async function handlerUpdateUserStatus(req, res) {
   if (!updatedStatus) {
     throw new BadRequestError(req, "Are you sure that status ID exists?");
   }
+
+  await invalidateUserStatusesCache();
 
   respondWithJson(res, HTTPCodes.OK, {
     message: "Status updated successfully",

@@ -8,6 +8,7 @@ import { HTTPCodes, respondWithJson } from "../../utils/json.js";
 import { newUserRegistration } from "../../services/newAccount.js";
 import Status from "../../models/appdb/status.js";
 import Roles from "../../models/appdb/roles.js";
+import { getUserRoleByID } from "../../services/cacheDb.js";
 
 export async function handlerCreateUser(req, res) {
   const { firstName, lastName, email, mfaEnabled, roleID } = req.body;
@@ -38,8 +39,8 @@ export async function handlerCreateUser(req, res) {
     );
   }
 
-  const role = await Roles.findOne({ where: { roleID: roleID } });
-  if (!role) {
+  const { success: roleSuccess, data: role } = await getUserRoleByID(roleID);
+  if (!roleSuccess) {
     throw new BadRequestError(
       req,
       "Invalid roleID provided",
@@ -49,10 +50,8 @@ export async function handlerCreateUser(req, res) {
   }
 
   if (role.isAdmin) {
-    const isUserAdmin = await Roles.findOne({
-      where: { roleID: req.session.roleID },
-    });
-    if (!isUserAdmin.isAdmin) {
+    const isUserAdmin = await getUserRoleByID(req.session.roleID);
+    if (!isUserAdmin.success || !isUserAdmin.data.isAdmin) {
       throw new BadRequestError(
         req,
         "Only admin users can be assigned the admin role",
