@@ -16,7 +16,6 @@ function ResetPasswordPage() {
     document.title = "Reset Password | Inspectra";
   }, []);
 
-  // Password Strength Calculation 
   const calculateStrength = (pwd) => {
     let score = 0;
     if (!pwd) return 0;
@@ -72,25 +71,53 @@ function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen flex bg-slate-950 text-slate-100">
+      
+      {/* Desktop Left Side */}
       <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
         <div className="flex items-center gap-4 mb-6">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 text-slate-900">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-12 h-12 text-slate-900"
+          >
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
           </svg>
-          <h1 className="text-4xl font-semibold text-slate-900 tracking-wide uppercase">Inspectra</h1>
+          <h1 className="text-4xl font-semibold text-slate-900 tracking-wide uppercase">
+            Inspectra
+          </h1>
         </div>
-        <p className="text-slate-900/80 text-lg mb-8">Choose a new password for your maintenance console.</p>
-        <p className="max-w-md text-slate-900/80">This link is tied to your work email. Keep your new password secure and do not share it.</p>
+
+        <p className="text-slate-900/80 text-lg mb-8">
+          Choose a new password for your maintenance console.
+        </p>
+        <p className="max-w-md text-slate-900/80">
+          This link is tied to your work email. Keep your new password secure and do not share it.
+        </p>
       </div>
 
+      {/* Form Side */}
       <div className="flex-1 flex items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-md">
           <div className="mb-8 md:hidden">
             <div className="flex items-center gap-3 mb-3">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-sky-500">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-10 h-10 text-sky-500"
+              >
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
-              <h1 className="text-3xl font-semibold text-slate-100 tracking-wide uppercase">Inspectra</h1>
+              <h1 className="text-3xl font-semibold text-slate-100 tracking-wide uppercase">
+                Inspectra
+              </h1>
             </div>
             <p className="text-slate-400 text-sm">Maintenance Console</p>
           </div>

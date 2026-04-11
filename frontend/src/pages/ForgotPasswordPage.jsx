@@ -1,14 +1,16 @@
 // src/pages/ForgotPasswordPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import api from "../lib/api"
-import logo from '../assets/hero.png';
-
+import api from "../lib/api";
 
 function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    document.title = "Forgot Password | Inspectra";
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,61 +18,76 @@ function ForgotPasswordPage() {
     try {
       // TODO: replace with real backend route, e.g. POST /api/users/forgot-password
       await api.get("/ping");
-      toast.success("If that account exists, a reset link has been sent.");
+      toast.success("If that email is registered, a reset link has been sent.");
+      setEmail("");
     } catch (err) {
-      const msg =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to request reset";
-      toast.error(msg);
+      toast.error("Failed to send reset link.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-     <div className="min-h-screen flex bg-slate-950 text-slate-100">
-  <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
-    <div className="flex items-center gap-3 mb-6">
-      <img 
-        src={logo} 
-        alt="inseactra logo" 
-        className="w-16 h-16 object-contain"
-      />
-      <h1 className="text-4xl font-semibold text-slate-900">inseactra</h1>
-    </div>
+    <div className="min-h-screen flex bg-slate-950 text-slate-100">
+      
+      {/* Desktop Left Side */}
+      <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
+        <div className="flex items-center gap-4 mb-6">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-12 h-12 text-slate-900"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+          <h1 className="text-4xl font-semibold text-slate-900 tracking-wide uppercase">
+            Inspectra
+          </h1>
+        </div>
 
         <p className="text-slate-900/80 text-lg mb-8">
-          Reset your maintenance console password.
+          Account Recovery
         </p>
         <p className="max-w-md text-slate-900/80">
-          Use your work email address and we will send a secure link to create
-          a new password.
+          Enter your work email address to receive a secure password reset link. 
+          If you continue to experience issues, contact the System Administrator.
         </p>
       </div>
 
+      {/* Form Side */}
       <div className="flex-1 flex items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-md">
           <div className="mb-8 md:hidden">
-            <div className="text-xs font-semibold tracking-widest text-sky-400 mb-2">
-              AR
+            <div className="flex items-center gap-3 mb-3">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-10 h-10 text-sky-500"
+              >
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+              <h1 className="text-3xl font-semibold text-slate-100 tracking-wide uppercase">
+                Inspectra
+              </h1>
             </div>
-            <h1 className="text-3xl font-semibold">Inspectra</h1>
-            <p className="text-slate-400 text-sm">Maintenance Console</p>
+            <p className="text-slate-400 text-sm">Account Recovery</p>
           </div>
 
-          <h2 className="text-2xl font-semibold mb-1">Reset password</h2>
+          <h2 className="text-2xl font-semibold mb-1">Reset your password</h2>
           <p className="text-sm text-slate-400 mb-6">
-            Enter your work email and we&apos;ll send you a reset link.
+            Enter your work email and we will send you a reset link.
           </p>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-slate-200 mb-1"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-slate-200 mb-1">
                 Work email
               </label>
               <input
@@ -94,10 +111,7 @@ function ForgotPasswordPage() {
           </form>
 
           <p className="mt-6 text-xs text-slate-500">
-            Remembered your password?{" "}
-            <Link to="/" className="text-sky-400 hover:text-sky-300">
-              Back to login
-            </Link>
+            Back to <Link to="/" className="text-sky-400 hover:text-sky-300">login</Link>
           </p>
         </div>
       </div>
