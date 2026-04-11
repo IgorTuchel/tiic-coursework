@@ -1,26 +1,26 @@
 // src/pages/DashboardPage.jsx
 import MainLayout from "../layouts/MainLayout";
 
-
 function DashboardPage() {
   return (
     <MainLayout title="Dashboard">
+      
       {/* Top Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow hover:shadow-lg transition">
-          <div className="text-xs font-medium text-slate-400 mb-1">Active faults</div>
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 cursor-default group">
+          <div className="text-xs font-medium text-slate-400 mb-1 group-hover:text-sky-400 transition-colors">Active faults</div>
           <div className="text-3xl font-bold text-slate-100 mb-1">12</div>
           <div className="text-xs text-amber-400">+3 today · high on markers 21 & 42</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow hover:shadow-lg transition">
-          <div className="text-xs font-medium text-slate-400 mb-1">Tools ready</div>
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 cursor-default group">
+          <div className="text-xs font-medium text-slate-400 mb-1 group-hover:text-sky-400 transition-colors">Tools ready</div>
           <div className="text-3xl font-bold text-slate-100 mb-1">94%</div>
           <div className="text-xs text-amber-300">3 kits missing calibration</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow hover:shadow-lg transition">
-          <div className="text-xs font-medium text-slate-400 mb-1">Open alerts</div>
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 cursor-default group">
+          <div className="text-xs font-medium text-slate-400 mb-1 group-hover:text-sky-400 transition-colors">Open alerts</div>
           <div className="text-3xl font-bold text-slate-100 mb-1">5</div>
           <div className="text-xs text-rose-300">1 critical, 4 warning</div>
         </div>
@@ -30,58 +30,56 @@ function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-[2fr,1.2fr]">
         
         {/* Fault List */}
-        {/* Added min-w-0 to prevent table from breaking the grid on mobile */}
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow min-w-0">
+        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-100">Fault List</h2>
             <span className="text-xs text-slate-500">Live feed from AR markers</span>
           </div>
 
           <div className="overflow-x-auto w-full pb-2">
-            {/* Added whitespace-nowrap so text doesn't squish together */}
             <table className="w-full text-sm whitespace-nowrap">
               <thead className="text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="text-left py-2 pr-4">Marker</th>
-                  <th className="text-left py-2 pr-4">Location</th>
-                  <th className="text-left py-2 pr-4">Severity</th>
-                  <th className="text-left py-2 pr-4">Detected</th>
-                  <th className="text-left py-2">Status</th>
+                  <th className="text-left py-2 pr-4 font-medium">Marker</th>
+                  <th className="text-left py-2 pr-4 font-medium">Location</th>
+                  <th className="text-left py-2 pr-4 font-medium">Severity</th>
+                  <th className="text-left py-2 pr-4 font-medium">Detected</th>
+                  <th className="text-left py-2 font-medium">Status</th>
                 </tr>
               </thead>
 
               <tbody className="divide-y divide-slate-800">
-                <tr className="hover:bg-slate-800 transition">
-                  <td className="py-2 pr-4 font-mono text-sky-300">#21</td>
-                  <td className="py-2 pr-4">Line A · Station 4</td>
-                  <td className="py-2 pr-4 text-rose-400">High</td>
-                  <td className="py-2 pr-4">Today · 09:14</td>
-                  <td className="py-2">
-                    <span className="inline-flex rounded-full bg-rose-500/20 text-rose-300 px-2 py-0.5 text-xs font-medium">
+                <tr className="hover:bg-slate-800/50 transition-colors">
+                  <td className="py-2.5 pr-4 font-mono text-sky-300">#21</td>
+                  <td className="py-2.5 pr-4 text-slate-200">Line A · Station 4</td>
+                  <td className="py-2.5 pr-4 text-rose-400 font-medium">High</td>
+                  <td className="py-2.5 pr-4 text-slate-400">Today · 09:14</td>
+                  <td className="py-2.5">
+                    <span className="inline-flex rounded-full bg-rose-500/15 text-rose-300 px-2.5 py-0.5 text-[11px] font-medium tracking-wide">
                       Awaiting intervention
                     </span>
                   </td>
                 </tr>
 
-                <tr className="hover:bg-slate-800 transition">
-                  <td className="py-2 pr-4 font-mono text-sky-300">#42</td>
-                  <td className="py-2 pr-4">Line B · Station 2</td>
-                  <td className="py-2 pr-4 text-amber-300">Medium</td>
-                  <td className="py-2 pr-4">Today · 08:51</td>
-                  <td className="py-2">
-                    <span className="inline-flex rounded-full bg-amber-500/20 text-amber-200 px-2 py-0.5 text-xs font-medium">
+                <tr className="hover:bg-slate-800/50 transition-colors">
+                  <td className="py-2.5 pr-4 font-mono text-sky-300">#42</td>
+                  <td className="py-2.5 pr-4 text-slate-200">Line B · Station 2</td>
+                  <td className="py-2.5 pr-4 text-amber-300 font-medium">Medium</td>
+                  <td className="py-2.5 pr-4 text-slate-400">Today · 08:51</td>
+                  <td className="py-2.5">
+                    <span className="inline-flex rounded-full bg-amber-500/15 text-amber-200 px-2.5 py-0.5 text-[11px] font-medium tracking-wide">
                       Technician dispatched
                     </span>
                   </td>
                 </tr>
 
-                <tr className="hover:bg-slate-800 transition">
-                  <td className="py-2 pr-4 font-mono text-sky-300">#07</td>
-                  <td className="py-2 pr-4">Line A · Station 1</td>
-                  <td className="py-2 pr-4 text-emerald-300">Low</td>
-                  <td className="py-2 pr-4">Yesterday · 17:03</td>
-                  <td className="py-2">
-                    <span className="inline-flex rounded-full bg-emerald-500/20 text-emerald-200 px-2 py-0.5 text-xs font-medium">
+                <tr className="hover:bg-slate-800/50 transition-colors">
+                  <td className="py-2.5 pr-4 font-mono text-sky-300">#07</td>
+                  <td className="py-2.5 pr-4 text-slate-200">Line A · Station 1</td>
+                  <td className="py-2.5 pr-4 text-emerald-300 font-medium">Low</td>
+                  <td className="py-2.5 pr-4 text-slate-400">Yesterday · 17:03</td>
+                  <td className="py-2.5">
+                    <span className="inline-flex rounded-full bg-emerald-500/15 text-emerald-200 px-2.5 py-0.5 text-[11px] font-medium tracking-wide">
                       Resolved
                     </span>
                   </td>
@@ -92,13 +90,12 @@ function DashboardPage() {
         </section>
 
         {/* AR Marker Activity Chart */}
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col shadow min-w-0">
+        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 min-w-0">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-sm font-semibold text-slate-100">Marker Activity</h2>
             <span className="text-xs text-slate-500">Last 7 Days</span>
           </div>
 
-          {/* Removed flex-1 and wrappers. Forced a hard height so percentages work perfectly. */}
           <div className="h-48 w-full flex items-end justify-between gap-2 border-b border-slate-800">
             {[40, 70, 45, 90, 65, 30, 80].map((height, i) => (
               <div 
