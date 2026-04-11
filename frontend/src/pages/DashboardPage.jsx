@@ -1,9 +1,10 @@
 // src/pages/DashboardPage.jsx
 import MainLayout from "../layouts/MainLayout";
 
+
 function DashboardPage() {
   return (
-    <MainLayout>
+    <MainLayout title="Dashboard">
       {/* Top Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow hover:shadow-lg transition">

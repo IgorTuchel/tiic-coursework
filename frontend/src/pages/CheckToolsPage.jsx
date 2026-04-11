@@ -4,7 +4,7 @@ import ToolScanner from "../components/ToolScanner";
 
 function CheckToolsPage() {
   return (
-    <MainLayout>
+    <MainLayout title="Tool Check">
       <div className="space-y-6">
         <h2 className="text-xl font-semibold">Tool Check</h2>
         <p className="text-sm text-slate-400">

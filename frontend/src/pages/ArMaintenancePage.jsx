@@ -13,7 +13,7 @@ function ArMaintenancePage() {
   };
 
   return (
-    <MainLayout>
+    <MainLayout title="AR Scanner">
       <div className="space-y-6">
         <h2 className="text-xl font-semibold">AR Maintenance</h2>
         <p className="text-sm text-slate-400">Scan environment and attach faults to AR markers.</p>
