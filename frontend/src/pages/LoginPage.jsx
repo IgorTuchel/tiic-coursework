@@ -2,9 +2,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import api from "../lib/api"
-import logo from '../assets/hero.png';
-
+import api from "../lib/api";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -19,9 +17,9 @@ function LoginPage() {
     setLoading(true);
     try {
       // TODO: replace with real backend login route when implemented.
-      // Example target: POST /api/users/login
+      // Mock login route
       const res = await api.get("/ping");
-      toast.success("Logged in (mock): " + res.data.message);
+      toast.success("Logged in successfully!");
       navigate("/dashboard");
     } catch (err) {
       const msg =
@@ -37,44 +35,64 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-slate-950 text-slate-100">
-  <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
-    <div className="flex items-center gap-3 mb-6">
-      <img 
-        src={logo} 
-        alt="inspectra logo" 
-        className="w-16 h-16 object-contain"
-      />
-      <h1 className="text-4xl font-semibold text-slate-900">inspectra</h1>
-    </div>
-
-    <p className="text-slate-900/80 text-lg mb-8">
-      Maintenance Console
-    </p>
-    <p className="max-w-md text-slate-900/80">
-      Secure access for authorised maintenance staff. Monitor active
-      faults, schedule interventions, and keep tool kits in top shape from
-      a single pane of glass.
-    </p>
-  </div>
-
-  <div className="flex-1 flex items-center justify-center p-6 md:p-10">
-    <div className="w-full max-w-md">
-      <div className="mb-8 md:hidden">
-        <div className="flex items-center gap-2 mb-3">
-          <img 
-            src={logo} 
-            alt="inspectra logo" 
-            className="w-12 h-12 object-contain"
-          />
-          <h1 className="text-3xl font-semibold text-slate-100">inspectra</h1>
+      
+      {/* Desktop Left Side */}
+      <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
+        
+        <div className="flex items-center gap-4 mb-6">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-12 h-12 text-slate-900"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+          <h1 className="text-4xl font-semibold text-slate-900 tracking-wide uppercase">
+            Inspectra
+          </h1>
         </div>
-        <p className="text-slate-400 text-sm">Maintenance Console</p>
+
+        <p className="text-slate-900/80 text-lg mb-8">
+          Maintenance Console
+        </p>
+        <p className="max-w-md text-slate-900/80">
+          Secure access for authorised maintenance staff. Monitor active
+          faults, schedule interventions, and keep tool kits in top shape from
+          a single pane of glass.
+        </p>
       </div>
 
-      <h2 className="text-2xl font-semibold mb-1">Sign in</h2>
-      <p className="text-sm text-slate-400 mb-6">
-        Use your work email and maintenance console password.
-      </p>
+      {/* Login Form Side */}
+      <div className="flex-1 flex items-center justify-center p-6 md:p-10">
+        <div className="w-full max-w-md">
+          <div className="mb-8 md:hidden">
+            <div className="flex items-center gap-3 mb-3">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-10 h-10 text-sky-500"
+              >
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+              <h1 className="text-3xl font-semibold text-slate-100 tracking-wide uppercase">
+                Inspectra
+              </h1>
+            </div>
+            <p className="text-slate-400 text-sm">Maintenance Console</p>
+          </div>
+
+          <h2 className="text-2xl font-semibold mb-1">Sign in</h2>
+          <p className="text-sm text-slate-400 mb-6">
+            Use your work email and maintenance console password.
+          </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
