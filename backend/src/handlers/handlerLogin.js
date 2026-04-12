@@ -13,7 +13,6 @@ import {
   getUserByEmail,
   getUserRoleByID,
   getUserStatusByID,
-  invalidateUserCache,
 } from "../services/cacheDb.js";
 
 export async function handlerLogin(req, res) {

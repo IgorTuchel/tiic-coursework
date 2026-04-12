@@ -2,14 +2,16 @@ import {
   BadRequestError,
   InternalServerError,
   NotFoundError,
-} from "../../utils/errors.js";
-import { respondWithJson, HTTPCodes } from "../../utils/json.js";
-import FaultReport from "../../models/appdb/faultReport.js";
-import ReportNotes from "../../models/appdb/reportNotes.js";
-import FaultReportNotes from "../../models/appdb/faultReportNotes.js";
+} from "../../../middleware/errorHandler.js";
+import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
+import FaultReport from "../../../models/appdb/faultReport.js";
+import ReportNotes from "../../../models/appdb/reportNotes.js";
+import FaultReportNotes from "../../../models/appdb/faultReportNotes.js";
+import { userAssignedToFaultReport } from "../../../services/workOnReport.js";
+import { getUserRoleByID } from "../../../services/cacheDb.js";
 
 export async function handlerCreateFaultReportNote(req, res) {
-  const { faultReportID } = req.params;
+  const { id } = req.params;
   const { title, content } = req.body;
 
   if (!title || !content) {
@@ -17,21 +19,29 @@ export async function handlerCreateFaultReportNote(req, res) {
   }
 
   const faultReport = await FaultReport.findOne({
-    where: { faultReportID },
+    where: { faultReportID: id },
   });
   if (!faultReport) {
     throw new NotFoundError(req, "Fault report not found");
   }
 
-  const requestedUserRole = await Roles.findOne({
-    where: { roleID: req.session.roleID },
-  });
-
-  if (!requestedUserRole) {
+  const requestedUserRole = await getUserRoleByID(req.session.roleID);
+  if (!requestedUserRole.success) {
     throw new NotFoundError(req, "User role not found");
   }
 
-  if (faultReport.createdBy !== req.session.userID || !requestedUserRole.isAdmin || !requestedUserRole.canMangeFaults) {
+  if (
+    !faultReport.createdBy == req.session.userID ||
+    !requestedUserRole.data.isAdmin ||
+    !requestedUserRole.data.canManageFaults ||
+    !userAssignedToFaultReport(req.session.userID, id)
+  ) {
+    console.log(requestedUserRole.data);
+    throw new BadRequestError(
+      req,
+      "You do not have permission to add notes to this fault report",
+    );
+  }
 
   const newNote = await ReportNotes.create({
     title,
@@ -44,7 +54,7 @@ export async function handlerCreateFaultReportNote(req, res) {
   }
 
   const faultReportNotes = await FaultReportNotes.create({
-    faultReportID,
+    faultReportID: id,
     reportNoteID: newNote.reportNoteID,
   });
 

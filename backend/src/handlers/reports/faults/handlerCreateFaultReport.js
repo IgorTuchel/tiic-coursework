@@ -1,5 +1,3 @@
-import ReportStatus from "../../../models/appdb/reportStatus.js";
-import SeverityLevel from "../../../models/appdb/severityLevel.js";
 import { respondWithJson } from "../../../utils/json.js";
 import { HTTPCodes } from "../../../utils/json.js";
 import {
@@ -7,6 +5,10 @@ import {
   InternalServerError,
 } from "../../../middleware/errorHandler.js";
 import FaultReport from "../../../models/appdb/faultReport.js";
+import {
+  getReportStatuses,
+  getSeverityLevelByID,
+} from "../../../services/cacheDb.js";
 
 export async function handlerCreateFaultReport(req, res) {
   const { name, description, severity } = req.body;
@@ -15,20 +17,22 @@ export async function handlerCreateFaultReport(req, res) {
     throw new BadRequestError(req, "Missing required fields");
   }
 
-  const reportStatus = await ReportStatus.findOne({
-    where: { statusName: "open" },
-  });
-  if (!reportStatus) {
-    throw new InternalServerError(
-      req,
-      "Open report status not found in database",
-    );
-  }
+  const reportStatus = await getReportStatuses()
+    .then((res) => {
+      if (!res.success) {
+        throw new InternalServerError(
+          req,
+          "Failed to retrieve report statuses",
+        );
+      }
+      return res.data.find((status) => status.statusName === "open");
+    })
+    .catch((err) => {
+      throw new InternalServerError(req, "Failed to retrieve report statuses");
+    });
 
-  const severityLevel = await SeverityLevel.findOne({
-    where: { levelName: severity },
-  });
-  if (!severityLevel) {
+  const severityLevel = await getSeverityLevelByID(severity);
+  if (!severityLevel.success) {
     throw new BadRequestError(req, "Invalid severity level provided");
   }
 
@@ -36,7 +40,7 @@ export async function handlerCreateFaultReport(req, res) {
     name,
     description,
     reportStatus: reportStatus.reportStatusID,
-    severityLevel: severityLevel.severityLevelID,
+    severityLevel: severityLevel.data.severityLevelID,
     createdBy: req.session.userID,
   });
 
@@ -50,7 +54,7 @@ export async function handlerCreateFaultReport(req, res) {
       name: newFaultReport.name,
       description: newFaultReport.description,
       reportStatus: reportStatus.statusName,
-      severityLevel: severityLevel.levelName,
+      severityLevel: severityLevel.data.severityLevelName,
       createdBy: req.session.userID,
     },
   });

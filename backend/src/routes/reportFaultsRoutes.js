@@ -1,8 +1,8 @@
 import express from "express";
-import { handlerCreateFaultReport } from "../handlers/reports/faults/handlerCreateFaultReport";
-import { handlerCreateFaultReportNote } from "../handlers/reports/faults/handlerCreateFaultReportNote";
-import { protectedRoute } from "../middleware/protectedRoute";
-import { permissionGuard } from "../middleware/permissionGuard";
+import { handlerCreateFaultReport } from "../handlers/reports/faults/handlerCreateFaultReport.js";
+import { handlerCreateFaultReportNote } from "../handlers/reports/faults/handlerCreateFaultReportNote.js";
+import { protectedRoute } from "../middleware/protectedRoute.js";
+import { permissionGuard } from "../middleware/permissionGuard.js";
 
 const router = express.Router();
 
@@ -14,8 +14,10 @@ router.post(
 );
 
 router.post(
-  "/:id",
+  "/:id/notes",
   protectedRoute,
   permissionGuard("canSuggestFaults"),
   handlerCreateFaultReportNote,
 );
+
+export default router;

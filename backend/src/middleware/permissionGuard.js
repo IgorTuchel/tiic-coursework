@@ -1,5 +1,5 @@
 import { ForbiddenError, StatusCodes } from "./errorHandler.js";
-import Roles from "../models/appdb/roles.js";
+import { getUserRoleByID } from "../services/cacheDb.js";
 
 export function permissionGuard(requiredPermissions) {
   return async (req, res, next) => {
@@ -21,8 +21,8 @@ export function permissionGuard(requiredPermissions) {
         false,
       );
     }
-    const role = await Roles.findOne({ where: { roleID: userRole } });
-    if (!role) {
+    const role = await getUserRoleByID(userRole);
+    if (!role.success) {
       throw new ForbiddenError(
         req,
         "User role not found",
@@ -30,10 +30,10 @@ export function permissionGuard(requiredPermissions) {
         false,
       );
     }
-    if (role.isAdmin) {
+    if (role.data.isAdmin) {
       return next();
     }
-    if (!role[requiredPermissions]) {
+    if (!role.data[requiredPermissions]) {
       throw new ForbiddenError(
         req,
         "User does not have required permissions",
