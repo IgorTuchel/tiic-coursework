@@ -22,4 +22,18 @@ const FaultReportAssign = db.define("FaultReportAssign", {
   },
 });
 
+FaultReport.belongsToMany(User, {
+  through: FaultReportAssign,
+  as: "assignedUsers",
+  foreignKey: "faultReportID",
+  otherKey: "userID",
+});
+
+User.belongsToMany(FaultReport, {
+  through: FaultReportAssign,
+  as: "assignedFaultReports",
+  foreignKey: "userID",
+  otherKey: "faultReportID",
+});
+
 export default FaultReportAssign;
