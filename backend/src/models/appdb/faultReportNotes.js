@@ -22,4 +22,18 @@ const FaultReportNotes = db.define("FaultReportNotes", {
   },
 });
 
+FaultReport.belongsToMany(ReportNotes, {
+  through: FaultReportNotes,
+  as: "notes",
+  foreignKey: "faultReportID",
+  otherKey: "reportNoteID",
+});
+
+ReportNotes.belongsToMany(FaultReport, {
+  through: FaultReportNotes,
+  as: "faultReports",
+  foreignKey: "reportNoteID",
+  otherKey: "faultReportID",
+});
+
 export default FaultReportNotes;

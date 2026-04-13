@@ -26,4 +26,6 @@ const ReportNotes = db.define("ReportNotes", {
   },
 });
 
+ReportNotes.belongsTo(User, { foreignKey: "createdBy", as: "createdByUser" });
+
 export default ReportNotes;

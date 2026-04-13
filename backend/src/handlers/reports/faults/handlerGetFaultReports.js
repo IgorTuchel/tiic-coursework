@@ -5,7 +5,7 @@ import User from "../../../models/appdb/users.js";
 import { Op } from "sequelize";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import { userAssignedToFaultReport } from "../../../services/workOnReport.js";
-// Handler 1, get all fault reports, if user can manage faults or other high permission return all reports, otherwise return only reports created by the user or assigned to the user
+import ReportNotes from "../../../models/appdb/reportNotes.js";
 
 export async function handlerGetFaultReports(req, res) {
   const requestedUserRole = await getUserRoleByID(req.session.roleID);
@@ -27,6 +27,25 @@ export async function handlerGetFaultReports(req, res) {
           through: { attributes: [] },
           required: false,
         },
+        {
+          model: ReportNotes,
+          as: "notes",
+          attributes: [
+            "reportNoteID",
+            "title",
+            "content",
+            "createdAt",
+            "updatedAt",
+          ],
+          include: [
+            {
+              model: User,
+              as: "createdByUser",
+              attributes: ["userID", "firstName", "email"],
+            },
+          ],
+          required: false,
+        },
       ],
       distinct: true,
     });
@@ -46,6 +65,25 @@ export async function handlerGetFaultReports(req, res) {
           through: { attributes: [] },
           required: false,
         },
+        {
+          model: ReportNotes,
+          as: "notes",
+          attributes: [
+            "reportNoteID",
+            "title",
+            "content",
+            "createdAt",
+            "updatedAt",
+          ],
+          include: [
+            {
+              model: User,
+              as: "createdByUser",
+              attributes: ["userID", "firstName", "email"],
+            },
+          ],
+          required: false,
+        },
       ],
       distinct: true,
     });
@@ -57,7 +95,6 @@ export async function handlerGetFaultReports(req, res) {
   });
 }
 
-// Handler 2, get a specific fault report by ID
 export async function handlerGetFaultReportByID(req, res) {
   const { id } = req.params;
   const requestedUserRole = await getUserRoleByID(req.session.roleID);
@@ -74,6 +111,25 @@ export async function handlerGetFaultReportByID(req, res) {
         as: "assignedUsers",
         attributes: ["userID", "firstName", "email"],
         through: { attributes: [] },
+        required: false,
+      },
+      {
+        model: ReportNotes,
+        as: "notes",
+        attributes: [
+          "reportNoteID",
+          "title",
+          "content",
+          "createdAt",
+          "updatedAt",
+        ],
+        include: [
+          {
+            model: User,
+            as: "createdByUser",
+            attributes: ["userID", "firstName", "email"],
+          },
+        ],
         required: false,
       },
     ],

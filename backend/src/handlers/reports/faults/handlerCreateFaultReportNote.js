@@ -31,9 +31,9 @@ export async function handlerCreateFaultReportNote(req, res) {
   }
 
   if (
-    !faultReport.createdBy == req.session.userID ||
-    !requestedUserRole.data.isAdmin ||
-    !requestedUserRole.data.canManageFaults ||
+    !faultReport.createdBy == req.session.userID &&
+    !requestedUserRole.data.isAdmin &&
+    !requestedUserRole.data.canManageFaults &&
     !userAssignedToFaultReport(req.session.userID, id)
   ) {
     console.log(requestedUserRole.data);
