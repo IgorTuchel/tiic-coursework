@@ -3,7 +3,10 @@ import { handlerCreateFaultReport } from "../handlers/reports/faults/handlerCrea
 import { handlerCreateFaultReportNote } from "../handlers/reports/faults/handlerCreateFaultReportNote.js";
 import { protectedRoute } from "../middleware/protectedRoute.js";
 import { permissionGuard } from "../middleware/permissionGuard.js";
-import { handlerGetFaultReports } from "../handlers/reports/faults/handlerGetFaultReports.js";
+import {
+  handlerGetFaultReportByID,
+  handlerGetFaultReports,
+} from "../handlers/reports/faults/handlerGetFaultReports.js";
 import {
   handlerAssignFaultReport,
   handlerUnassignFaultReport,
@@ -23,6 +26,13 @@ router.get(
   protectedRoute,
   permissionGuard("canSuggestFaults"),
   handlerGetFaultReports,
+);
+
+router.get(
+  "/:id",
+  protectedRoute,
+  permissionGuard("canSuggestFaults"),
+  handlerGetFaultReportByID,
 );
 
 router.post(
