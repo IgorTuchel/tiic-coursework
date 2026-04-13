@@ -11,6 +11,7 @@ import {
   handlerAssignFaultReport,
   handlerUnassignFaultReport,
 } from "../handlers/reports/faults/handlerAssignFaultReport.js";
+import { handlerUpdateFaultReport } from "../handlers/reports/faults/handlerUpdateFaultReport.js";
 
 const router = express.Router();
 
@@ -33,6 +34,13 @@ router.get(
   protectedRoute,
   permissionGuard("canSuggestFaults"),
   handlerGetFaultReportByID,
+);
+
+router.put(
+  "/:id",
+  protectedRoute,
+  permissionGuard("canSuggestFaults"),
+  handlerUpdateFaultReport,
 );
 
 router.post(
