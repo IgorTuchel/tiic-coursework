@@ -12,6 +12,7 @@ import {
   handlerUnassignFaultReport,
 } from "../handlers/reports/faults/handlerAssignFaultReport.js";
 import { handlerUpdateFaultReport } from "../handlers/reports/faults/handlerUpdateFaultReport.js";
+import { handlerUpdateFaultReportNote } from "../handlers/reports/faults/handlerUpdateFaultReportNote.js";
 
 const router = express.Router();
 
@@ -48,6 +49,13 @@ router.post(
   protectedRoute,
   permissionGuard("canSuggestFaults"),
   handlerCreateFaultReportNote,
+);
+
+router.post(
+  "/:id/notes/:noteID",
+  protectedRoute,
+  permissionGuard("canSuggestFaults"),
+  handlerUpdateFaultReportNote,
 );
 
 router.post(
