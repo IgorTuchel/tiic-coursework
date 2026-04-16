@@ -8,7 +8,7 @@ import {
 import { getUserRoleByID } from "../../../services/cacheDb.js";
 import { userAssignedToMaintenanceReport } from "../../../services/workOnReport.js";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
-import MaintenanceReportToolCheck from "../../../models/appdb/maintenanceReportToolCheck.js";
+import ToolCheck from "../../../models/appdb/toolCheck.js";
 
 export async function handlerGetMaintenanceReportByID(req, res) {
   const { id } = req.params;
@@ -59,17 +59,11 @@ export async function handlerGetMaintenanceReportByID(req, res) {
         required: false,
       },
       {
-        model: MaintenanceReportToolCheck,
-        as: "tools",
-        attributes: ["toolID"],
+        model: ToolCheck,
+        as: "toolChecks",
+        attributes: ["toolID", "name"],
+        through: { attributes: [] },
         required: false,
-        include: [
-          {
-            model: ToolCheck,
-            as: "tool",
-            attributes: ["name"],
-          },
-        ],
       },
     ],
   });
