@@ -32,6 +32,7 @@ export async function handlerGetAllMaintenanceReports(req, res) {
         {
           model: ReportNotes,
           as: "notes",
+          through: { attributes: [] },
           attributes: [
             "reportNoteID",
             "title",
@@ -77,6 +78,7 @@ export async function handlerGetAllMaintenanceReports(req, res) {
         {
           model: ReportNotes,
           as: "notes",
+          through: { attributes: [] },
           attributes: [
             "reportNoteID",
             "title",
