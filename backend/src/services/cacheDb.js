@@ -3,6 +3,7 @@ import ReportStatus from "../models/appdb/reportStatus.js";
 import Roles from "../models/appdb/roles.js";
 import SeverityLevel from "../models/appdb/severityLevel.js";
 import Status from "../models/appdb/status.js";
+import ToolCheck from "../models/appdb/toolCheck.js";
 import User from "../models/appdb/users.js";
 
 export async function getUserStatuses() {
@@ -189,4 +190,33 @@ export async function getReportStatusByID(statusID) {
 
 export async function invalidateReportStatusesCache() {
   await redisClient.del("reportStatuses");
+}
+
+export async function getTools() {
+  const storedTools = await redisClient.get("tools");
+  if (storedTools) {
+    return { success: true, data: JSON.parse(storedTools) };
+  }
+
+  const tools = await ToolCheck.findAll();
+  if (!tools || tools.length === 0) {
+    return { success: false, message: "Failed to fetch tools" };
+  }
+
+  await redisClient.setEx("tools", 3600, JSON.stringify(tools));
+  return { success: true, data: tools };
+}
+
+export async function getToolByID(toolID) {
+  const tools = await getTools();
+  if (!tools.success) {
+    return { success: false, message: "Failed to fetch tools" };
+  }
+
+  const tool = tools.data.find((t) => t.toolID === toolID);
+  if (!tool) {
+    return { success: false, message: "Tool not found" };
+  }
+
+  return { success: true, data: tool };
 }

@@ -56,7 +56,7 @@ export async function handlerUpdateFaultReportNote(req, res) {
     note.createdBy !== req.session.userID &&
     !requestedUserRole.data.isAdmin &&
     !requestedUserRole.data.canManageFaults &&
-    !userAssignedToFaultReport(req.session.userID, id)
+    !(await userAssignedToFaultReport(req.session.userID, id))
   ) {
     throw new ForbiddenError(
       req,

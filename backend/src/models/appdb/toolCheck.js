@@ -9,6 +9,7 @@ const ToolCheck = db.define("ToolCheck", {
   },
   name: {
     type: Sequelize.STRING,
+    unique: true,
     allowNull: false,
   },
 });

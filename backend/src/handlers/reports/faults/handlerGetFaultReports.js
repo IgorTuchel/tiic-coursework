@@ -139,7 +139,7 @@ export async function handlerGetFaultReportByID(req, res) {
   }
 
   if (
-    !userAssignedToFaultReport(req.session.userID, id) &&
+    !(await userAssignedToFaultReport(req.session.userID, id)) &&
     faultReport.createdBy !== req.session.userID &&
     !requestedUserRole.data.isAdmin &&
     !requestedUserRole.data.canManageFaults

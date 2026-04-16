@@ -31,10 +31,10 @@ export async function handlerCreateFaultReportNote(req, res) {
   }
 
   if (
-    !faultReport.createdBy == req.session.userID &&
+    faultReport.createdBy !== req.session.userID &&
     !requestedUserRole.data.isAdmin &&
     !requestedUserRole.data.canManageFaults &&
-    !userAssignedToFaultReport(req.session.userID, id)
+    !(await userAssignedToFaultReport(req.session.userID, id))
   ) {
     console.log(requestedUserRole.data);
     throw new BadRequestError(

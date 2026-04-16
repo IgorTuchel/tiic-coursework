@@ -32,7 +32,7 @@ import { HTTPCodes } from "../utils/json.js";
 async function createVerificationCode(userID, email) {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   await redisClient.setEx(`mfa_${userID}`, 300, code); // Code valid for 5 minutes
-
+  console.log(`Generated MFA code for user ${userID}: ${code}`);
   const { success, data } = await sendEmailWithResend(
     email,
     cfg.resendSender,

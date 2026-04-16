@@ -79,12 +79,11 @@ export async function userAssignedToMaintenanceReport(userID, reportID) {
 }
 
 export async function assignUserToMaintenanceReport(userID, reportID) {
-  const existingAssignment = await MaintenanceReportAssign.findOne({
-    where: {
-      userID,
-      maintenanceReportID: reportID,
-    },
-  });
+  const existingAssignment = await userAssignedToMaintenanceReport(
+    userID,
+    reportID,
+  );
+
   if (existingAssignment) {
     return {
       success: false,
@@ -108,12 +107,10 @@ export async function assignUserToMaintenanceReport(userID, reportID) {
 }
 
 export async function unassignUserFromMaintenanceReport(userID, reportID) {
-  const existingAssignment = await MaintenanceReportAssign.findOne({
-    where: {
-      userID,
-      maintenanceReportID: reportID,
-    },
-  });
+  const existingAssignment = await userAssignedToMaintenanceReport(
+    userID,
+    reportID,
+  );
   if (!existingAssignment) {
     return {
       success: false,
@@ -121,7 +118,12 @@ export async function unassignUserFromMaintenanceReport(userID, reportID) {
     };
   }
 
-  const deleted = await existingAssignment.destroy();
+  const deleted = await MaintenanceReportAssign.destroy({
+    where: {
+      userID,
+      maintenanceReportID: reportID,
+    },
+  });
   if (!deleted) {
     return {
       success: false,

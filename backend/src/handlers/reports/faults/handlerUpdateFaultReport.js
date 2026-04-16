@@ -36,7 +36,7 @@ export async function handlerUpdateFaultReport(req, res) {
 
   if (
     faultReport.createdBy !== req.session.userID &&
-    !userAssignedToFaultReport(req.session.userID, id) &&
+    !(await userAssignedToFaultReport(req.session.userID, id)) &&
     !requestedUserRole.data.isAdmin &&
     !requestedUserRole.data.canManageFaults
   ) {
