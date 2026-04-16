@@ -37,6 +37,7 @@ export async function handlerGetFaultReports(req, res) {
             "createdAt",
             "updatedAt",
           ],
+          through: { attributes: [] },
           include: [
             {
               model: User,
@@ -68,6 +69,7 @@ export async function handlerGetFaultReports(req, res) {
         {
           model: ReportNotes,
           as: "notes",
+          through: { attributes: [] },
           attributes: [
             "reportNoteID",
             "title",

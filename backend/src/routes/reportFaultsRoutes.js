@@ -58,6 +58,8 @@ router.post(
   handlerUpdateFaultReportNote,
 );
 
+router.put("/:id/notes/:noteID", protectedRoute, handlerUpdateFaultReportNote);
+
 router.post(
   "/:id/assign",
   protectedRoute,

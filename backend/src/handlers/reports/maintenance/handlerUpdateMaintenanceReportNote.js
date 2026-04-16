@@ -13,7 +13,7 @@ export async function handlerUpdateMaintenanceReportNote(req, res) {
   const { id, noteID } = req.params;
   const { title, content } = req.body;
 
-  if (!title || !content) {
+  if (!title && !content) {
     throw new BadRequestError(req, "Missing required fields");
   }
 

@@ -10,6 +10,7 @@ import {
 } from "../handlers/reports/maintenance/handlerAssignMaintenanceReport.js";
 import { handlerGetMaintenanceReportByID } from "../handlers/reports/maintenance/handlerGetMaintenanceReportByID.js";
 import { handlerCreateMaintenanceReportNote } from "../handlers/reports/maintenance/handlerCreateMaintenanceReportNote.js";
+import { handlerUpdateMaintenanceReportNote } from "../handlers/reports/maintenance/handlerUpdateMaintenanceReportNote.js";
 
 const router = express.Router();
 
@@ -46,6 +47,13 @@ router.post(
   protectedRoute,
   permissionGuard("canWorkOnReports"),
   handlerCreateMaintenanceReportNote,
+);
+
+router.put(
+  "/:id/notes/:noteID",
+  protectedRoute,
+  permissionGuard("canWorkOnReports"),
+  handlerUpdateMaintenanceReportNote,
 );
 
 router.post(
