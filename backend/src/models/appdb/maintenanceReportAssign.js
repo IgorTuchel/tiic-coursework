@@ -3,7 +3,7 @@ import MaintenanceReport from "./maintenanceReport.js";
 import User from "./users.js";
 import { Sequelize } from "sequelize";
 
-const maintenanceReportAssign = db.define("MaintenanceReportAssign", {
+const MaintenanceReportAssign = db.define("MaintenanceReportAssign", {
   maintenanceReportID: {
     type: Sequelize.UUID,
     allowNull: false,
@@ -22,4 +22,18 @@ const maintenanceReportAssign = db.define("MaintenanceReportAssign", {
   },
 });
 
-export default maintenanceReportAssign;
+MaintenanceReport.belongsToMany(User, {
+  through: MaintenanceReportAssign,
+  as: "assignedUsers",
+  foreignKey: "maintenanceReportID",
+  otherKey: "userID",
+});
+
+User.belongsToMany(MaintenanceReport, {
+  through: MaintenanceReportAssign,
+  as: "assignedMaintenanceReports",
+  foreignKey: "userID",
+  otherKey: "maintenanceReportID",
+});
+
+export default MaintenanceReportAssign;

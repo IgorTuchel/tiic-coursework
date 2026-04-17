@@ -22,4 +22,18 @@ const MaintenanceReportToolCheck = db.define("MaintenanceReportToolCheck", {
   },
 });
 
+MaintenanceReport.belongsToMany(ToolCheck, {
+  through: MaintenanceReportToolCheck,
+  as: "toolChecks",
+  foreignKey: "maintenanceReportID",
+  otherKey: "toolID",
+});
+
+ToolCheck.belongsToMany(MaintenanceReport, {
+  through: MaintenanceReportToolCheck,
+  as: "maintenanceReports",
+  foreignKey: "toolID",
+  otherKey: "maintenanceReportID",
+});
+
 export default MaintenanceReportToolCheck;

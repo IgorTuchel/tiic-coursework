@@ -22,4 +22,18 @@ const maintenanceReportNotes = db.define("MaintenanceReportNotes", {
   },
 });
 
+MaintenanceReport.belongsToMany(ReportNotes, {
+  through: maintenanceReportNotes,
+  as: "notes",
+  foreignKey: "maintenanceReportID",
+  otherKey: "reportNoteID",
+});
+
+ReportNotes.belongsToMany(MaintenanceReport, {
+  through: maintenanceReportNotes,
+  as: "maintenanceReports",
+  foreignKey: "reportNoteID",
+  otherKey: "maintenanceReportID",
+});
+
 export default maintenanceReportNotes;

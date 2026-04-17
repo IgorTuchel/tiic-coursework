@@ -3,17 +3,18 @@ import redisClient from "../config/redis.js";
 import { emailTemplates, sendEmailWithResend } from "./sendEmail.js";
 import User from "../models/appdb/users.js";
 import crypto from "crypto";
+import { getUserByID } from "./cacheDb.js";
 
 export async function newUserRegistration(userID) {
-  const dbUser = await User.findByPk(userID);
-  if (!dbUser) {
-    return { success: false, message: "User not found" };
+  const dbUser = await getUserByID(userID);
+  if (!dbUser.success) {
+    throw new Error("User not found for new user registration");
   }
 
   const code = crypto.randomBytes(20).toString("hex");
-  await redisClient.setEx(`newUser:${code}`, 3600, dbUser.userID); // Code valid for 1 hour
+  await redisClient.setEx(`newUser:${code}`, 3600, dbUser.data.userID); // Code valid for 1 hour
   await sendEmailWithResend(
-    dbUser.email,
+    dbUser.data.email,
     cfg.resendSender,
     "Complete Your Registration",
     emailTemplates.setupAccount.replace(

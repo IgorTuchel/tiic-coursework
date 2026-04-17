@@ -1,5 +1,3 @@
-import Roles from "../models/appdb/roles.js";
-import User from "../models/appdb/users.js";
 import { comparePassword } from "../utils/hashPassword.js";
 import { handleMFA } from "../middleware/mfaVerificationMiddleware.js";
 import {
@@ -9,13 +7,16 @@ import {
   StatusCodes,
   UnauthorizedError,
 } from "../middleware/errorHandler.js";
-import Status from "../models/appdb/status.js";
 import { HTTPCodes, respondWithJson } from "../utils/json.js";
 import { newUserRegistration } from "../services/newAccount.js";
+import {
+  getUserByEmail,
+  getUserRoleByID,
+  getUserStatusByID,
+} from "../services/cacheDb.js";
 
 export async function handlerLogin(req, res) {
   const { email, password, mfaCode = "" } = req.body;
-
   if (!email) {
     throw new BadRequestError(
       req,
@@ -26,8 +27,8 @@ export async function handlerLogin(req, res) {
   }
 
   //Get user from DB
-  const dbUser = await User.findOne({ where: { email } });
-  if (!dbUser) {
+  const dbUser = await getUserByEmail(email);
+  if (!dbUser.success) {
     throw new UnauthorizedError(
       req,
       "Invalid email or password",
@@ -37,11 +38,8 @@ export async function handlerLogin(req, res) {
   }
 
   // Check account status
-  const accountStatus = await Status.findOne({
-    where: { statusID: dbUser.statusID },
-  });
-
-  if (!accountStatus) {
+  const accountStatus = await getUserStatusByID(dbUser.data.statusID);
+  if (!accountStatus.success) {
     throw new InternalServerError(
       req,
       "User account status not found",
@@ -50,8 +48,8 @@ export async function handlerLogin(req, res) {
     );
   }
 
-  if (accountStatus.statusName === "pending") {
-    await newUserRegistration(dbUser.userID); // Resend the registration email
+  if (accountStatus.data.statusName === "pending") {
+    await newUserRegistration(dbUser.data.userID); // Resend the registration email
     throw new ForbiddenError(
       req,
       `Account is not set up yet, an email has been sent with instructions to set up your account. If you haven't received the email, please check your spam folder or contact support.`,
@@ -70,7 +68,10 @@ export async function handlerLogin(req, res) {
   }
 
   // Check if passwords match
-  const passwordMatch = await comparePassword(password, dbUser.passwordHash);
+  const passwordMatch = await comparePassword(
+    password,
+    dbUser.data.passwordHash,
+  );
   if (!passwordMatch) {
     throw new UnauthorizedError(
       req,
@@ -80,18 +81,18 @@ export async function handlerLogin(req, res) {
     );
   }
 
-  if (accountStatus.statusName !== "active") {
+  if (accountStatus.data.statusName !== "active") {
     throw new ForbiddenError(
       req,
-      `Account is ${accountStatus.statusName}`,
+      `Account is ${accountStatus.data.statusName}`,
       StatusCodes.LOGIN_FAILURE_ACCOUNT_LOCKED,
       true,
     );
   }
 
   //Get the users role
-  let dbRole = await Roles.findOne({ where: { roleID: dbUser.roleID } });
-  if (!dbRole) {
+  let dbRole = await getUserRoleByID(dbUser.data.roleID);
+  if (!dbRole.success) {
     throw new InternalServerError(
       req,
       "User role not found",
@@ -101,11 +102,11 @@ export async function handlerLogin(req, res) {
   }
 
   // MFA handle
-  if (dbUser.mfaEnabled || dbRole.mfaRequired) {
+  if (dbUser.data.mfaEnabled || dbRole.data.mfaRequired) {
     const { success, data } = await handleMFA(
       mfaCode,
-      dbUser.userID,
-      dbUser.email,
+      dbUser.data.userID,
+      dbUser.data.email,
     );
     if (!success) {
       if (data.code === HTTPCodes.FORBIDDEN) {
@@ -133,28 +134,34 @@ export async function handlerLogin(req, res) {
     }
   }
 
-  // Set the user's session
-  req.session.regenerate((err) => {
-    if (err) {
-      console.error("Session regeneration error:", err);
-      throw new InternalServerError(
-        req,
-        "Failed to create session",
-        StatusCodes.LOGIN_FAILURE,
-        true,
-      );
-    }
-    req.session.userID = dbUser.userID;
-    req.session.roleID = dbUser.roleID;
-
-    respondWithJson(res, HTTPCodes.OK, {
-      message: "Login successful",
-      data: {
-        email: dbUser.email,
-        role: dbRole.roleName,
-        firstName: dbUser.firstName,
-        lastName: dbUser.lastName,
-      },
+  // Set user session
+  await new Promise((resolve, reject) => {
+    req.session.regenerate((err) => {
+      if (err)
+        return reject(
+          new InternalServerError(
+            req,
+            "Failed to create session",
+            StatusCodes.LOGIN_FAILURE,
+            true,
+          ),
+        );
+      resolve();
     });
+  });
+
+  req.session.userID = dbUser.data.userID;
+  req.session.roleID = dbUser.data.roleID;
+
+  return respondWithJson(res, HTTPCodes.OK, {
+    message: "Login successful",
+    data: {
+      email: dbUser.data.email,
+      role: dbRole.data.roleName,
+      firstName: dbUser.data.firstName,
+      lastName: dbUser.data.lastName,
+      mfaEnabled: dbUser.data.mfaEnabled,
+      createdAt: dbUser.data.createdAt,
+    },
   });
 }

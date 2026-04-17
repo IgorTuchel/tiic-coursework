@@ -1,9 +1,11 @@
-import { verifyDbIntegrity } from "./db.js";
 import cfg from "./config.js";
 import { appendToErrorLog } from "../utils/errorWriter.js";
 import { verifyResendConnection } from "./resend.js";
 import { sendEmailWithResend } from "../services/sendEmail.js";
 import { verifyRedisConnection } from "./redis.js";
+import { hashPassword } from "../utils/hashPassword.js";
+import { db } from "./db.js";
+import { verifyDbIntegrity, registerHooks } from "./dbStartup.js";
 
 const startupMessage = `
 ===========================
@@ -27,6 +29,7 @@ let errorLog = [];
 
 export async function startup() {
   console.log(startupMessage);
+  await registerHooks();
   let {
     message: dbMessage,
     successful: dbSuccessful,
@@ -44,20 +47,20 @@ export async function startup() {
   }
   console.log(dbMessage);
 
-  let {
-    message: resendMessage,
-    successful: resendSuccessful,
-    data: resendData,
-  } = await verifyResendConnection();
-  if (!resendSuccessful) {
-    errorLog.push(
-      "Startup error: " +
-        resendMessage +
-        "\nResend API Error:\n" +
-        JSON.stringify(resendData.error, null, 2),
-    );
-  }
-  console.log(resendMessage);
+  // let {
+  //   message: resendMessage,
+  //   successful: resendSuccessful,
+  //   data: resendData,
+  // } = await verifyResendConnection();
+  // if (!resendSuccessful) {
+  //   errorLog.push(
+  //     "Startup error: " +
+  //       resendMessage +
+  //       "\nResend API Error:\n" +
+  //       JSON.stringify(resendData.error, null, 2),
+  //   );
+  // }
+  // console.log(resendMessage);
 
   let {
     message: redisMessage,

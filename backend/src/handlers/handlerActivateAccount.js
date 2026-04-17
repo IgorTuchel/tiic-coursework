@@ -8,7 +8,7 @@ import { verifyNewUser } from "../services/newAccount.js";
 import { evaulatePassword } from "../utils/passwordStrength.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import User from "../models/appdb/users.js";
-import Status from "../models/appdb/status.js";
+import { getUserStatuses, invalidateUserCache } from "../services/cacheDb.js";
 
 export async function handlerActivateAccount(req, res) {
   const { id } = req.query;
@@ -51,9 +51,16 @@ export async function handlerActivateAccount(req, res) {
     );
   }
 
-  const pendingStatus = await Status.findOne({
-    where: { statusName: "pending" },
-  });
+  const pendingStatus = await getUserStatuses()
+    .then((res) => {
+      if (!res.success) {
+        throw new InternalServerError(req, res.message);
+      }
+      return res.data.find((status) => status.statusName === "pending");
+    })
+    .catch((err) => {
+      throw new InternalServerError(req, err.message);
+    });
   if (dbUser.statusID !== pendingStatus.statusID) {
     throw new BadRequestError(
       req,
@@ -65,22 +72,27 @@ export async function handlerActivateAccount(req, res) {
 
   const hashedPassword = await hashPassword(password);
 
-  const activeStatus = await Status.findOne({
-    where: { statusName: "active" },
-  });
-  if (!activeStatus) {
-    throw new InternalServerError(
-      req,
-      "Active status not found in database",
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      true,
-    );
-  }
+  const activeStatus = await getUserStatuses()
+    .then((res) => {
+      if (!res.success) {
+        throw new InternalServerError(req, res.message);
+      }
+      return res.data.find((status) => status.statusName === "active");
+    })
+    .catch((err) => {
+      throw new InternalServerError(req, err.message);
+    });
 
   const updatedUser = await User.update(
     { passwordHash: hashedPassword, statusID: activeStatus.statusID },
     { where: { userID } },
   );
+
+  if (!updatedUser) {
+    throw new InternalServerError(req, "Failed to activate account");
+  }
+
+  await invalidateUserCache(userID);
 
   respondWithJson(res, HTTPCodes.OK, {
     message: "Account activated successfully",

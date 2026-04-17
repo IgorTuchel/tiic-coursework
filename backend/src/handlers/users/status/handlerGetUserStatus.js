@@ -4,9 +4,9 @@
  * @module handlers/handlerGetUserStatus
  */
 
-import { InternalServerError } from "../middleware/errorHandler.js";
-import { HTTPCodes, respondWithJson } from "../utils/json.js";
-import Status from "../models/appdb/status.js";
+import { InternalServerError } from "../../../middleware/errorHandler.js";
+import { HTTPCodes, respondWithJson } from "../../../utils/json.js";
+import { getUserStatuses } from "../../../services/cacheDb.js";
 
 /**
  * Handler for retrieving all user statuses.
@@ -20,10 +20,13 @@ import Status from "../models/appdb/status.js";
  * @throws {InternalServerError} If there is an error retrieving user statuses from the database.
  */
 export async function handlerGetUserStatus(req, res) {
-  const status = await Status.findAll();
-  if (!status) {
-    throw new InternalServerError(req, "Failed to retrieve user statuses");
+  const userStatuses = await getUserStatuses();
+  if (!userStatuses.success) {
+    throw new InternalServerError(req, userStatuses.message);
   }
 
-  respondWithJson(res, HTTPCodes.OK, { data: status });
+  respondWithJson(res, HTTPCodes.OK, {
+    success: true,
+    data: userStatuses.data,
+  });
 }

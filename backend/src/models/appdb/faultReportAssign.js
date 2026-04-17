@@ -1,6 +1,7 @@
 import FaultReport from "./faultReport.js";
 import User from "./users.js";
 import { Sequelize } from "sequelize";
+import { db } from "../../config/db.js";
 
 const FaultReportAssign = db.define("FaultReportAssign", {
   userID: {
@@ -19,6 +20,20 @@ const FaultReportAssign = db.define("FaultReportAssign", {
       key: "faultReportID",
     },
   },
+});
+
+FaultReport.belongsToMany(User, {
+  through: FaultReportAssign,
+  as: "assignedUsers",
+  foreignKey: "faultReportID",
+  otherKey: "userID",
+});
+
+User.belongsToMany(FaultReport, {
+  through: FaultReportAssign,
+  as: "assignedFaultReports",
+  foreignKey: "userID",
+  otherKey: "faultReportID",
 });
 
 export default FaultReportAssign;

@@ -36,13 +36,14 @@ export async function errorHandlingMiddleware(err, req, res, next) {
  * @function StatusCodes
  * @description Standardized status codes for various error conditions in the application. These are used in conjunction with the custom error classes to provide consistent error handling and responses across the application.
  * @constant
- * @type {{LOGIN_FAILURE: string, LOGIN_FAILURE_MFA_REQUIRED: string, LOGIN_FAILURE_ACCOUNT_LOCKED: string, LOGIN_FAILURE_ACCOUNT_NOT_SETUP: string, UNAUTHORIZED: string, BAD_REQUEST: string, FORBIDDEN: string, INTERNAL_SERVER_ERROR: string, NOT_FOUND: string, RUN_TIME_ERROR: string}}
+ * @type {{LOGIN_FAILURE: string, LOGIN_FAILURE_MFA_REQUIRED: string, LOGIN_FAILURE_ACCOUNT_LOCKED: string, LOGIN_FAILURE_ACCOUNT_NOT_SETUP: string, UNAUTHORIZED: string, BAD_REQUEST: string, FORBIDDEN: string, INTERNAL_SERVER_ERROR: string, NOT_FOUND: string, RUN_TIME_ERROR: string, ACTION_REQUIRE_MFA: string}}
  */
 export const StatusCodes = {
   LOGIN_FAILURE: "LOGIN_FAILURE",
   LOGIN_FAILURE_MFA_REQUIRED: "LOGIN_FAILURE_MFA_REQUIRED",
   LOGIN_FAILURE_ACCOUNT_LOCKED: "LOGIN_FAILURE_ACCOUNT_LOCKED",
   LOGIN_FAILURE_ACCOUNT_NOT_SETUP: "LOGIN_FAILURE_ACCOUNT_NOT_SETUP",
+  ACTION_REQUIRE_MFA: "ACTION_REQUIRE_MFA",
   UNAUTHORIZED: "UNAUTHORIZED",
   BAD_REQUEST: "BAD_REQUEST",
   FORBIDDEN: "FORBIDDEN",
