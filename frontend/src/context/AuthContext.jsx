@@ -1,82 +1,63 @@
-// src/context/AuthContext.jsx
-import { createContext, useState, useEffect, useCallback } from "react";
+/**
+ * @file AuthContext.jsx
+ * @description Context provider for authentication state management.
+ * Manages user authentication status, user data, and loading state.
+ * @module context/AuthContext
+ */
+
+import { createContext, useState, useEffect } from "react";
 import api from "../lib/api";
 
+// ignore:start
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
+// ignore:end
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Initialize auth state from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("accessToken");
-
-    if (storedUser && token) {
+    const checkAuth = async () => {
+      setLoading(true);
       try {
-        setUser(JSON.parse(storedUser));
-        setIsAuthenticated(true);
-      } catch (e) {
-        localStorage.removeItem("user");
-        localStorage.removeItem("accessToken");
+        const res = await api.get("/users/self", { withCredentials: true });
+        if (res.status === 200) {
+          setIsAuthenticated(true);
+          setUser({
+            email: res.data.email,
+            firstName: res.data.firstName,
+            lastName: res.data.lastName,
+            mfaEnabled: res.data.mfaEnabled,
+            role: res.data.role,
+            createdAt: res.data.createdAt,
+          });
+        } else {
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+      } catch {
+        setIsAuthenticated(false);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-    }
-    setLoading(false);
+    };
+    checkAuth();
   }, []);
 
-  const login = useCallback(async (email, password) => {
-    const response = await api.post("/users/login", { email, password });
-    const { accessToken, refreshToken, user: userData } = response.data;
-
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-    localStorage.setItem("user", JSON.stringify(userData));
-
-    setUser(userData);
-    setIsAuthenticated(true);
-
-    return response.data;
-  }, []);
-
-  const signup = useCallback(async (userData) => {
-    const response = await api.post("/users/signup", userData);
-    return response.data;
-  }, []);
-
-  const logout = useCallback(async () => {
-    try {
-      await api.post("/users/logout");
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      setUser(null);
-      setIsAuthenticated(false);
-    }
-  }, []);
-
-  const forgotPassword = useCallback(async (email) => {
-    return api.post("/users/forgot-password", { email });
-  }, []);
-
-  const resetPassword = useCallback(async (token, newPassword) => {
-    return api.post("/users/reset-password", { token, newPassword });
-  }, []);
-
-  const value = {
-    user,
-    isAuthenticated,
-    loading,
-    login,
-    signup,
-    logout,
-    forgotPassword,
-    resetPassword,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        user,
+        loading,
+        setIsAuthenticated,
+        setUser,
+        setLoading,
+      }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};

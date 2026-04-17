@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_URL = "/api";
-const BYPASS = ["/users/login", "/auth/2fa"];
+const BYPASS = ["/login"];
 
 const api = axios.create({
   baseURL: API_URL,
@@ -12,10 +12,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
+    console.error("API Error:", error);
     if (
       error.response?.status === 401 &&
-      !BYPASS.includes(originalRequest.url)
+      !BYPASS.includes(originalRequest.url) &&
+      window.location.pathname !== "/login"
     ) {
       window.location.href = "/login";
       return Promise.reject({ message: "Unauthorized. Redirecting to login." });
