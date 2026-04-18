@@ -11,7 +11,7 @@ function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "", mfaCode: "" });
   const [mfaRequired, setMfaRequired] = useState(false);
   const [visiblePass, setVisiblePass] = useState(false);
-  const { loading, setIsAuthenticated, isAuthenticated, setUser, setLoading } =
+  const { loading, setIsAuthenticated, isAuthenticated, setLoading } =
     useContext(AuthContext);
 
   const handleChange = (e) =>
@@ -55,16 +55,8 @@ function LoginPage() {
 
     setLoading(false);
     setIsAuthenticated(true);
-    setUser({
-      userID: res.data.userID,
-      email: res.data.email,
-      username: res.data.username,
-      mfaEnabled: res.data.mfaEnabled,
-      role: res.data.role,
-      createdAt: res.data.createdAt,
-    });
     toast.success("Successfully logged in!");
-    navigate("/app/dashboard", { replace: true });
+    navigate(0);
   };
 
   const handleSubmit = async (e) => {

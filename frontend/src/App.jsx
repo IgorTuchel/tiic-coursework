@@ -20,11 +20,17 @@ function App() {
       <Toaster
         position="top-right"
         toastOptions={{
-          className: "bg-slate-800 text-slate-100 border border-slate-700",
-          style: {
-            background: "#1e293b",
-            color: "#f1f5f9",
-            border: "1px solid #334155",
+          error: {
+            style: {
+              background: "#1e293b",
+              color: "#f8f8f8",
+            },
+          },
+          success: {
+            style: {
+              background: "#1e293b",
+              color: "#f8f8f8",
+            },
           },
         }}
       />
@@ -35,7 +41,7 @@ function App() {
           <Route path="/app/dashboard" element={<DashboardPage />} />
           <Route path="/app/ar" element={<ArMaintenancePage />} />
           <Route path="/app/check-tools" element={<CheckToolsPage />} />
-          <Route path="/app/users" element={<UserManagementPage />} />
+          <Route path="/app/admin" element={<UserManagementPage />} />
         </Route>
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

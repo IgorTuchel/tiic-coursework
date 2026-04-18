@@ -26,13 +26,15 @@ export const AuthProvider = ({ children }) => {
         if (res.status === 200) {
           setIsAuthenticated(true);
           setUser({
-            email: res.data.email,
-            firstName: res.data.firstName,
-            lastName: res.data.lastName,
-            mfaEnabled: res.data.mfaEnabled,
-            role: res.data.role,
-            createdAt: res.data.createdAt,
+            email: res.data.data.email,
+            firstName: res.data.data.firstName,
+            lastName: res.data.data.lastName,
+            mfaEnabled: res.data.data.mfaEnabled,
+            role: res.data.data.role,
+            createdAt: res.data.data.createdAt,
+            roleInfo: res.data.data.roleInfo,
           });
+          console.log("User authenticated:", res.data);
         } else {
           setIsAuthenticated(false);
           setUser(null);
@@ -45,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       }
     };
     checkAuth();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <AuthContext.Provider

@@ -20,7 +20,6 @@ export async function handlerGetSelf(req, res) {
   if (!user.success) {
     throw new UnauthorizedError(req, user.message);
   }
-
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
     data: {
@@ -30,6 +29,24 @@ export async function handlerGetSelf(req, res) {
       lastName: user.data.lastName,
       mfaEnabled: user.data.mfaEnabled,
       createdAt: user.data.createdAt,
+      roleInfo: {
+        isAdmin: userRole.data.isAdmin,
+        canManageUsers: userRole.data.canManageUsers,
+        canManageRoles: userRole.data.canManageRoles,
+        canViewAllUsers: userRole.data.canViewAllUsers,
+        canViewSecurityLogs: userRole.data.canViewSecurityLogs,
+        canViewActivityLogs: userRole.data.canViewActivityLogs,
+        canViewAllReports: userRole.data.canViewAllReports,
+        canWorkOnReports: userRole.data.canWorkOnReports,
+        canManageReports: userRole.data.canManageReports,
+        canManageTools: userRole.data.canManageTools,
+        canSuggestFaults: userRole.data.canSuggestFaults,
+        canAssignReports: userRole.data.canAssignReports,
+        canManageFaults: userRole.data.canManageFaults,
+        canViewAllFaults: userRole.data.canViewAllFaults,
+        canAssignFaults: userRole.data.canAssignFaults,
+        mfaRequired: userRole.data.mfaRequired,
+      },
     },
   });
 }

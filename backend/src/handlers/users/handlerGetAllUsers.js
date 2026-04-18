@@ -4,7 +4,17 @@ import { HTTPCodes, respondWithJson } from "../../utils/json.js";
 
 export async function handlerGetAllUsers(req, res) {
   const users = await User.findAll({
-    attributes: { exclude: ["passwordHash"] },
+    attributes: { exclude: ["passwordHash", "roleID", "statusID"] },
+    include: [
+      {
+        association: "role",
+        attributes: ["roleName", "roleID"],
+      },
+      {
+        association: "status",
+        attributes: ["statusName", "statusID"],
+      },
+    ],
   });
 
   if (!users) {

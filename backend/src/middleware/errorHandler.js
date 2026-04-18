@@ -7,6 +7,15 @@ import { HTTPCodes, respondWithErrorJson } from "../utils/json.js";
 
 export async function errorHandlingMiddleware(err, req, res, next) {
   if (err instanceof HTTPRequestError) {
+    console.log(
+      `${err.name} - ${err.message} - IP: ${err.ip} - User Agent: ${err.user_agent}`,
+    );
+    console.log("Request details:", {
+      method: err.method,
+      url: err.url,
+      headers: err.headers,
+      body: err.body,
+    });
     return respondWithErrorJson(
       res,
       err.httpStatusCode,

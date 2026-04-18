@@ -18,6 +18,7 @@ api.interceptors.response.use(
       !BYPASS.includes(originalRequest.url) &&
       window.location.pathname !== "/login"
     ) {
+      console.log(error.response.status);
       window.location.href = "/login";
       return Promise.reject({ message: "Unauthorized. Redirecting to login." });
     }

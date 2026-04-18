@@ -24,7 +24,7 @@ export async function handlerGetUserById(req, res) {
   const user = await getUserByID(id);
   console.log(user);
   if (!user.success) {
-    throw new UnauthorizedError(req, "User not found");
+    throw new BadRequestError(req, "User not found");
   }
 
   const targetUserRole = await getUserRoleByID(user.data.roleID);
@@ -42,10 +42,13 @@ export async function handlerGetUserById(req, res) {
     data: {
       userID: user.data.userID,
       email: user.data.email,
-      role: targetUserRole.data.roleName,
+      role: [targetUserRole.data.roleName, targetUserRole.data.roleID],
       firstName: user.data.firstName,
       lastName: user.data.lastName,
-      status: targetUserStatus.data.statusName,
+      status: [
+        targetUserStatus.data.statusName,
+        targetUserStatus.data.statusID,
+      ],
       mfaEnabled: user.data.mfaEnabled,
       createdAt: user.data.createdAt,
     },

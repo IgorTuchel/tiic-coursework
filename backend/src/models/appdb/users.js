@@ -49,4 +49,7 @@ const User = db.define("User", {
   },
 });
 
+User.belongsTo(Roles, { foreignKey: "roleID", as: "role" });
+User.belongsTo(Status, { foreignKey: "statusID", as: "status" });
+
 export default User;
