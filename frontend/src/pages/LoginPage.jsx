@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { login } from "../services/loginUserService";
 import { AuthContext } from "../context/AuthContext";
-import { validateEmail, validatePassword } from "../../utils/validator";
+import { validateEmail, validatePassword } from "../utils/validator";
 
 function LoginPage() {
   const navigate = useNavigate();

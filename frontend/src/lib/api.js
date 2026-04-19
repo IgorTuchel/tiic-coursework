@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_URL = "/api";
-const BYPASS = ["/login"];
+const BYPASS = ["/login", "/activate-account"];
 
 const api = axios.create({
   baseURL: API_URL,
@@ -11,12 +11,10 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
     console.error("API Error:", error);
     if (
       error.response?.status === 401 &&
-      !BYPASS.includes(originalRequest.url) &&
-      window.location.pathname !== "/login"
+      !BYPASS.includes(window.location.pathname)
     ) {
       console.log(error.response.status);
       window.location.href = "/login";

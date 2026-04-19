@@ -32,6 +32,7 @@ export const login = async (email, password, mfaCode = "") => {
     }
     return {
       success: false,
+      statusCode: error.response?.data?.statusCode || "LOGIN_FAILURE",
       message:
         error.response?.data?.error ||
         error.message ||

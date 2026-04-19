@@ -13,6 +13,7 @@ import UserManagementPage from "./pages/UserManagementPage";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ProtectedPage from "./components/ProtectedPage.jsx";
+import ActivateAccountPage from "./pages/ActivateAccountPage.jsx";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
 
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/activate-account" element={<ActivateAccountPage />} />
         <Route path="/app" element={<ProtectedPage />}>
           <Route path="/app/dashboard" element={<DashboardPage />} />
           <Route path="/app/ar" element={<ArMaintenancePage />} />

@@ -46,3 +46,16 @@ export function validatePassword(password) {
   }
   return { valid: true, reason: "Password meets the criteria." };
 }
+
+export function passwordRules() {
+  return [
+    { label: "At least 8 characters", test: (p) => p.length >= 8 },
+    { label: "One uppercase letter", test: (p) => /[A-Z]/.test(p) },
+    { label: "One lowercase letter", test: (p) => /[a-z]/.test(p) },
+    { label: "One number", test: (p) => /[0-9]/.test(p) },
+    {
+      label: "One special character",
+      test: (p) => /[!@#$%^&*(),.?":{}|<>]/.test(p),
+    },
+  ];
+}
