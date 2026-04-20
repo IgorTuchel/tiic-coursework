@@ -15,10 +15,15 @@ const ToolCheck = db.define("ToolCheck", {
 });
 
 ToolCheck.afterSync(async () => {
-  await ToolCheck.bulkCreate(
-    [{ name: "Screwdriver" }, { name: "Metal Nut" }, { name: "Tape Measure" }],
-    { ignoreDuplicates: true },
-  );
+  await ToolCheck.findOrCreate({
+    where: { name: "screwdriver" },
+  });
+  await ToolCheck.findOrCreate({
+    where: { name: "metal_nut" },
+  });
+  await ToolCheck.findOrCreate({
+    where: { name: "tape_measure" },
+  });
 });
 
 export default ToolCheck;

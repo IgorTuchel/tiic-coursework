@@ -7,6 +7,8 @@ import MaintenanceReportToolCheck from "../../../models/appdb/maintenanceReportT
 import ToolCheck from "../../../models/appdb/toolCheck.js";
 import { getUserRoleByID } from "../../../services/cacheDb.js";
 import { Op } from "sequelize";
+import SeverityLevel from "../../../models/appdb/severityLevel.js";
+import ReportStatus from "../../../models/appdb/reportStatus.js";
 
 export async function handlerGetAllMaintenanceReports(req, res) {
   const requrestedUserRole = await getUserRoleByID(req.session.roleID);
@@ -24,8 +26,26 @@ export async function handlerGetAllMaintenanceReports(req, res) {
       include: [
         {
           model: User,
+          as: "createdByUser",
+          attributes: ["userID", "firstName", "lastName", "email"],
+          required: false,
+        },
+        {
+          model: SeverityLevel,
+          as: "severityLevel",
+          attributes: ["severityLevelID", "severityLevelName"],
+          required: false,
+        },
+        {
+          model: ReportStatus,
+          as: "reportStatus",
+          attributes: ["reportStatusID", "statusName"],
+          required: false,
+        },
+        {
+          model: User,
           as: "assignedUsers",
-          attributes: ["userID", "firstName", "email"],
+          attributes: ["userID", "firstName", "lastName", "email"],
           through: { attributes: [] },
           required: false,
         },
@@ -44,7 +64,7 @@ export async function handlerGetAllMaintenanceReports(req, res) {
             {
               model: User,
               as: "createdByUser",
-              attributes: ["userID", "firstName", "email"],
+              attributes: ["userID", "firstName", "lastName", "email"],
             },
           ],
           required: false,
@@ -71,8 +91,26 @@ export async function handlerGetAllMaintenanceReports(req, res) {
         {
           model: User,
           as: "assignedUsers",
-          attributes: ["userID", "firstName", "email"],
+          attributes: ["userID", "firstName", "lastName", "email"],
           through: { attributes: [] },
+          required: false,
+        },
+        {
+          model: User,
+          as: "createdByUser",
+          attributes: ["userID", "firstName", "lastName", "email"],
+          required: false,
+        },
+        {
+          model: SeverityLevel,
+          as: "severityLevel",
+          attributes: ["severityLevelID", "severityLevelName"],
+          required: false,
+        },
+        {
+          model: ReportStatus,
+          as: "reportStatus",
+          attributes: ["reportStatusID", "statusName"],
           required: false,
         },
         {
@@ -90,7 +128,7 @@ export async function handlerGetAllMaintenanceReports(req, res) {
             {
               model: User,
               as: "createdByUser",
-              attributes: ["userID", "firstName", "email"],
+              attributes: ["userID", "firstName", "lastName", "email"],
             },
           ],
           required: false,

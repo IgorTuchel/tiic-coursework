@@ -16,6 +16,10 @@ import {
   handlerRemoveToolsFromMaintenanceReport,
 } from "../handlers/reports/tools/handlerManageToolsForMaintenanceReport.js";
 import { handlerUpdateMaintenanceReport } from "../handlers/reports/maintenance/handlerUpdateMaintenanceReport.js";
+import {
+  handlerGetMarkerPdf,
+  handlerGetMarkerQr,
+} from "../handlers/reports/maintenance/handlerGetMarkerQr.js";
 
 const router = express.Router();
 
@@ -94,6 +98,20 @@ router.post(
   protectedRoute,
   permissionGuard("canAssignReports"),
   handlerUnassignUserFromMaintenanceReport,
+);
+
+router.get(
+  "/:id/marker/qr",
+  protectedRoute,
+  permissionGuard("canWorkOnReports"),
+  handlerGetMarkerQr,
+);
+
+router.get(
+  "/:id/marker/pdf",
+  protectedRoute,
+  permissionGuard("canWorkOnReports"),
+  handlerGetMarkerPdf,
 );
 
 export default router;

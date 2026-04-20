@@ -9,6 +9,8 @@ import { getUserRoleByID } from "../../../services/cacheDb.js";
 import { userAssignedToMaintenanceReport } from "../../../services/workOnReport.js";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import ToolCheck from "../../../models/appdb/toolCheck.js";
+import SeverityLevel from "../../../models/appdb/severityLevel.js";
+import ReportStatus from "../../../models/appdb/reportStatus.js";
 
 export async function handlerGetMaintenanceReportByID(req, res) {
   const { id } = req.params;
@@ -35,8 +37,26 @@ export async function handlerGetMaintenanceReportByID(req, res) {
       {
         model: User,
         as: "assignedUsers",
-        attributes: ["userID", "firstName", "email"],
+        attributes: ["userID", "firstName", "lastName", "email"],
         through: { attributes: [] },
+        required: false,
+      },
+      {
+        model: User,
+        as: "createdByUser",
+        attributes: ["userID", "firstName", "lastName", "email"],
+        required: false,
+      },
+      {
+        model: SeverityLevel,
+        as: "severityLevel",
+        attributes: ["severityLevelID", "severityLevelName"],
+        required: false,
+      },
+      {
+        model: ReportStatus,
+        as: "reportStatus",
+        attributes: ["reportStatusID", "statusName"],
         required: false,
       },
       {
@@ -54,7 +74,7 @@ export async function handlerGetMaintenanceReportByID(req, res) {
           {
             model: User,
             as: "createdByUser",
-            attributes: ["userID", "firstName", "email"],
+            attributes: ["userID", "firstName", "lastName", "email"],
           },
         ],
         required: false,

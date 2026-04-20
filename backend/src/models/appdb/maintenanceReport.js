@@ -2,7 +2,7 @@ import { db } from "../../config/db.js";
 import ReportStatus from "./reportStatus.js";
 import SeverityLevel from "./severityLevel.js";
 import User from "./users.js";
-import { Sequelize } from "sequelize"; 
+import { Sequelize } from "sequelize";
 
 const MaintenanceReport = db.define("MaintenanceReport", {
   maintenanceReportID: {
@@ -46,6 +46,19 @@ const MaintenanceReport = db.define("MaintenanceReport", {
       key: "severityLevelID",
     },
   },
+});
+
+MaintenanceReport.belongsTo(User, {
+  as: "createdByUser",
+  foreignKey: "createdBy",
+});
+MaintenanceReport.belongsTo(ReportStatus, {
+  as: "reportStatus",
+  foreignKey: "reportStatusID",
+});
+MaintenanceReport.belongsTo(SeverityLevel, {
+  as: "severityLevel",
+  foreignKey: "severityLevelID",
 });
 
 export default MaintenanceReport;
