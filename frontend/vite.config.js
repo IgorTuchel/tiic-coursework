@@ -5,6 +5,12 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   server: {
+    host: "0.0.0.0", // listen on all interfaces
+    port: 5173,
+    allowedHosts: true, // allow ngrok's hostname
+    hmr: {
+      clientPort: 443, // ngrok terminates HTTPS on 443
+    },
     proxy: {
       "/api": {
         target: "http://localhost:3000",

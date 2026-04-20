@@ -68,7 +68,7 @@ function Header() {
 
   const navLinks = [
     { to: "/app/dashboard", label: "Dashboard" },
-    { to: "/app/reports/maintenance", label: "AR Scanner" },
+    { to: "/app/maintenance", label: "Maintenance Reports" },
     ...(perms?.canManageTools
       ? [{ to: "/app/check-tools", label: "Tool Check" }]
       : []),

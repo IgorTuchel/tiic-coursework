@@ -11,9 +11,11 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserManagementPage from "./pages/UserManagementPage";
 import { AuthProvider } from "./context/AuthContext";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 import ProtectedPage from "./components/ProtectedPage.jsx";
 import ActivateAccountPage from "./pages/ActivateAccountPage.jsx";
+import { MaintenancePage } from "./pages/MaintenancePage.jsx";
+import { MaintenanceDetailPage } from "./pages/MaintenanceDetailPage.jsx";
 
 function App() {
   return (
@@ -41,7 +43,11 @@ function App() {
         <Route path="/activate-account" element={<ActivateAccountPage />} />
         <Route path="/app" element={<ProtectedPage />}>
           <Route path="/app/dashboard" element={<DashboardPage />} />
-          <Route path="/app/ar" element={<ArMaintenancePage />} />
+          <Route path="/app/maintenance" element={<MaintenancePage />} />
+          <Route
+            path="/app/maintenance/:id"
+            element={<MaintenanceDetailPage />}
+          />
           <Route path="/app/check-tools" element={<CheckToolsPage />} />
           <Route path="/app/admin" element={<UserManagementPage />} />
         </Route>
