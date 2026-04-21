@@ -174,129 +174,124 @@ export default function AIToolChecker({
 
   return (
     <MainLayout>
-      <div className="flex flex-col h-full px-4 py-6">
-        <button
-          onClick={handleCancel}
-          className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-100 transition-colors self-start">
-          <LuArrowLeft size={15} /> Back
-        </button>
+      <div className="overflow-y-auto max-h-[calc(100vh-8rem)] px-4 py-6 mb-32">
+        <div className="w-full max-w-md mx-auto space-y-5">
+          <button
+            onClick={handleCancel}
+            className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-100 transition-colors">
+            <LuArrowLeft size={15} /> Back
+          </button>
 
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-5">
-            <div className="space-y-1 text-center">
-              <h1 className="text-xl font-semibold text-slate-100">
-                Equipment Audit
-              </h1>
-              <p className="text-sm text-slate-400">
-                Scan the required tools to verify the report inventory.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-4">
-              <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-slate-800 bg-black">
-                <div ref={canvasContainerRef} className="absolute inset-0" />
-
-                {status === "loading" && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center">
-                    <span className="text-sm text-slate-400 animate-pulse">
-                      Initializing camera and model...
-                    </span>
-                  </div>
-                )}
-                {status === "error" && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center">
-                    <span className="text-sm text-red-400">
-                      Failed to load scanner.
-                    </span>
-                  </div>
-                )}
-                {status === "scanning" && (
-                  <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-20">
-                    <LuScanSearch size={40} className="text-white" />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Live detection
-                </span>
-                <span
-                  className={`text-sm font-medium transition-colors ${
-                    currentPrediction.probability >= DETECTION_THRESHOLD
-                      ? "text-emerald-400"
-                      : "text-slate-300"
-                  }`}>
-                  {predictionLabel}
-                </span>
-              </div>
-            </div>
-
-            {/* Tool checlist */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-4">
-              <div className="flex items-end justify-between">
-                <h2 className="text-sm font-semibold text-slate-200">
-                  Required tools
-                </h2>
-                <span className="text-xs text-slate-500">
-                  {toolsScannedCount} of {totalTools} verified
-                </span>
-              </div>
-
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
-                <div
-                  className="h-full bg-sky-600 transition-all duration-500"
-                  style={{ width: `${progressPercentage}%` }}
-                />
-              </div>
-
-              <div className="space-y-2">
-                {requiredTools.map((tool) => {
-                  const isChecked = scannedTools.has(tool.name);
-                  return (
-                    <div
-                      key={tool.name}
-                      className={`flex items-center justify-between rounded-lg border px-3.5 py-3 transition-colors ${
-                        isChecked
-                          ? "border-emerald-500/20 bg-emerald-500/10"
-                          : "border-slate-800 bg-slate-950/40"
-                      }`}>
-                      <div className="flex items-center gap-2">
-                        <LuCamera
-                          size={15}
-                          className={
-                            isChecked ? "text-emerald-400" : "text-slate-500"
-                          }
-                        />
-                        <span
-                          className={`text-sm font-medium ${
-                            isChecked ? "text-emerald-400" : "text-slate-300"
-                          }`}>
-                          {tool.name}
-                        </span>
-                      </div>
-                      {isChecked ? (
-                        <LuCheck size={18} className="text-emerald-400" />
-                      ) : (
-                        <div className="h-4 w-4 rounded-full border-2 border-slate-700" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <button
-              onClick={handleComplete}
-              disabled={!allChecked}
-              className={`w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
-                allChecked
-                  ? "bg-sky-600 text-white hover:bg-sky-500"
-                  : "cursor-not-allowed bg-slate-800 text-slate-500"
-              }`}>
-              {allChecked ? "Confirm Tool Check" : "Pending Verification..."}
-            </button>
+          <div className="space-y-1 text-center">
+            <h1 className="text-xl font-semibold text-slate-100">
+              Equipment Audit
+            </h1>
+            <p className="text-sm text-slate-400">
+              Scan the required tools to verify the report inventory.
+            </p>
           </div>
+
+          {/* Camera card */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-4">
+            <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-slate-800 bg-black">
+              <div ref={canvasContainerRef} className="absolute inset-0" />
+              {status === "loading" && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center">
+                  <span className="text-sm text-slate-400 animate-pulse">
+                    Initializing camera and model...
+                  </span>
+                </div>
+              )}
+              {status === "error" && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center">
+                  <span className="text-sm text-red-400">
+                    Failed to load scanner.
+                  </span>
+                </div>
+              )}
+              {status === "scanning" && (
+                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-20">
+                  <LuScanSearch size={40} className="text-white" />
+                </div>
+              )}
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Live detection
+              </span>
+              <span
+                className={`text-sm font-medium transition-colors ${
+                  currentPrediction.probability >= DETECTION_THRESHOLD
+                    ? "text-emerald-400"
+                    : "text-slate-300"
+                }`}>
+                {predictionLabel}
+              </span>
+            </div>
+          </div>
+
+          {/* Tool checklist */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-4">
+            <div className="flex items-end justify-between">
+              <h2 className="text-sm font-semibold text-slate-200">
+                Required tools
+              </h2>
+              <span className="text-xs text-slate-500">
+                {toolsScannedCount} of {totalTools} verified
+              </span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+              <div
+                className="h-full bg-sky-600 transition-all duration-500"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+            <div className="space-y-2">
+              {requiredTools.map((tool) => {
+                const isChecked = scannedTools.has(tool.name);
+                return (
+                  <div
+                    key={tool.name}
+                    className={`flex items-center justify-between rounded-lg border px-3.5 py-3 transition-colors ${
+                      isChecked
+                        ? "border-emerald-500/20 bg-emerald-500/10"
+                        : "border-slate-800 bg-slate-950/40"
+                    }`}>
+                    <div className="flex items-center gap-2">
+                      <LuCamera
+                        size={15}
+                        className={
+                          isChecked ? "text-emerald-400" : "text-slate-500"
+                        }
+                      />
+                      <span
+                        className={`text-sm font-medium ${
+                          isChecked ? "text-emerald-400" : "text-slate-300"
+                        }`}>
+                        {tool.name}
+                      </span>
+                    </div>
+                    {isChecked ? (
+                      <LuCheck size={18} className="text-emerald-400" />
+                    ) : (
+                      <div className="h-4 w-4 rounded-full border-2 border-slate-700" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <button
+            onClick={handleComplete}
+            disabled={!allChecked}
+            className={`w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
+              allChecked
+                ? "bg-sky-600 text-white hover:bg-sky-500"
+                : "cursor-not-allowed bg-slate-800 text-slate-500"
+            }`}>
+            {allChecked ? "Confirm Tool Check" : "Pending Verification..."}
+          </button>
         </div>
       </div>
     </MainLayout>

@@ -72,7 +72,7 @@ function ActivateAccountPage() {
               Please check your email for the correct activation link or enter
               your email below to resend the activation instructions.
             </p>
-            <div className="mt-4">
+            <div className="mt-4 flex flex-col items-center gap-3">
               <input
                 type="email"
                 value={email}
@@ -82,7 +82,7 @@ function ActivateAccountPage() {
                 className="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
               <button
-                className="mt-2 w-full rounded-md bg-sky-500 hover:bg-sky-600 px-3 py-2.5 text-sm font-medium text-slate-950 transition-colors"
+                className="mt-2 w-48 rounded-md bg-sky-500 hover:bg-sky-600 px-3 py-2.5 text-sm font-medium text-slate-950  transition-colors"
                 onClick={handleSubmitEmail}
                 aria-label="Resend activation email">
                 Resend Activation Email

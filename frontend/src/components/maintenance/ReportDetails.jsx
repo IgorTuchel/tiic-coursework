@@ -1,5 +1,5 @@
-import { useContext, useState } from "react";
-import { LuCalendar, LuUser } from "react-icons/lu";
+import { useState } from "react";
+import { LuCalendar, LuIdCard, LuUser } from "react-icons/lu";
 import toast from "react-hot-toast";
 
 import { AuthContext } from "../../context/AuthContext";
@@ -46,6 +46,8 @@ export function ReportDetails({
   availableTools = [],
   reportStatuses = [],
   severityLevels = [],
+  canManage,
+  canAssign,
   onUpdateReport,
   onUpdateNote,
   onUpdateReportAR,
@@ -55,10 +57,6 @@ export function ReportDetails({
   onAddTool,
   onRemoveTool,
 }) {
-  const { user } = useContext(AuthContext);
-  const canManage = user?.roleInfo?.canManageReports ?? false;
-  const canAssign = user?.roleInfo?.canAssignReports ?? false;
-
   // Maintenance Report editing
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -215,17 +213,31 @@ export function ReportDetails({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <MetaItem icon={LuCalendar} label="Created">
-          {new Date(report.createdAt).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
+        <MetaItem icon={LuIdCard} label="Report ID">
+          {report.maintenanceReportID || report.reportID}
         </MetaItem>
         <MetaItem icon={LuUser} label="Created by">
           {report.createdByUser
             ? `${report.createdByUser.firstName} ${report.createdByUser.lastName}`
             : "Unknown"}
+        </MetaItem>
+        <MetaItem icon={LuCalendar} label="Created">
+          {new Date(report.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </MetaItem>
+        <MetaItem icon={LuCalendar} label="Last updated">
+          {new Date(report.updatedAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </MetaItem>
       </div>
 
@@ -288,7 +300,7 @@ export function ReportDetails({
         <NoteModal
           note={selectedNote}
           onClose={() => setSelectedNote(null)}
-          onUpdate={canManage ? onUpdateNote : null}
+          onSave={canManage ? onUpdateNote : null}
         />
       )}
     </div>

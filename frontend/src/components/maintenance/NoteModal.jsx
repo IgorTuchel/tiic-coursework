@@ -128,6 +128,7 @@ export function NoteModal({ note, onClose, onSave }) {
         onSave={async (updated) => {
           await onSave(updated);
           setEditing(false);
+          onClose();
         }}
       />
     );

@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import toast from "react-hot-toast";
 import { LuArrowLeft } from "react-icons/lu";
 import MainLayout from "../layouts/MainLayout";
@@ -18,8 +18,15 @@ import {
   addToolToReport,
   removeToolFromReport,
 } from "../services/maintenanceReports";
+import { AuthContext } from "../context/AuthContext";
 
 export function MaintenanceDetailPage() {
+  const { user } = useContext(AuthContext);
+  const canManage =
+    user?.roleInfo?.canManageReports ||
+    user?.roleInfo?.canWorkOnReports ||
+    false;
+  const canAssign = user?.roleInfo?.canAssignReports ?? false;
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -32,25 +39,16 @@ export function MaintenanceDetailPage() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const [
-        reportResult,
-        usersResult,
-        toolsResult,
-        statusesResult,
-        severitiesResult,
-      ] = await Promise.all([
-        getMaintenanceReportById(id),
-        getAllUsers(),
-        getAllTools(),
-        getReportStatuses(),
-        getSeverityLevels(),
-      ]);
+      const [reportResult, toolsResult, statusesResult, severitiesResult] =
+        await Promise.all([
+          getMaintenanceReportById(id),
+          getAllTools(),
+          getReportStatuses(),
+          getSeverityLevels(),
+        ]);
 
       if (reportResult.success) setReport(reportResult.data);
       else toast.error(reportResult.message || "Failed to load report.");
-
-      if (usersResult.success) setAvailableUsers(usersResult.data);
-      else toast.error(usersResult.message || "Failed to load users.");
 
       if (toolsResult.success) setAvailableTools(toolsResult.data);
       else toast.error(toolsResult.message || "Failed to load tools.");
@@ -65,8 +63,14 @@ export function MaintenanceDetailPage() {
       setLoading(false);
     };
 
+    if (canAssign) {
+      getAllUsers().then((res) => {
+        if (res.success) setAvailableUsers(res.data);
+        else toast.error(res.message || "Failed to load users.");
+      });
+    }
     fetchAll();
-  }, [id]);
+  }, [id, canAssign]);
 
   const handleUpdateReportAR = async (fields) => {
     const result = await updateMaintenanceReport(id, {
@@ -115,7 +119,7 @@ export function MaintenanceDetailPage() {
       setReport((prev) => ({
         ...prev,
         notes: prev.notes.map((n) =>
-          n.reportNoteID === updated.reportNoteID ? updated : n,
+          n.reportNoteID === updated.reportNoteID ? result.data : n,
         ),
       }));
       toast.success("Note updated.");
@@ -213,6 +217,8 @@ export function MaintenanceDetailPage() {
             onRemoveUser={handleRemoveUser}
             onAddTool={handleAddTool}
             onRemoveTool={handleRemoveTool}
+            canManage={canManage}
+            canAssign={canAssign}
           />
         ) : (
           <p className="text-red-400">Report not found.</p>

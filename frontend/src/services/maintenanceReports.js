@@ -243,3 +243,28 @@ export const downloadMarkerPdf = async (reportId) => {
     };
   }
 };
+
+export const createMaintenanceReport = async ({
+  name,
+  description,
+  severityLevelID,
+  tools,
+}) => {
+  try {
+    const response = await api.post("/reports/maintenance", {
+      name,
+      description,
+      severity: severityLevelID,
+      tools: tools ?? [],
+    });
+    return { success: true, data: response.data.data };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to create maintenance report.",
+    };
+  }
+};
