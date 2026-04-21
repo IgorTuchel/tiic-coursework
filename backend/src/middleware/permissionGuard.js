@@ -34,6 +34,9 @@ export function permissionGuard(requiredPermissions) {
       return next();
     }
     if (!role.data[requiredPermissions]) {
+      console.log(
+        `User ${userID} with role ${role.data.roleName} does not have required permissions: ${requiredPermissions}`,
+      );
       throw new ForbiddenError(
         req,
         "User does not have required permissions",

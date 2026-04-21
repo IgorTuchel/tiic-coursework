@@ -10,6 +10,11 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../../../middleware/errorHandler.js";
+import User from "../../../models/appdb/users.js";
+import ReportNotes from "../../../models/appdb/reportNotes.js";
+import ToolCheck from "../../../models/appdb/toolCheck.js";
+import SeverityLevel from "../../../models/appdb/severityLevel.js";
+import ReportStatus from "../../../models/appdb/reportStatus.js";
 
 export async function handlerUpdateMaintenanceReport(req, res) {
   const { id } = req.params;
@@ -71,15 +76,73 @@ export async function handlerUpdateMaintenanceReport(req, res) {
     throw new BadRequestError(req, "Failed to update maintenance report");
   }
 
+  const maintenanceReportNew = await MaintenanceReport.findOne({
+    where: { maintenanceReportID: id },
+    include: [
+      {
+        model: User,
+        as: "assignedUsers",
+        attributes: ["userID", "firstName", "lastName", "email"],
+        through: { attributes: [] },
+        required: false,
+      },
+      {
+        model: User,
+        as: "createdByUser",
+        attributes: ["userID", "firstName", "lastName", "email"],
+        required: false,
+      },
+      {
+        model: SeverityLevel,
+        as: "severityLevel",
+        attributes: ["severityLevelID", "severityLevelName"],
+        required: false,
+      },
+      {
+        model: ReportStatus,
+        as: "reportStatus",
+        attributes: ["reportStatusID", "statusName"],
+        required: false,
+      },
+      {
+        model: ReportNotes,
+        as: "notes",
+        through: { attributes: [] },
+        attributes: [
+          "reportNoteID",
+          "title",
+          "content",
+          "createdAt",
+          "updatedAt",
+        ],
+        include: [
+          {
+            model: User,
+            as: "createdByUser",
+            attributes: ["userID", "firstName", "lastName", "email"],
+          },
+        ],
+        required: false,
+      },
+      {
+        model: ToolCheck,
+        as: "toolChecks",
+        attributes: ["toolID", "name"],
+        through: { attributes: [] },
+        required: false,
+      },
+    ],
+  });
+
+  if (!maintenanceReportNew) {
+    throw new NotFoundError(
+      req,
+      "Could not retrieve updated maintenance report",
+    );
+  }
+
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
-    data: {
-      maintenanceReportID: saved.maintenanceReportID,
-      name: saved.name,
-      description: saved.description,
-      reportStatusID: saved.reportStatusID,
-      severityLevelID: saved.severityLevelID,
-      markerScanBlob: saved.markerScanBlob,
-    },
+    data: maintenanceReportNew,
   });
 }

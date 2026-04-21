@@ -8,6 +8,7 @@ import { getUserRoleByID } from "../../../services/cacheDb.js";
 import { userAssignedToMaintenanceReport } from "../../../services/workOnReport.js";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import { Sequelize } from "sequelize";
+import User from "../../../models/appdb/users.js";
 
 export async function handlerUpdateMaintenanceReportNote(req, res) {
   const { id, noteID } = req.params;
@@ -42,6 +43,13 @@ export async function handlerUpdateMaintenanceReportNote(req, res) {
   }
   const note = await ReportNotes.findOne({
     where: { reportNoteID: noteID },
+    include: [
+      {
+        model: User,
+        as: "createdByUser",
+        attributes: ["userID", "firstName", "lastName", "email"],
+      },
+    ],
   });
   if (!note) {
     throw new NotFoundError(req, "Report note not found");
@@ -60,7 +68,9 @@ export async function handlerUpdateMaintenanceReportNote(req, res) {
       reportNoteID: updatedNote.reportNoteID,
       title: updatedNote.title,
       content: updatedNote.content,
-      createdBy: updatedNote.createdBy,
+      createdAt: updatedNote.createdAt,
+      updatedAt: updatedNote.updatedAt,
+      createdByUser: updatedNote.createdByUser,
     },
   });
 }

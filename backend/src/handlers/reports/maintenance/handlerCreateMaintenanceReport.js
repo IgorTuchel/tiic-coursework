@@ -11,7 +11,7 @@ import MaintenanceReportToolCheck from "../../../models/appdb/maintenanceReportT
 export async function handlerCreateMaintenanceReport(req, res) {
   const { name, description, severity, markerScanBlob, tools } = req.body;
 
-  if (!name || !description || !severity || !markerScanBlob || !tools) {
+  if (!name || !description || !severity || !tools) {
     throw new BadRequestError(req, "Missing required fields");
   }
 
