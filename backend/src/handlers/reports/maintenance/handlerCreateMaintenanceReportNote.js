@@ -7,7 +7,11 @@ import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import ReportNotes from "../../../models/appdb/reportNotes.js";
 import MaintenanceReportNotes from "../../../models/appdb/maintenanceReportNotes.js";
 import { NotFoundError } from "../../../middleware/errorHandler.js";
-import { getUserRoleByID } from "../../../services/cacheDb.js";
+import {
+  getUserByID,
+  getUserRoleByID,
+  getUserStatusByID,
+} from "../../../services/cacheDb.js";
 import { userAssignedToMaintenanceReport } from "../../../services/workOnReport.js";
 
 export async function handlerCreateMaintenanceReportNote(req, res) {
@@ -66,13 +70,23 @@ export async function handlerCreateMaintenanceReportNote(req, res) {
       "Failed to link note to maintenance report",
     );
   }
-
+  const getUser = await getUserByID(req.session.userID);
+  if (!getUser.success) {
+    throw new NotFoundError(req, "User not found");
+  }
   respondWithJson(res, HTTPCodes.CREATED, {
     data: {
       reportNoteID: newNote.reportNoteID,
       title: newNote.title,
       content: newNote.content,
-      createdBy: req.session.userID,
+      createdByUser: {
+        userID: getUser.data.userID,
+        email: getUser.data.email,
+        firstName: getUser.data.firstName,
+        lastName: getUser.data.lastName,
+      },
+      createdAt: newNote.createdAt,
+      updatedAt: newNote.updatedAt,
     },
   });
 }
