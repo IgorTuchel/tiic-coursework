@@ -11,10 +11,18 @@ export default function ARPolygonApp({
   markerDetails,
   markerUrl,
   onExit,
+  setIsArSupported,
 }) {
   const mountRef = useRef(null);
   const overlayRef = useRef(null);
-  const hookAPI = useAR(mountRef, overlayRef, initialData, onSave, markerUrl);
+  const hookAPI = useAR(
+    mountRef,
+    overlayRef,
+    initialData,
+    onSave,
+    markerUrl,
+    setIsArSupported,
+  );
 
   return (
     <>

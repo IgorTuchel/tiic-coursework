@@ -63,7 +63,7 @@ export const updateUser = async (id, payload) => {
 
 export const deactivateUser = async (id) => {
   try {
-    const response = await api.put(`/users/${id}`);
+    const response = await api.delete(`/users/${id}`);
     return { success: true, data: response.data };
   } catch (error) {
     return {

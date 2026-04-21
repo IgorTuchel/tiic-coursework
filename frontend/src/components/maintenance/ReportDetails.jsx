@@ -71,6 +71,7 @@ export function ReportDetails({
   // AR + tool checks workflows
   const [workflowView, setWorkflowView] = useState(null); // null / "ai" / "ar"
   const [toolCheckPassed, setToolCheckPassed] = useState(false);
+  const [isArSupported, setIsArSupported] = useState(false);
   const markerUrl = useMarkerUrl(report.maintenanceReportID);
   const modelFiles = useModelFiles();
   const hasTools = report.toolChecks?.length > 0;
@@ -167,6 +168,7 @@ export function ReportDetails({
       <ARView
         markerUrl={markerUrl}
         report={report}
+        setIsArSupported={setIsArSupported}
         initialPolygonData={initialPolygonData}
         onSave={handleARSave}
         onExit={() => setWorkflowView(null)}
@@ -294,6 +296,7 @@ export function ReportDetails({
         polygonData={initialPolygonData}
         onOpenWorkflow={handleOpenWorkflow}
         onDownloadPdf={handleDownloadPdf}
+        isArSupported={isArSupported}
       />
 
       {selectedNote && (

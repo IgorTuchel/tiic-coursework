@@ -17,12 +17,13 @@ export function useAR(
   initialData,
   onSaveCallback,
   markerUrl,
+  setIsARSupported,
 ) {
   const [arSessionActive, setArSessionActive] = useState(false);
   const [isMarkerTracked, setIsMarkerTracked] = useState(false);
   const [isAnchorLocked, setIsAnchorLocked] = useState(false);
   const [currentMode, setCurrentMode] = useState("scanning");
-  const [isArSupported, setIsARSupported] = useState(null);
+  const [isArSupported, setIsARSupportedInternal] = useState(null);
 
   // Grouped Mutable Refs
   const stateRefs = useRef({
@@ -43,9 +44,15 @@ export function useAR(
 
   useEffect(() => {
     (async () => {
-      if (navigator.xr)
+      if (navigator.xr) {
         setIsARSupported(await navigator.xr.isSessionSupported("immersive-ar"));
-      else setIsARSupported(false);
+        setIsARSupportedInternal(
+          await navigator.xr.isSessionSupported("immersive-ar"),
+        );
+      } else {
+        setIsARSupported(false);
+        setIsARSupportedInternal(false);
+      }
     })();
   }, []);
 

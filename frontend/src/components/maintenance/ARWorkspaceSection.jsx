@@ -7,6 +7,7 @@ export function ARWorkspaceSection({
   modelFiles,
   polygonData,
   onOpenWorkflow,
+  isArSupported,
   onDownloadPdf,
 }) {
   const workflowReady = !!markerUrl && !!modelFiles;
@@ -25,13 +26,19 @@ export function ARWorkspaceSection({
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm text-slate-200 font-medium transition-colors">
           <LuFileDown size={15} /> Download Marker
         </button>
-
-        <button
-          disabled={!workflowReady}
-          onClick={onOpenWorkflow}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm text-white font-semibold transition-colors">
-          <LuCpu size={15} /> {workflowLabel}
-        </button>
+        {!isArSupported && (
+          <p className="text-sm text-red-400">
+            AR is not supported on this device/browser.
+          </p>
+        )}
+        {isArSupported && (
+          <button
+            disabled={!workflowReady}
+            onClick={onOpenWorkflow}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm text-white font-semibold transition-colors">
+            <LuCpu size={15} /> {workflowLabel}
+          </button>
+        )}
       </div>
 
       <p className="text-xs text-slate-500">
