@@ -8,7 +8,7 @@ import FaultReport from "../../../models/appdb/faultReport.js";
 import ReportNotes from "../../../models/appdb/reportNotes.js";
 import FaultReportNotes from "../../../models/appdb/faultReportNotes.js";
 import { userAssignedToFaultReport } from "../../../services/workOnReport.js";
-import { getUserRoleByID } from "../../../services/cacheDb.js";
+import { getUserByID, getUserRoleByID } from "../../../services/cacheDb.js";
 
 export async function handlerCreateFaultReportNote(req, res) {
   const { id } = req.params;
@@ -63,12 +63,24 @@ export async function handlerCreateFaultReportNote(req, res) {
     throw new InternalServerError(req, "Failed to link note to fault report");
   }
 
+  const getUser = await getUserByID(req.session.userID);
+  if (!getUser.success) {
+    throw new NotFoundError(req, "User not found");
+  }
+
   respondWithJson(res, HTTPCodes.CREATED, {
     data: {
       reportNoteID: newNote.reportNoteID,
       title: newNote.title,
       content: newNote.content,
-      createdBy: req.session.userID,
+      createdByUser: {
+        userID: req.session.userID,
+        firstName: getUser.data.firstName,
+        lastName: getUser.data.lastName,
+        email: getUser.data.email,
+      },
+      createdAt: newNote.createdAt,
+      updatedAt: newNote.updatedAt,
     },
   });
 }

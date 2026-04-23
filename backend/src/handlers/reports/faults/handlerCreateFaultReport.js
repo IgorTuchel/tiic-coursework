@@ -39,8 +39,8 @@ export async function handlerCreateFaultReport(req, res) {
   const newFaultReport = await FaultReport.create({
     name,
     description,
-    reportStatus: reportStatus.reportStatusID,
-    severityLevel: severityLevel.data.severityLevelID,
+    reportStatusID: reportStatus.reportStatusID,
+    severityLevelID: severityLevel.data.severityLevelID,
     createdBy: req.session.userID,
   });
 
@@ -53,8 +53,8 @@ export async function handlerCreateFaultReport(req, res) {
       faultReportID: newFaultReport.faultReportID,
       name: newFaultReport.name,
       description: newFaultReport.description,
-      reportStatus: reportStatus.statusName,
-      severityLevel: severityLevel.data.severityLevelName,
+      reportStatusID: reportStatus.reportStatusID,
+      severityLevelID: severityLevel.data.severityLevelID,
       createdBy: req.session.userID,
     },
   });

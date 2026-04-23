@@ -18,7 +18,7 @@ const FaultReport = db.define("FaultReport", {
     type: Sequelize.TEXT,
     allowNull: false,
   },
-  reportStatus: {
+  reportStatusID: {
     type: Sequelize.UUID,
     allowNull: false,
     references: {
@@ -26,7 +26,7 @@ const FaultReport = db.define("FaultReport", {
       key: "reportStatusID",
     },
   },
-  severityLevel: {
+  severityLevelID: {
     type: Sequelize.UUID,
     allowNull: false,
     references: {
@@ -42,6 +42,19 @@ const FaultReport = db.define("FaultReport", {
       key: "userID",
     },
   },
+});
+
+FaultReport.belongsTo(User, {
+  as: "createdByUser",
+  foreignKey: "createdBy",
+});
+FaultReport.belongsTo(ReportStatus, {
+  as: "reportStatus",
+  foreignKey: "reportStatusID",
+});
+FaultReport.belongsTo(SeverityLevel, {
+  as: "severityLevel",
+  foreignKey: "severityLevelID",
 });
 
 export default FaultReport;

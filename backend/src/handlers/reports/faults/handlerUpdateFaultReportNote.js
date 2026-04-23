@@ -5,6 +5,8 @@ import {
 } from "../../../middleware/errorHandler.js";
 import FaultReport from "../../../models/appdb/faultReport.js";
 import ReportNotes from "../../../models/appdb/reportNotes.js";
+import ReportStatus from "../../../models/appdb/reportStatus.js";
+import User from "../../../models/appdb/users.js";
 import {
   getReportStatusByID,
   getUserRoleByID,
@@ -28,17 +30,20 @@ export async function handlerUpdateFaultReportNote(req, res) {
 
   const faultReport = await FaultReport.findOne({
     where: { faultReportID: id },
+    include: [
+      {
+        model: ReportStatus,
+        as: "reportStatus",
+        attributes: ["reportStatusID", "statusName"],
+        required: false,
+      },
+    ],
   });
   if (!faultReport) {
     throw new NotFoundError(req, "Fault report not found");
   }
 
-  const reportStatus = await getReportStatusByID(faultReport.reportStatus);
-  if (!reportStatus.success) {
-    throw new NotFoundError(req, "Report status not found");
-  }
-
-  if (reportStatus.data.statusName === "Closed") {
+  if (faultReport.reportStatus.statusName === "closed") {
     throw new BadRequestError(
       req,
       "Cannot update notes on a closed fault report",
@@ -47,6 +52,13 @@ export async function handlerUpdateFaultReportNote(req, res) {
 
   const note = await ReportNotes.findOne({
     where: { reportNoteID: noteID },
+    include: [
+      {
+        model: User,
+        as: "createdByUser",
+        attributes: ["userID", "firstName", "lastName", "email"],
+      },
+    ],
   });
   if (!note) {
     throw new NotFoundError(req, "Report note not found");
@@ -74,6 +86,13 @@ export async function handlerUpdateFaultReportNote(req, res) {
 
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
-    data: updatedNote,
+    data: {
+      reportNoteID: updatedNote.reportNoteID,
+      title: updatedNote.title,
+      content: updatedNote.content,
+      createdAt: updatedNote.createdAt,
+      updatedAt: updatedNote.updatedAt,
+      createdByUser: updatedNote.createdByUser,
+    },
   });
 }

@@ -13,6 +13,7 @@ import {
 } from "../handlers/reports/faults/handlerAssignFaultReport.js";
 import { handlerUpdateFaultReport } from "../handlers/reports/faults/handlerUpdateFaultReport.js";
 import { handlerUpdateFaultReportNote } from "../handlers/reports/faults/handlerUpdateFaultReportNote.js";
+import { handlerGetAssignableUsers } from "../handlers/reports/faults/handlerGetAssignableUsers.js";
 
 const router = express.Router();
 
@@ -28,6 +29,13 @@ router.get(
   protectedRoute,
   permissionGuard("canSuggestFaults"),
   handlerGetFaultReports,
+);
+
+router.get(
+  "/assignable-users",
+  protectedRoute,
+  permissionGuard("canAssignFaults"),
+  handlerGetAssignableUsers,
 );
 
 router.get(
@@ -58,7 +66,12 @@ router.post(
   handlerUpdateFaultReportNote,
 );
 
-router.put("/:id/notes/:noteID", protectedRoute, handlerUpdateFaultReportNote);
+router.put(
+  "/:id/notes/:noteID",
+  protectedRoute,
+  permissionGuard("canSuggestFaults"),
+  handlerUpdateFaultReportNote,
+);
 
 router.post(
   "/:id/assign",

@@ -6,6 +6,8 @@ import { Op } from "sequelize";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import { userAssignedToFaultReport } from "../../../services/workOnReport.js";
 import ReportNotes from "../../../models/appdb/reportNotes.js";
+import SeverityLevel from "../../../models/appdb/severityLevel.js";
+import ReportStatus from "../../../models/appdb/reportStatus.js";
 
 export async function handlerGetFaultReports(req, res) {
   const requestedUserRole = await getUserRoleByID(req.session.roleID);
@@ -20,6 +22,24 @@ export async function handlerGetFaultReports(req, res) {
   ) {
     faultReports = await FaultReport.findAll({
       include: [
+        {
+          model: SeverityLevel,
+          as: "severityLevel",
+          attributes: ["severityLevelID", "severityLevelName"],
+          required: false,
+        },
+        {
+          model: ReportStatus,
+          as: "reportStatus",
+          attributes: ["reportStatusID", "statusName"],
+          required: false,
+        },
+        {
+          model: User,
+          as: "createdByUser",
+          attributes: ["userID", "firstName", "lastName", "email"],
+          required: false,
+        },
         {
           model: User,
           as: "assignedUsers",
@@ -59,6 +79,24 @@ export async function handlerGetFaultReports(req, res) {
         ],
       },
       include: [
+        {
+          model: SeverityLevel,
+          as: "severityLevel",
+          attributes: ["severityLevelID", "severityLevelName"],
+          required: false,
+        },
+        {
+          model: ReportStatus,
+          as: "reportStatus",
+          attributes: ["reportStatusID", "statusName"],
+          required: false,
+        },
+        {
+          model: User,
+          as: "createdByUser",
+          attributes: ["userID", "firstName", "lastName", "email"],
+          required: false,
+        },
         {
           model: User,
           as: "assignedUsers",
@@ -108,6 +146,24 @@ export async function handlerGetFaultReportByID(req, res) {
   const faultReport = await FaultReport.findOne({
     where: { faultReportID: id },
     include: [
+      {
+        model: SeverityLevel,
+        as: "severityLevel",
+        attributes: ["severityLevelID", "severityLevelName"],
+        required: false,
+      },
+      {
+        model: ReportStatus,
+        as: "reportStatus",
+        attributes: ["reportStatusID", "statusName"],
+        required: false,
+      },
+      {
+        model: User,
+        as: "createdByUser",
+        attributes: ["userID", "firstName", "lastName", "email"],
+        required: false,
+      },
       {
         model: User,
         as: "assignedUsers",
