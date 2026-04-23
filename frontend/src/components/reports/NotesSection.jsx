@@ -1,5 +1,5 @@
 import { LuPlus, LuSave } from "react-icons/lu";
-import { inputCls } from "./ReportDetailsHelpers";
+import { inputCls } from "../../utils/styles";
 
 function NoteForm({ noteForm, saving, onChangeField, onSubmit, onCancel }) {
   return (

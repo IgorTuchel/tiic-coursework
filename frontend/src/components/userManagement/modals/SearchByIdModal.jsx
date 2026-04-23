@@ -8,7 +8,8 @@ import {
 } from "react-icons/lu";
 import { Modal } from "../../Modal.jsx";
 import { StatusBadge } from "../StatusBadge.jsx";
-import { normaliseUser, resolveMfa, initials, inputCls } from "../utils.js";
+import { normaliseUser, resolveMfa, initials } from "../../../utils/utils.js";
+import { inputCls } from "../../../utils/styles.js";
 import { getUserById } from "../../../services/getUsersService.js";
 
 export function SearchByIdModal({

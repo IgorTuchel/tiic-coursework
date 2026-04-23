@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal } from "../../Modal.jsx";
-import { inputCls, labelCls } from "../utils.js";
+
+import { inputCls, labelCls } from "../../../utils/styles.js";
 
 export function UserModal({
   mode,
@@ -90,9 +91,8 @@ export function UserModal({
       <form id="user-form" onSubmit={handleSubmit} className="space-y-3">
         {mode === "edit" && isPending && (
           <div className="rounded-md bg-yellow-400/10 border border-yellow-400/20 px-3 py-2 text-xs text-yellow-300">
-            ⚠ Account is{" "}
-            <span className="font-medium">pending registration</span> — status
-            cannot be changed yet.
+            Account is <span className="font-medium">pending registration</span>{" "}
+            — status cannot be changed yet.
           </div>
         )}
         <div className="grid grid-cols-2 gap-3">

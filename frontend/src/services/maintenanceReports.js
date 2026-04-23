@@ -268,3 +268,18 @@ export const createMaintenanceReport = async ({
     };
   }
 };
+
+export const getAssignableUsers = async () => {
+  try {
+    const response = await api.get("/reports/maintenance/assignable-users");
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to fetch assignable users.",
+    };
+  }
+};

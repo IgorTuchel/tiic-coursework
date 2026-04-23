@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal } from "../Modal";
 import { LuPencil, LuSave } from "react-icons/lu";
+import { inputCls } from "../../utils/styles";
 
 function NoteViewModal({ note, onClose, onStartEdit }) {
   const createdAt = note.createdAt ? new Date(note.createdAt) : null;
@@ -97,7 +98,7 @@ function NoteEditModal({ note, onClose, onBack, onSave }) {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className={inputCls}
             placeholder="Note title"
           />
         </div>
@@ -107,7 +108,7 @@ function NoteEditModal({ note, onClose, onBack, onSave }) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={6}
-            className="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"
+            className={inputCls}
             placeholder="Write your note here..."
           />
         </div>

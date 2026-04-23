@@ -1,6 +1,6 @@
 import { LuUser, LuEllipsis } from "react-icons/lu";
 import { StatusBadge } from "./StatusBadge.jsx";
-import { resolveMfa, initials } from "./utils.js";
+import { resolveMfa, initials } from "../../utils/utils.js";
 
 export function UserTable({ users, roles, loading, onActionClick }) {
   if (loading)

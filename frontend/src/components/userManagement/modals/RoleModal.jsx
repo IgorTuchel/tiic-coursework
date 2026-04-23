@@ -1,6 +1,6 @@
 import { LuCheck, LuMinus } from "react-icons/lu";
 import { Modal } from "../../Modal.jsx";
-import { PERM_LABELS } from "../utils.js";
+import { PERM_LABELS } from "../../../utils/utils.js";
 
 export function RoleModal({ user, roles, onClose, onBack }) {
   const fullRole =

@@ -1,5 +1,5 @@
 import { LuPencil, LuSave, LuX } from "react-icons/lu";
-import { inputCls } from "./ReportDetailsHelpers";
+import { inputCls } from "../../utils/styles";
 
 export function ReportHeader({
   report,

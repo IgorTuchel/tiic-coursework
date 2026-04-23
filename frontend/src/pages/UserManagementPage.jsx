@@ -107,7 +107,7 @@ function UserManagementPage() {
         )}
       </div>
 
-      {/* ── Modals ── */}
+      {/* modals */}
       {modal === "searchById" && (
         <SearchByIdModal
           roles={roles}

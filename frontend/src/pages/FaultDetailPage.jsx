@@ -4,55 +4,48 @@ import toast from "react-hot-toast";
 import { LuArrowLeft } from "react-icons/lu";
 import MainLayout from "../layouts/MainLayout";
 import { ReportDetails } from "../components/reports/ReportDetails";
-import { getAllUsers } from "../services/getUsersService";
 import {
-  getMaintenanceReportById,
-  getAllTools,
   getReportStatuses,
   getSeverityLevels,
-  updateMaintenanceReport,
-  updateMaintenanceReportNote,
-  createMaintenanceReportNote,
-  assignUserToReport,
-  unassignUserFromReport,
-  addToolToReport,
-  removeToolFromReport,
-  getAssignableUsers,
 } from "../services/maintenanceReports";
 import { AuthContext } from "../context/AuthContext";
+import {
+  assignUserToReport,
+  createFaultReportNote,
+  getAssignableUsers,
+  getFaultReportById,
+  unassignUserFromReport,
+  updateFaultReport,
+  updateFaultReportNote,
+} from "../services/faultReports";
 
-export function MaintenanceDetailPage() {
+export function FaultDetailPage() {
   const { user } = useContext(AuthContext);
   const canManage =
-    user?.roleInfo?.canManageReports ||
-    user?.roleInfo?.canWorkOnReports ||
+    user?.roleInfo?.canManageFaults ||
+    user?.roleInfo?.canSuggestFaults ||
     false;
-  const canAssign = user?.roleInfo?.canAssignReports ?? false;
+  const canAssign = user?.roleInfo?.canAssignFaults ?? false;
   const navigate = useNavigate();
   const { id } = useParams();
 
   const [report, setReport] = useState(null);
   const [availableUsers, setAvailableUsers] = useState([]);
-  const [availableTools, setAvailableTools] = useState([]);
   const [reportStatuses, setReportStatuses] = useState([]);
   const [severityLevels, setSeverityLevels] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAll = async () => {
-      const [reportResult, toolsResult, statusesResult, severitiesResult] =
+      const [reportResult, statusesResult, severitiesResult] =
         await Promise.all([
-          getMaintenanceReportById(id),
-          getAllTools(),
+          getFaultReportById(id),
           getReportStatuses(),
           getSeverityLevels(),
         ]);
 
       if (reportResult.success) setReport(reportResult.data);
       else toast.error(reportResult.message || "Failed to load report.");
-
-      if (toolsResult.success) setAvailableTools(toolsResult.data);
-      else toast.error(toolsResult.message || "Failed to load tools.");
 
       if (statusesResult.success) setReportStatuses(statusesResult.data);
       else toast.error(statusesResult.message || "Failed to load statuses.");
@@ -73,26 +66,15 @@ export function MaintenanceDetailPage() {
     fetchAll();
   }, [id, canAssign]);
 
-  const handleUpdateReportAR = async (fields) => {
-    const result = await updateMaintenanceReport(id, {
-      markerScanBlob: fields.markerScanBlob,
-    });
-    if (result.success) {
-      setReport((prev) => ({ ...prev, ...result.data }));
-      toast.success("Marker scan saved.");
-    } else {
-      toast.error(result.message || "Failed to save marker scan.");
-    }
-  };
-
   const handleUpdateReport = async (fields) => {
-    const result = await updateMaintenanceReport(id, {
+    const result = await updateFaultReport(id, {
       name: fields.name,
       description: fields.description,
       status: fields.reportStatusID,
       severity: fields.severityLevelID,
     });
     if (result.success) {
+      console.log("Updated report:", result.data);
       setReport((prev) => ({ ...prev, ...result.data }));
       toast.success("Report updated.");
     } else {
@@ -101,7 +83,7 @@ export function MaintenanceDetailPage() {
   };
 
   const handleCreateNote = async ({ title, content }) => {
-    const result = await createMaintenanceReportNote(id, { title, content });
+    const result = await createFaultReportNote(id, { title, content });
     if (result.success) {
       setReport((prev) => ({ ...prev, notes: [...prev.notes, result.data] }));
       toast.success("Note created.");
@@ -111,7 +93,7 @@ export function MaintenanceDetailPage() {
   };
 
   const handleUpdateNote = async (updated) => {
-    const result = await updateMaintenanceReportNote(
+    const result = await updateFaultReportNote(
       id,
       updated.reportNoteID,
       updated,
@@ -157,43 +139,17 @@ export function MaintenanceDetailPage() {
     }
   };
 
-  const handleAddTool = async (tool) => {
-    const result = await addToolToReport(id, tool.toolID);
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        toolChecks: [...prev.toolChecks, tool],
-      }));
-      toast.success(`${tool.name} added.`);
-    } else {
-      toast.error(result.message || "Failed to add tool.");
-    }
-  };
-
-  const handleRemoveTool = async (tool) => {
-    const result = await removeToolFromReport(id, tool.toolID);
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        toolChecks: prev.toolChecks.filter((t) => t.toolID !== tool.toolID),
-      }));
-      toast.success(`${tool.name} removed.`);
-    } else {
-      toast.error(result.message || "Failed to remove tool.");
-    }
-  };
-
   return (
     <MainLayout>
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate("/app/maintenance")}
+            onClick={() => navigate("/app/faults")}
             className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
             aria-label="Go back">
             <LuArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-semibold">Maintenance Report</h1>
+          <h1 className="text-2xl font-semibold">Fault Report</h1>
         </div>
 
         {loading ? (
@@ -206,18 +162,15 @@ export function MaintenanceDetailPage() {
         ) : report ? (
           <ReportDetails
             report={report}
+            maintenanceOrFault="Fault"
             availableUsers={availableUsers}
-            availableTools={availableTools}
             reportStatuses={reportStatuses}
             severityLevels={severityLevels}
-            onUpdateReportAR={handleUpdateReportAR}
             onUpdateReport={handleUpdateReport}
             onCreateNote={handleCreateNote}
             onUpdateNote={handleUpdateNote}
             onAddUser={handleAddUser}
             onRemoveUser={handleRemoveUser}
-            onAddTool={handleAddTool}
-            onRemoveTool={handleRemoveTool}
             canManage={canManage}
             canAssign={canAssign}
           />

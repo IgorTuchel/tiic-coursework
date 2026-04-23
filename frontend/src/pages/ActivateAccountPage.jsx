@@ -6,6 +6,7 @@ import { LuEye, LuEyeOff, LuCheck } from "react-icons/lu";
 import { activateAccount } from "../services/activateAccountService";
 import toast from "react-hot-toast";
 import { login } from "../services/loginUserService";
+import { inputCls, labelCls } from "../utils/styles";
 
 function ActivateAccountPage() {
   const [searchParams] = useSearchParams();
@@ -79,7 +80,7 @@ function ActivateAccountPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 aria-label="Email address"
-                className="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className={inputCls}
               />
               <button
                 className="mt-2 w-48 rounded-md bg-sky-500 hover:bg-sky-600 px-3 py-2.5 text-sm font-medium text-slate-950  transition-colors"
@@ -118,9 +119,7 @@ function ActivateAccountPage() {
         <div className="rounded-xl bg-slate-800 border border-slate-700 p-6 space-y-5">
           <form onSubmit={handleSubmitPassword} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                Password
-              </label>
+              <label className={labelCls}>Password</label>
               <div className="relative">
                 <input
                   type={showPass ? "text" : "password"}

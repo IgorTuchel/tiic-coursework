@@ -4,18 +4,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import DashboardPage from "./pages/DashboardPage";
-import ArMaintenancePage from "./pages/ArMaintenancePage";
-import CheckToolsPage from "./pages/CheckToolsPage";
 import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserManagementPage from "./pages/UserManagementPage";
 import { AuthProvider } from "./context/AuthContext";
-import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 import ProtectedPage from "./components/ProtectedPage.jsx";
 import ActivateAccountPage from "./pages/ActivateAccountPage.jsx";
 import { MaintenancePage } from "./pages/MaintenancePage.jsx";
 import { MaintenanceDetailPage } from "./pages/MaintenanceDetailPage.jsx";
+import { FaultPage } from "./pages/FaultPage.jsx";
+import { FaultDetailPage } from "./pages/FaultDetailPage.jsx";
 
 function App() {
   return (
@@ -41,6 +40,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/activate-account" element={<ActivateAccountPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/app" element={<ProtectedPage />}>
           <Route path="/app/dashboard" element={<DashboardPage />} />
           <Route path="/app/maintenance" element={<MaintenancePage />} />
@@ -48,11 +49,10 @@ function App() {
             path="/app/maintenance/:id"
             element={<MaintenanceDetailPage />}
           />
-          <Route path="/app/check-tools" element={<CheckToolsPage />} />
+          <Route path="/app/faults" element={<FaultPage />} />
+          <Route path="/app/faults/:id" element={<FaultDetailPage />} />
           <Route path="/app/admin" element={<UserManagementPage />} />
         </Route>
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Routes>
     </BrowserRouter>
   );

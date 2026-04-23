@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { LuX, LuPlus, LuSave } from "react-icons/lu";
-import { inputCls } from "./ReportDetailsHelpers";
+import { inputCls } from "../../utils/styles";
 
 export function CreateReportModal({
+  maintenanceOrFault = "Maintenance",
   severityLevels = [],
   availableTools = [],
   onSubmit,
@@ -33,17 +34,26 @@ export function CreateReportModal({
   const removeTool = (toolID) =>
     setSelectedTools((prev) => prev.filter((t) => t.toolID !== toolID));
 
-  const canSubmit = form.name.trim() && form.severityLevelID;
+  const canSubmit =
+    form.name.trim() && form.severityLevelID && form.description.trim();
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSaving(true);
-    await onSubmit({
-      name: form.name.trim(),
-      description: form.description.trim(),
-      severityLevelID: form.severityLevelID,
-      tools: selectedTools.map((t) => t.toolID),
-    });
+    if (maintenanceOrFault === "Maintenance") {
+      await onSubmit({
+        name: form.name.trim(),
+        description: form.description.trim(),
+        severityLevelID: form.severityLevelID,
+        tools: selectedTools.map((t) => t.toolID),
+      });
+    } else {
+      await onSubmit({
+        name: form.name.trim(),
+        description: form.description.trim(),
+        severityLevelID: form.severityLevelID,
+      });
+    }
     setSaving(false);
   };
 
@@ -52,7 +62,7 @@ export function CreateReportModal({
       <div className="w-full max-w-lg rounded-xl bg-slate-900 border border-slate-700 shadow-2xl flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
           <h2 className="text-base font-semibold text-slate-100">
-            New Maintenance Report
+            New {maintenanceOrFault} Report
           </h2>
           <button
             onClick={onClose}
@@ -76,7 +86,7 @@ export function CreateReportModal({
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Description
+              Description <span className="text-red-400">*</span>
             </label>
             <textarea
               {...field("description")}
@@ -98,53 +108,54 @@ export function CreateReportModal({
               ))}
             </select>
           </div>
+          {maintenanceOrFault === "Maintenance" && (
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Required Tools
+              </label>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Required Tools
-            </label>
+              {selectedTools.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {selectedTools.map((tool) => (
+                    <span
+                      key={tool.toolID}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-slate-800 border border-slate-700 pl-3 pr-1.5 py-1 text-xs text-slate-300">
+                      {tool.name}
+                      <button
+                        onClick={() => removeTool(tool.toolID)}
+                        className="rounded-full p-0.5 text-slate-500 hover:text-red-400 transition-colors">
+                        <LuX size={11} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
 
-            {selectedTools.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
-                {selectedTools.map((tool) => (
-                  <span
-                    key={tool.toolID}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-slate-800 border border-slate-700 pl-3 pr-1.5 py-1 text-xs text-slate-300">
-                    {tool.name}
-                    <button
-                      onClick={() => removeTool(tool.toolID)}
-                      className="rounded-full p-0.5 text-slate-500 hover:text-red-400 transition-colors">
-                      <LuX size={11} />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {unselectedTools.length > 0 && (
-              <select
-                className={inputCls}
-                value=""
-                onChange={(e) => {
-                  if (e.target.value) addTool(e.target.value);
-                }}>
-                <option value="" disabled>
-                  Add a tool...
-                </option>
-                {unselectedTools.map((t) => (
-                  <option key={t.toolID} value={t.toolID}>
-                    {t.name}
+              {unselectedTools.length > 0 && (
+                <select
+                  className={inputCls}
+                  value=""
+                  onChange={(e) => {
+                    if (e.target.value) addTool(e.target.value);
+                  }}>
+                  <option value="" disabled>
+                    Add a tool...
                   </option>
-                ))}
-              </select>
-            )}
+                  {unselectedTools.map((t) => (
+                    <option key={t.toolID} value={t.toolID}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              )}
 
-            {availableTools.length === 0 && (
-              <p className="text-xs text-slate-500 italic">
-                No tools available.
-              </p>
-            )}
-          </div>
+              {availableTools.length === 0 && (
+                <p className="text-xs text-slate-500 italic">
+                  No tools available.
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-slate-800">
@@ -158,7 +169,7 @@ export function CreateReportModal({
             disabled={!canSubmit || saving}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors">
             <LuSave size={14} />
-            {saving ? "Creating…" : "Create Report"}
+            {saving ? "Creating…" : `Create ${maintenanceOrFault} Report`}
           </button>
         </div>
       </div>

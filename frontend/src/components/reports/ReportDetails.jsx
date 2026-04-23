@@ -9,14 +9,11 @@ import {
   MetaItem,
   AssignedUsersSection,
   ToolChecksSection,
-  SEVERITY_STYLES,
-  STATUS_STYLES,
-  inputCls,
 } from "./ReportDetailsHelpers";
+import { SEVERITY_STYLES, STATUS_STYLES, inputCls } from "../../utils/styles";
 import { downloadMarkerPdf } from "../../services/maintenanceReports";
-
-import { useMarkerUrl } from "../../hooks/maintenance/useMarkerUrl";
-import { useModelFiles } from "../../hooks/maintenance/useModelFiles";
+import { useMarkerUrl } from "../../hooks/useMarkerUrl";
+import { useModelFiles } from "../../hooks/useModelFiles";
 import { ReportHeader } from "./ReportHeader";
 import { NotesSection } from "./NotesSection";
 import { ARWorkspaceSection } from "./ARWorkspaceSection";
@@ -41,6 +38,7 @@ function buildEditForm(report) {
 }
 
 export function ReportDetails({
+  maintenanceOrFault = "Maintenance",
   report,
   availableUsers = [],
   availableTools = [],
@@ -72,7 +70,10 @@ export function ReportDetails({
   const [workflowView, setWorkflowView] = useState(null); // null / "ai" / "ar"
   const [toolCheckPassed, setToolCheckPassed] = useState(false);
   const [isArSupported, setIsArSupported] = useState(false);
-  const markerUrl = useMarkerUrl(report.maintenanceReportID);
+  const markerUrl =
+    maintenanceOrFault === "Maintenance"
+      ? useMarkerUrl(report.maintenanceReportID)
+      : null;
   const modelFiles = useModelFiles();
   const hasTools = report.toolChecks?.length > 0;
   const initialPolygonData = parsePolygonBlob(report.markerScanBlob);
@@ -152,7 +153,7 @@ export function ReportDetails({
   };
 
   // Views
-  if (workflowView === "ai") {
+  if (workflowView === "ai" && maintenanceOrFault === "Maintenance") {
     return (
       <AIView
         modelFiles={modelFiles}
@@ -163,7 +164,7 @@ export function ReportDetails({
     );
   }
 
-  if (workflowView === "ar") {
+  if (workflowView === "ar" && maintenanceOrFault === "Maintenance") {
     return (
       <ARView
         markerUrl={markerUrl}
@@ -216,7 +217,7 @@ export function ReportDetails({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <MetaItem icon={LuIdCard} label="Report ID">
-          {report.maintenanceReportID || report.reportID}
+          {report.maintenanceReportID || report.faultReportID || "N/A"}
         </MetaItem>
         <MetaItem icon={LuUser} label="Created by">
           {report.createdByUser
@@ -268,12 +269,14 @@ export function ReportDetails({
         onRemove={canAssign ? onRemoveUser : null}
       />
 
-      <ToolChecksSection
-        toolChecks={report.toolChecks ?? []}
-        availableTools={availableTools}
-        onAdd={canManage ? onAddTool : null}
-        onRemove={canManage ? onRemoveTool : null}
-      />
+      {maintenanceOrFault === "Maintenance" && (
+        <ToolChecksSection
+          toolChecks={report.toolChecks ?? []}
+          availableTools={availableTools}
+          onAdd={canManage ? onAddTool : null}
+          onRemove={canManage ? onRemoveTool : null}
+        />
+      )}
 
       <NotesSection
         notes={report.notes}
@@ -288,16 +291,18 @@ export function ReportDetails({
         onSelectNote={setSelectedNote}
       />
 
-      <ARWorkspaceSection
-        hasTools={hasTools}
-        toolCheckPassed={toolCheckPassed}
-        markerUrl={markerUrl}
-        modelFiles={modelFiles}
-        polygonData={initialPolygonData}
-        onOpenWorkflow={handleOpenWorkflow}
-        onDownloadPdf={handleDownloadPdf}
-        isArSupported={isArSupported}
-      />
+      {maintenanceOrFault === "Maintenance" && (
+        <ARWorkspaceSection
+          hasTools={hasTools}
+          toolCheckPassed={toolCheckPassed}
+          markerUrl={markerUrl}
+          modelFiles={modelFiles}
+          polygonData={initialPolygonData}
+          onOpenWorkflow={handleOpenWorkflow}
+          onDownloadPdf={handleDownloadPdf}
+          isArSupported={isArSupported}
+        />
+      )}
 
       {selectedNote && (
         <NoteModal

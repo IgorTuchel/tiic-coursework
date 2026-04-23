@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getMarkerQrBlobUrl } from "../../services/maintenanceReports";
+import { getMarkerQrBlobUrl } from "../services/maintenanceReports";
 
 export function useMarkerUrl(reportId) {
   const [markerUrl, setMarkerUrl] = useState(null);

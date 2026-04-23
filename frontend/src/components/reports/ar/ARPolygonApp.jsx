@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { LuArrowLeft, LuScanLine } from "react-icons/lu";
-import { useAR } from "./useAR";
+import { useAR } from "../../../hooks/useAR";
 import { AROverlay } from "./AROverlay";
 import MainLayout from "../../../layouts/MainLayout";
 

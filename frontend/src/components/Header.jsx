@@ -69,11 +69,12 @@ function Header() {
   const navLinks = [
     { to: "/app/dashboard", label: "Dashboard" },
     { to: "/app/maintenance", label: "Maintenance Reports" },
-    ...(perms?.canManageTools
-      ? [{ to: "/app/check-tools", label: "Tool Check" }]
-      : []),
-    ...(perms?.canWorkOnReports || perms?.canViewAllReports
-      ? [{ to: "/app/reports", label: "Reports" }]
+    ...(perms?.canWorkOnReports ||
+    perms?.canViewAllReports ||
+    perms?.canSuggestFaults ||
+    perms?.canManageFaults ||
+    perms?.canViewAllFaults
+      ? [{ to: "/app/faults", label: "Fault Reports" }]
       : []),
     ...(perms?.canManageUsers || perms?.canViewAllUsers
       ? [{ to: "/app/admin", label: "Users" }]
@@ -96,7 +97,7 @@ function Header() {
       <div className="px-4 sm:px-6 py-3 flex items-center justify-between gap-6">
         {/* Logo */}
         <Link
-          to="/dashboard"
+          to="/app/dashboard"
           className="flex items-center gap-2.5 group shrink-0">
           <LuLayers className="w-5 h-5 text-sky-500 group-hover:text-sky-400 transition-colors" />
           <span className="text-base font-semibold tracking-wide uppercase text-slate-100 group-hover:text-white transition-colors">

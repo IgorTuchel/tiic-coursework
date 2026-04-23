@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { ARButton } from "three/examples/jsm/webxr/ARButton.js";
 import toast from "react-hot-toast";
-import { setupPolygon } from "./polygonUtils";
+import { setupPolygon } from "../utils/polygonUtils";
 
 const RETICLE_COLORS = {
   editing: 0x00ff88,

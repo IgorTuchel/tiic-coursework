@@ -1,5 +1,5 @@
 import { Modal } from "../../Modal.jsx";
-import { PERM_LABELS, resolveMfa } from "../utils.js";
+import { PERM_LABELS, resolveMfa } from "../../../utils/utils.js";
 
 function Section({ title, children }) {
   return (

@@ -9,15 +9,6 @@ import {
   LuX,
 } from "react-icons/lu";
 import toast from "react-hot-toast";
-import MainLayout from "../layouts/MainLayout";
-import { ReportTable } from "../components/reports/ReportTable";
-import { CreateReportModal } from "../components/reports/CreateReportModal";
-import {
-  getAllMaintenanceReports,
-  createMaintenanceReport,
-  getSeverityLevels,
-  getAllTools,
-} from "../services/maintenanceReports";
 import {
   QUICK_FILTERS,
   SEVERITY_ORDER,
@@ -26,11 +17,18 @@ import {
   matchesQuickFilter,
   sortReports,
 } from "../utils/utils";
+import MainLayout from "../layouts/MainLayout";
+import { ReportTable } from "../components/reports/ReportTable";
+import { CreateReportModal } from "../components/reports/CreateReportModal";
+import { getSeverityLevels } from "../services/maintenanceReports";
+import {
+  createFaultReport,
+  getAllFaultReports,
+} from "../services/faultReports";
 
-export function MaintenancePage() {
+export function FaultPage() {
   const [reports, setReports] = useState([]);
   const [severityLevels, setSeverityLevels] = useState([]);
-  const [availableTools, setAvailableTools] = useState([]);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState("date_desc");
   const [quickFilter, setQuickFilter] = useState("all");
@@ -47,12 +45,12 @@ export function MaintenancePage() {
       setLoading(true);
     }
 
-    const result = await getAllMaintenanceReports();
+    const result = await getAllFaultReports();
 
     if (result.success) {
       setReports(result.data);
     } else {
-      toast.error(result.message ?? "Failed to fetch maintenance reports.");
+      toast.error(result.message ?? "Failed to fetch fault reports.");
     }
 
     setLoading(false);
@@ -64,10 +62,6 @@ export function MaintenancePage() {
 
     getSeverityLevels().then((result) => {
       if (result.success) setSeverityLevels(result.data);
-    });
-
-    getAllTools().then((result) => {
-      if (result.success) setAvailableTools(result.data);
     });
   }, []);
 
@@ -87,7 +81,7 @@ export function MaintenancePage() {
     (search.trim() ? 1 : 0) + (quickFilter !== "all" ? 1 : 0);
 
   const handleCreate = async (formData) => {
-    const result = await createMaintenanceReport(formData);
+    const result = await createFaultReport(formData);
 
     if (result.success) {
       toast.success("Report created!");
@@ -105,13 +99,12 @@ export function MaintenancePage() {
   };
 
   return (
-    <MainLayout title="Maintenance Reports">
+    <MainLayout title="Fault Reports">
       <div className="flex flex-col gap-5">
-        {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold text-slate-100">
-              Maintenance Reports
+              Fault Reports
             </h1>
             <p className="text-sm text-slate-400">
               Track open issues, review severity, and manage report workflows.
@@ -238,9 +231,7 @@ export function MaintenancePage() {
               loading={loading}
               reports={processedReports}
               onActionClick={(report) =>
-                navigate(
-                  `/app/maintenance/${report.maintenanceReportID || report.reportID}`,
-                )
+                navigate(`/app/faults/${report.faultReportID}`)
               }
             />
           </div>
@@ -250,8 +241,8 @@ export function MaintenancePage() {
       {showCreate && (
         <CreateReportModal
           severityLevels={severityLevels}
-          availableTools={availableTools}
           onSubmit={handleCreate}
+          maintenanceOrFault="Fault"
           onClose={() => setShowCreate(false)}
         />
       )}
