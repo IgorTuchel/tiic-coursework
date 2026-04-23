@@ -20,6 +20,7 @@ import {
   handlerGetMarkerPdf,
   handlerGetMarkerQr,
 } from "../handlers/reports/maintenance/handlerGetMarkerQr.js";
+import { handlerGetAssignableUsers } from "../handlers/reports/maintenance/handlerGetAssignableUsers.js";
 
 const router = express.Router();
 
@@ -35,6 +36,13 @@ router.get(
   protectedRoute,
   permissionGuard("canWorkOnReports"),
   handlerGetAllMaintenanceReports,
+);
+
+router.get(
+  "/assignable-users",
+  protectedRoute,
+  permissionGuard("canWorkOnReports"),
+  handlerGetAssignableUsers,
 );
 
 router.get(
