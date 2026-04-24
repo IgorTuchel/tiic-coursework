@@ -3,43 +3,24 @@
  * @description Centralized error handling middleware and custom error classes for the application. This module defines a hierarchy of error classes to represent various error conditions that can occur during HTTP request processing, as well as a middleware function to handle these errors and send standardized JSON responses to the client.
  * @module middleware/errorHandler
  */
+import { logError } from "../services/errorLogDb.js";
 import { HTTPCodes, respondWithErrorJson } from "../utils/json.js";
 
-export async function errorHandlingMiddleware(err, req, res, next) {
-  if (err instanceof HTTPRequestError) {
-    console.log(
-      `${err.name} - ${err.message} - IP: ${err.ip} - User Agent: ${err.user_agent}`,
-    );
-    console.log("Request details:", {
-      method: err.method,
-      url: err.url,
-      headers: err.headers,
-      body: err.body,
-    });
-    return respondWithErrorJson(
-      res,
-      err.httpStatusCode,
-      err.message,
-      err.statusCode,
-    );
-  }
-
-  if (err?.type === "entity.parse.failed") {
-    return respondWithErrorJson(
-      res,
-      HTTPCodes.BAD_REQUEST,
-      "Invalid JSON payload",
-      StatusCodes.BAD_REQUEST,
-    );
-  }
-  console.log("Unexpected Error!", err.stack);
-  return respondWithErrorJson(
-    res,
-    HTTPCodes.INTERNAL_SERVER_ERROR,
-    "An unexpected error occurred",
-    StatusCodes.INTERNAL_SERVER_ERROR,
-  );
-}
+/**
+ * @constant SENSITIVE_HEADERS
+ * @description A set of HTTP header names that are considered sensitive and should be redacted when logging or including in error responses. This includes headers that typically contain authentication credentials, tokens, or other sensitive information that should not be exposed in logs or error messages.
+ * @type {Set<string>}
+ */
+const SENSITIVE_HEADERS = new Set([
+  "authorization",
+  "cookie",
+  "set-cookie",
+  "x-api-key",
+  "x-auth-token",
+  "x-access-token",
+  "proxy-authorization",
+  "token",
+]);
 
 /**
  * @function StatusCodes
@@ -60,6 +41,76 @@ export const StatusCodes = {
   NOT_FOUND: "NOT_FOUND",
   RUN_TIME_ERROR: "RUN_TIME_ERROR",
 };
+
+export function errorHandlingMiddleware(err, req, res, next) {
+  if (err instanceof HTTPRequestError) {
+    logError({
+      errorName: err?.name,
+      statusCode: err?.statusCode,
+      httpStatusCode: err?.httpStatusCode,
+      message: err?.message,
+      stackTrace: err?.stack,
+      ipAddress: err?.ip,
+      userAgent: err?.user_agent,
+      method: err?.method,
+      url: err?.url,
+      headers: err?.headers,
+      body: err?.body,
+      userID: req?.session?.userID ?? null,
+    });
+    return respondWithErrorJson(
+      res,
+      err.httpStatusCode,
+      err.message,
+      err.statusCode,
+    );
+  }
+
+  if (err?.type === "entity.parse.failed") {
+    logError({
+      errorName: "JSONParseError",
+      statusCode: StatusCodes.BAD_REQUEST,
+      httpStatusCode: HTTPCodes.BAD_REQUEST,
+      message: "Invalid JSON payload",
+      stackTrace: err?.stack ?? null,
+      ipAddress: req?.ip ?? null,
+      userAgent: req?.headers?.["user-agent"] ?? null,
+      method: req?.method ?? null,
+      url: req?.originalUrl ?? null,
+      headers: sanitizeHeaders(req?.headers),
+      body: null,
+      userID: req?.session?.userID ?? null,
+    });
+    return respondWithErrorJson(
+      res,
+      HTTPCodes.BAD_REQUEST,
+      "Invalid JSON payload",
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+
+  logError({
+    errorName: err?.name || "UnknownError",
+    statusCode: err?.statusCode || "UNKNOWN_ERROR",
+    message: err?.message || "An unexpected error occurred",
+    httpStatusCode: HTTPCodes.INTERNAL_SERVER_ERROR,
+    stackTrace: err?.stack ?? null,
+    ipAddress: req?.ip ?? req?.socket?.remoteAddress ?? null,
+    userAgent: req?.headers?.["user-agent"] ?? null,
+    method: req?.method ?? null,
+    url: req?.originalUrl ?? null,
+    headers: sanitizeHeaders(req?.headers),
+    body: req?.body ?? null,
+    userID: req?.session?.userID ?? null,
+  });
+
+  return respondWithErrorJson(
+    res,
+    HTTPCodes.INTERNAL_SERVER_ERROR,
+    "An unexpected error occurred",
+    StatusCodes.INTERNAL_SERVER_ERROR,
+  );
+}
 
 /**
  * @function AppError
@@ -95,14 +146,14 @@ class AppError extends Error {
 class HTTPRequestError extends AppError {
   constructor(req, name, message, statusCode, httpStatusCode, sanitise) {
     super(name, message, statusCode);
-    this.ip = req?.ip || req?.socket?.remoteAddress || "Unknown IP";
-    this.user_agent = req?.headers["user-agent"] || "Unknown User Agent";
+    this.ip = req?.ip ?? req?.socket?.remoteAddress ?? null;
+    this.user_agent = req?.headers["user-agent"] ?? null;
     this.httpStatusCode = httpStatusCode;
     if (!sanitise) {
-      this.method = req?.method || "Unknown Method";
-      this.url = req?.url || "Unknown URL";
-      this.headers = req?.headers || "Unknown Headers";
-      this.body = req?.body || "Unknown Body";
+      this.method = req?.method ?? null;
+      this.url = req?.originalUrl ?? null;
+      this.headers = sanitizeHeaders(req?.headers);
+      this.body = req?.body ?? null;
     }
   }
 }
@@ -260,4 +311,28 @@ export class RunTimeError extends AppError {
     super("RunTimeError", message, StatusCodes.RUN_TIME_ERROR);
     this.stack = error?.stack || "No stack trace available";
   }
+}
+
+/**
+ * @function sanitizeHeaders
+ * @description Utility function to sanitize HTTP headers by redacting sensitive information. This is used to prevent logging or exposing sensitive data such as authorization tokens, cookies, and other authentication-related headers in error logs or responses.
+ * @param {Object} headers - The original HTTP headers object to be sanitized.
+ * @returns {Object} A new headers object with sensitive information redacted.
+ */
+function sanitizeHeaders(headers) {
+  const sanitizedHeaders = {};
+
+  if (!headers || typeof headers !== "object") {
+    return sanitizedHeaders;
+  }
+
+  for (const [key, value] of Object.entries(headers || {})) {
+    if (SENSITIVE_HEADERS.has(key.toLowerCase())) {
+      sanitizedHeaders[key] = "REDACTED";
+    } else {
+      sanitizedHeaders[key] = value;
+    }
+  }
+
+  return sanitizedHeaders;
 }
