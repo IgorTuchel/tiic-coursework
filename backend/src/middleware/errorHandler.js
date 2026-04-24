@@ -43,6 +43,7 @@ export const StatusCodes = {
 };
 
 export function errorHandlingMiddleware(err, req, res, next) {
+  console.error("Error caught by middleware:", err);
   if (err instanceof HTTPRequestError) {
     logError({
       errorName: err?.name,

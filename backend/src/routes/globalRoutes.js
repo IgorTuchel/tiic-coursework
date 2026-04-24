@@ -7,6 +7,7 @@ import { handlerLogout } from "../handlers/handlerLogout.js";
 import { protectedRoute } from "../middleware/protectedRoute.js";
 import { handlerGetErrorLogs } from "../handlers/handlerGetLogs.js";
 import { permissionGuard } from "../middleware/permissionGuard.js";
+import { handlerRequestResetPassword } from "../handlers/users/handlerResetPassword.js";
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.use("/reports", reportRouter);
 router.post("/login", handlerLogin);
 router.post("/logout", handlerLogout);
 router.post("/activate-account", handlerActivateAccount);
+router.post("/reset-password", handlerRequestResetPassword);
 router.get(
   "/logs",
   protectedRoute,
