@@ -1,184 +1,99 @@
-// src/pages/ActivateAccountPage.jsx
-import { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { passwordRules, validatePassword } from "../utils/validator";
-import { LuEye, LuEyeOff, LuCheck } from "react-icons/lu";
-import { activateAccount } from "../services/activateAccountService";
-import toast from "react-hot-toast";
-import { login } from "../services/loginUserService";
-import { inputCls, labelCls } from "../utils/styles";
+import { Link } from "react-router-dom";
+import AuthLayout from "../layouts/AuthLayout";
+import PasswordFormFields from "../components/auth/PasswordFormFields";
+import { useActivateAccount } from "../hooks/useActivateAccount";
+import { usePasswordForm } from "../hooks/usePasswordForm";
 
 function ActivateAccountPage() {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const token = searchParams.get("id");
+  const {
+    token,
+    email,
+    setEmail,
+    submitting,
+    handleSubmitPassword,
+    handleSubmitEmail,
+  } = useActivateAccount();
 
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  const rules = passwordRules().map((r) => ({
-    label: r.label,
-    ok: r.test(password),
-  }));
-
-  const handleSubmitPassword = async (e) => {
-    e.preventDefault();
-    const check = validatePassword(password);
-    if (!check.valid) {
-      toast.error(check.reason);
-      return;
-    }
-    if (!token) {
-      toast.error("Invalid activation link.");
-      return;
-    }
-
-    setSubmitting(true);
-    const result = await activateAccount(token, password);
-    setSubmitting(false);
-
-    if (result.success) {
-      toast.success("Account activated successfully! Redirecting to login...");
-      navigate("/login", { replace: true });
-    } else {
-      toast.error(
-        result.error?.error || "Activation failed. Please try again.",
-      );
-    }
-  };
-
-  const handleSubmitEmail = async (e) => {
-    e.preventDefault();
-    const res = await login(email, "dummyPassword");
-    if (res.statusCode === "LOGIN_FAILURE_ACCOUNT_NOT_SETUP") {
-      toast.success("Please check your email for the activation link.");
-    } else {
-      toast.error(
-        "Account not found or already activated. Please check your email or try logging in.",
-      );
-    }
-  };
-
-  if (!token) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-        <div className="w-full max-w-sm space-y-6">
-          <div className="text-center space-y-1">
-            <h1 className="text-xl font-semibold text-slate-100">
-              Invalid activation link
-            </h1>
-            <p className="text-sm text-slate-400">
-              Please check your email for the correct activation link or enter
-              your email below to resend the activation instructions.
-            </p>
-            <div className="mt-4 flex flex-col items-center gap-3">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                aria-label="Email address"
-                className={inputCls}
-              />
-              <button
-                className="mt-2 w-48 rounded-md bg-sky-500 hover:bg-sky-600 px-3 py-2.5 text-sm font-medium text-slate-950  transition-colors"
-                onClick={handleSubmitEmail}
-                aria-label="Resend activation email">
-                Resend Activation Email
-              </button>
-            </div>
-          </div>
-
-          <p className="text-center text-xs text-slate-600">
-            Already have an account?{" "}
-            <a
-              href="/login"
-              className="text-sky-500 hover:text-sky-400 transition-colors">
-              Sign in
-            </a>
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const {
+    password,
+    setPassword,
+    showPass,
+    setShowPass,
+    rules,
+    allValid,
+    validate,
+  } = usePasswordForm();
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center space-y-1">
-          <h1 className="text-xl font-semibold text-slate-100">
-            Activate your account
-          </h1>
-          <p className="text-sm text-slate-400">
-            Choose a password to get started.
+    <AuthLayout
+      title="Activate Account"
+      panelHeading="Welcome to the maintenance console."
+      panelBody="Your account has been created by an administrator. Set a password below to complete your setup and gain access.">
+      {!token ? (
+        <>
+          <h2 className="text-2xl font-semibold mb-1">Activate your account</h2>
+          <p className="text-sm text-slate-400 mb-6">
+            Please check your email for a account activation link or request a
+            new one below.
           </p>
-        </div>
 
-        <div className="rounded-xl bg-slate-800 border border-slate-700 p-6 space-y-5">
-          <form onSubmit={handleSubmitPassword} className="space-y-4">
+          <form onSubmit={handleSubmitEmail} className="space-y-4">
             <div>
-              <label className={labelCls}>Password</label>
-              <div className="relative">
-                <input
-                  type={showPass ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                  }}
-                  placeholder="Create a strong password"
-                  required
-                  className="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2 pr-10 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-                  aria-label={showPass ? "Hide password" : "Show password"}>
-                  {showPass ? (
-                    <LuEyeOff className="w-4 h-4" />
-                  ) : (
-                    <LuEye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-slate-200 mb-1">
+                Work email
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tech.ops@company.com"
+                className="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+              />
             </div>
-
-            {password.length > 0 && (
-              <ul className="space-y-1">
-                {rules.map(({ label, ok }) => (
-                  <li
-                    key={label}
-                    className={`flex items-center gap-2 text-xs transition-colors ${ok ? "text-emerald-400" : "text-slate-500"}`}>
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${ok ? "bg-emerald-400" : "bg-slate-600"}`}
-                    />
-                    {label}
-                  </li>
-                ))}
-              </ul>
-            )}
-
             <button
               type="submit"
-              disabled={submitting}
-              className="w-full rounded-md bg-sky-500 hover:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2.5 text-sm font-medium text-slate-950 transition-colors">
-              {submitting ? "Activating…" : "Activate account"}
+              className="w-full inline-flex items-center justify-center rounded-md bg-sky-500 hover:bg-sky-600 px-3 py-2.5 text-sm font-medium text-slate-950 transition-colors">
+              Resend activation email
             </button>
           </form>
-        </div>
+        </>
+      ) : (
+        <>
+          <h2 className="text-2xl font-semibold mb-1">Activate your account</h2>
+          <p className="text-sm text-slate-400 mb-6">
+            Choose a password to get started.
+          </p>
 
-        <p className="text-center text-xs text-slate-600">
-          Already have an account?{" "}
-          <a
-            href="/login"
-            className="text-sky-500 hover:text-sky-400 transition-colors">
-            Sign in
-          </a>
-        </p>
-      </div>
-    </div>
+          <form
+            onSubmit={(e) => handleSubmitPassword(e, { password, validate })}
+            className="space-y-4">
+            <PasswordFormFields
+              password={password}
+              setPassword={setPassword}
+              showPass={showPass}
+              setShowPass={setShowPass}
+              rules={rules}
+              allValid={allValid}
+              submitting={submitting}
+              label="Password"
+              submitLabel="Activate account"
+              submittingLabel="Activating…"
+            />
+          </form>
+        </>
+      )}
+
+      <p className="mt-6 text-xs text-slate-500">
+        Already have an account?{" "}
+        <Link to="/login" className="text-sky-400 hover:text-sky-300">
+          Sign in
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }
 

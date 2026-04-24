@@ -1,7 +1,6 @@
 import { useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  LuLayers,
   LuShield,
   LuEye,
   LuEyeOff,
@@ -11,20 +10,7 @@ import {
 import { AuthContext } from "../context/AuthContext";
 import { useLoginForm } from "../hooks/useLoginForm";
 import { inputCls } from "../utils/styles";
-
-function MobileLogo() {
-  return (
-    <div className="mb-8 md:hidden">
-      <div className="flex items-center gap-3 mb-3">
-        <LuLayers className="w-10 h-10 text-sky-500" />
-        <h1 className="text-3xl font-semibold text-slate-100 tracking-wide uppercase">
-          Inspectra
-        </h1>
-      </div>
-      <p className="text-slate-400 text-sm">Maintenance Console</p>
-    </div>
-  );
-}
+import AuthLayout from "../layouts/AuthLayout";
 
 function MfaStep({
   form,
@@ -34,9 +20,7 @@ function MfaStep({
   handleBackToLogin,
 }) {
   return (
-    <div className="w-full max-w-md">
-      <MobileLogo />
-
+    <>
       <div className="flex justify-center mb-6">
         <div className="w-16 h-16 rounded-full bg-sky-500/10 border border-sky-500/30 flex items-center justify-center">
           <LuShield className="w-8 h-8 text-sky-400" />
@@ -98,9 +82,9 @@ function MfaStep({
       </form>
 
       <p className="mt-6 text-xs text-slate-500 text-center">
-        Lost access to your authenticator? Contact your system administrator.
+        Lost access to your email? Contact your administrator for help.
       </p>
-    </div>
+    </>
   );
 }
 
@@ -113,9 +97,7 @@ function LoginStep({
   handleSubmit,
 }) {
   return (
-    <div className="w-full max-w-md">
-      <MobileLogo />
-
+    <>
       <h2 className="text-2xl font-semibold mb-1">Sign in</h2>
       <p className="text-sm text-slate-400 mb-6">
         Use your work email and maintenance console password.
@@ -148,7 +130,7 @@ function LoginStep({
               Password
             </label>
             <Link
-              to="/forgot-password"
+              to="/reset-password"
               className="text-xs text-sky-400 hover:text-sky-300">
               Forgot password?
             </Link>
@@ -192,11 +174,21 @@ function LoginStep({
         </button>
       </form>
 
-      <p className="mt-6 text-xs text-slate-500">
-        By signing in you agree to abide by the maintenance and safety
-        procedures for AR tooling.
-      </p>
-    </div>
+      <div className="mt-6 space-y-2">
+        <p className="text-xs text-slate-500">
+          New user?{" "}
+          <Link
+            to="/activate-account"
+            className="text-sky-400 hover:text-sky-300 transition-colors">
+            Activate your account
+          </Link>
+        </p>
+        <p className="text-xs text-slate-500">
+          By signing in you agree to abide by the maintenance and safety
+          procedures for AR tooling.
+        </p>
+      </div>
+    </>
   );
 }
 
@@ -219,52 +211,34 @@ function LoginPage() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen flex bg-slate-950 text-slate-100">
-      <title>Login - Inspectra Maintenance Console</title>
-
-      {/* Desktop left panel */}
-      <div className="hidden md:flex w-1/2 flex-col justify-center bg-gradient-to-br from-sky-500 via-cyan-500 to-emerald-500 p-10">
-        <div className="flex items-center gap-4 mb-6">
-          <LuLayers className="w-12 h-12 text-slate-900" />
-          <h1 className="text-4xl font-semibold text-slate-900 tracking-wide uppercase">
-            Inspectra
-          </h1>
+    <AuthLayout
+      title="Login"
+      panelHeading="Maintenance Console"
+      panelBody="Secure access for authorised maintenance staff. Monitor active faults, schedule interventions, and keep tool kits in top shape from a single pane of glass.">
+      {loading && !isAuthenticated && !mfaRequired ? (
+        <div className="text-center">
+          <LuLoader className="animate-spin w-12 h-12 text-sky-500 mx-auto mb-4" />
+          <p className="text-slate-400">Checking authentication...</p>
         </div>
-        <p className="text-slate-900/80 text-lg mb-8">Maintenance Console</p>
-        <p className="max-w-md text-slate-900/80">
-          Secure access for authorised maintenance staff. Monitor active faults,
-          schedule interventions, and keep tool kits in top shape from a single
-          pane of glass.
-        </p>
-      </div>
-
-      {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-6 md:p-10">
-        {loading && !isAuthenticated && !mfaRequired ? (
-          <div className="text-center">
-            <LuLoader className="animate-spin w-12 h-12 text-sky-500 mx-auto mb-4" />
-            <p className="text-slate-400">Checking authentication...</p>
-          </div>
-        ) : mfaRequired ? (
-          <MfaStep
-            form={form}
-            loading={loading}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            handleBackToLogin={handleBackToLogin}
-          />
-        ) : (
-          <LoginStep
-            form={form}
-            loading={loading}
-            visiblePass={visiblePass}
-            setVisiblePass={setVisiblePass}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-          />
-        )}
-      </div>
-    </div>
+      ) : mfaRequired ? (
+        <MfaStep
+          form={form}
+          loading={loading}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          handleBackToLogin={handleBackToLogin}
+        />
+      ) : (
+        <LoginStep
+          form={form}
+          loading={loading}
+          visiblePass={visiblePass}
+          setVisiblePass={setVisiblePass}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+        />
+      )}
+    </AuthLayout>
   );
 }
 

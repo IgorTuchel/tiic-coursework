@@ -52,7 +52,6 @@ export function ReportTable({ reports, loading, onActionClick }) {
           {loading ? (
             Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
           ) : reports.length === 0 ? (
-            // Empty state handled by parent, but keep a minimal inline fallback
             <tr>
               <td
                 colSpan={7}

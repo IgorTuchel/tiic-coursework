@@ -5,7 +5,6 @@ import { Toaster } from "react-hot-toast";
 
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserManagementPage from "./pages/UserManagementPage";
 import { AuthProvider } from "./context/AuthContext";
@@ -41,7 +40,6 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/activate-account" element={<ActivateAccountPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/app" element={<ProtectedPage />}>
           <Route path="/app/dashboard" element={<DashboardPage />} />
