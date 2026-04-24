@@ -3,152 +3,113 @@ import MaintenanceReport from "../../../models/appdb/maintenanceReport.js";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import ReportNotes from "../../../models/appdb/reportNotes.js";
 import { NotFoundError } from "../../../middleware/errorHandler.js";
-import MaintenanceReportToolCheck from "../../../models/appdb/maintenanceReportToolCheck.js";
 import ToolCheck from "../../../models/appdb/toolCheck.js";
 import { getUserRoleByID } from "../../../services/cacheDb.js";
 import { Op } from "sequelize";
 import SeverityLevel from "../../../models/appdb/severityLevel.js";
 import ReportStatus from "../../../models/appdb/reportStatus.js";
 
+// Shared includes for both query branches
+const reportIncludes = (includeAssigned = true) => [
+  {
+    model: User,
+    as: "createdByUser",
+    attributes: ["userID", "firstName", "lastName", "email"],
+    required: false,
+  },
+  {
+    model: SeverityLevel,
+    as: "severityLevel",
+    attributes: ["severityLevelID", "severityLevelName"],
+    required: false,
+  },
+  {
+    model: ReportStatus,
+    as: "reportStatus",
+    attributes: ["reportStatusID", "statusName"],
+    required: false,
+  },
+  {
+    model: User,
+    as: "assignedUsers",
+    attributes: ["userID", "firstName", "lastName", "email"],
+    through: { attributes: [] },
+    required: includeAssigned ? false : false,
+  },
+  {
+    model: ReportNotes,
+    as: "notes",
+    through: { attributes: [] },
+    attributes: ["reportNoteID", "title", "content", "createdAt", "updatedAt"],
+    include: [
+      {
+        model: User,
+        as: "createdByUser",
+        attributes: ["userID", "firstName", "lastName", "email"],
+      },
+    ],
+    required: false,
+  },
+  {
+    model: ToolCheck,
+    as: "toolChecks",
+    attributes: ["toolID", "name"],
+    through: { attributes: [] },
+    required: false,
+  },
+];
+
 export async function handlerGetAllMaintenanceReports(req, res) {
   const requrestedUserRole = await getUserRoleByID(req.session.roleID);
+
   if (!requrestedUserRole.success) {
     throw new NotFoundError(req, "User role not found");
   }
-  let maintenanceReports;
 
-  if (
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+  const offset = (page - 1) * limit;
+
+  const isPrivileged =
     requrestedUserRole.data.isAdmin ||
     requrestedUserRole.data.canManageReports ||
-    requrestedUserRole.data.canViewAllReports
-  ) {
-    maintenanceReports = await MaintenanceReport.findAll({
-      include: [
-        {
-          model: User,
-          as: "createdByUser",
-          attributes: ["userID", "firstName", "lastName", "email"],
-          required: false,
-        },
-        {
-          model: SeverityLevel,
-          as: "severityLevel",
-          attributes: ["severityLevelID", "severityLevelName"],
-          required: false,
-        },
-        {
-          model: ReportStatus,
-          as: "reportStatus",
-          attributes: ["reportStatusID", "statusName"],
-          required: false,
-        },
-        {
-          model: User,
-          as: "assignedUsers",
-          attributes: ["userID", "firstName", "lastName", "email"],
-          through: { attributes: [] },
-          required: false,
-        },
-        {
-          model: ReportNotes,
-          as: "notes",
-          through: { attributes: [] },
-          attributes: [
-            "reportNoteID",
-            "title",
-            "content",
-            "createdAt",
-            "updatedAt",
+    requrestedUserRole.data.canViewAllReports;
+
+  const queryOptions = isPrivileged
+    ? {
+        include: reportIncludes(),
+        distinct: true,
+        limit,
+        offset,
+      }
+    : {
+        where: {
+          [Op.or]: [
+            { createdBy: req.session.userID },
+            { "$assignedUsers.userID$": req.session.userID },
           ],
-          include: [
-            {
-              model: User,
-              as: "createdByUser",
-              attributes: ["userID", "firstName", "lastName", "email"],
-            },
-          ],
-          required: false,
         },
-        {
-          model: ToolCheck,
-          as: "toolChecks",
-          attributes: ["toolID", "name"],
-          through: { attributes: [] },
-          required: false,
-        },
-      ],
-      distinct: true,
-    });
-  } else {
-    maintenanceReports = await MaintenanceReport.findAll({
-      where: {
-        [Op.or]: [
-          { createdBy: req.session.userID },
-          { "$assignedUsers.userID$": req.session.userID },
-        ],
-      },
-      include: [
-        {
-          model: User,
-          as: "assignedUsers",
-          attributes: ["userID", "firstName", "lastName", "email"],
-          through: { attributes: [] },
-          required: false,
-        },
-        {
-          model: User,
-          as: "createdByUser",
-          attributes: ["userID", "firstName", "lastName", "email"],
-          required: false,
-        },
-        {
-          model: SeverityLevel,
-          as: "severityLevel",
-          attributes: ["severityLevelID", "severityLevelName"],
-          required: false,
-        },
-        {
-          model: ReportStatus,
-          as: "reportStatus",
-          attributes: ["reportStatusID", "statusName"],
-          required: false,
-        },
-        {
-          model: ReportNotes,
-          as: "notes",
-          through: { attributes: [] },
-          attributes: [
-            "reportNoteID",
-            "title",
-            "content",
-            "createdAt",
-            "updatedAt",
-          ],
-          include: [
-            {
-              model: User,
-              as: "createdByUser",
-              attributes: ["userID", "firstName", "lastName", "email"],
-            },
-          ],
-          required: false,
-        },
-        {
-          model: ToolCheck,
-          as: "toolChecks",
-          attributes: ["toolID", "name"],
-          through: { attributes: [] },
-          required: false,
-        },
-      ],
-      distinct: true,
-    });
-  }
-  if (!maintenanceReports) {
-    throw new NotFoundError(req, "No maintenance reports found");
-  }
+        include: reportIncludes(),
+        distinct: true,
+        limit,
+        offset,
+      };
+
+  const { count, rows: maintenanceReports } =
+    await MaintenanceReport.findAndCountAll(queryOptions);
+
+  const totalPages = Math.ceil(count / limit);
+
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
     data: maintenanceReports,
+    pagination: {
+      total: count,
+      page,
+      limit,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    },
   });
 }
