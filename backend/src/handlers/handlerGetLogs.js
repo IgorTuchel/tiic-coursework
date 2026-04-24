@@ -1,6 +1,10 @@
 import ErrorLog from "../models/auditdb/errorLogs.js";
+import { Op } from "sequelize";
 import { HTTPCodes, respondWithJson } from "../utils/json.js";
-import { BadRequestError } from "../middleware/errorHandler.js";
+
+function isValidDate(str) {
+  return str && !isNaN(new Date(str).getTime());
+}
 
 export async function handlerGetErrorLogs(req, res) {
   const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -8,11 +12,38 @@ export async function handlerGetErrorLogs(req, res) {
   const offset = (page - 1) * limit;
 
   const where = {};
+
   if (req.query.errorName) where.errorName = req.query.errorName;
+  if (req.query.statusCode) where.statusCode = req.query.statusCode;
   if (req.query.httpStatusCode)
     where.httpStatusCode = parseInt(req.query.httpStatusCode);
-  if (req.query.statusCode) where.statusCode = req.query.statusCode;
+  if (req.query.method) where.method = req.query.method.toUpperCase();
   if (req.query.userID) where.userID = req.query.userID;
+  if (req.query.ipAddress) where.ipAddress = req.query.ipAddress;
+
+  if (req.query.from || req.query.to) {
+    where.timestamp = {};
+
+    if (req.query.from && isValidDate(req.query.from)) {
+      where.timestamp[Op.gte] = new Date(`${req.query.from}T00:00:00.000Z`);
+    }
+
+    if (req.query.to && isValidDate(req.query.to)) {
+      where.timestamp[Op.lte] = new Date(`${req.query.to}T23:59:59.999Z`);
+    }
+    console.log("Date filter:", {
+      from: where.timestamp?.[Op.gte],
+      to: where.timestamp?.[Op.lte],
+    });
+  }
+
+  if (req.query.httpStatusRange) {
+    const ranges = { "4xx": [400, 499], "5xx": [500, 599], "3xx": [300, 399] };
+    const [min, max] = ranges[req.query.httpStatusRange] ?? [];
+    if (min !== undefined) {
+      where.httpStatusCode = { [Op.between]: [min, max] };
+    }
+  }
 
   const { count, rows } = await ErrorLog.findAndCountAll({
     where,
