@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 import { LuScanLine, LuCpu, LuFileDown } from "react-icons/lu";
 
 export function ARWorkspaceSection({

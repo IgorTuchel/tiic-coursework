@@ -17,7 +17,6 @@ export function useAR(
   initialData,
   onSaveCallback,
   markerUrl,
-  setIsARSupported,
 ) {
   const [arSessionActive, setArSessionActive] = useState(false);
   const [isMarkerTracked, setIsMarkerTracked] = useState(false);
@@ -45,12 +44,10 @@ export function useAR(
   useEffect(() => {
     (async () => {
       if (navigator.xr) {
-        setIsARSupported(await navigator.xr.isSessionSupported("immersive-ar"));
         setIsARSupportedInternal(
           await navigator.xr.isSessionSupported("immersive-ar"),
         );
       } else {
-        setIsARSupported(false);
         setIsARSupportedInternal(false);
       }
     })();

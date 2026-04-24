@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LuSearch,
@@ -8,101 +8,38 @@ import {
   LuFileSearch,
   LuX,
 } from "react-icons/lu";
-import toast from "react-hot-toast";
 import MainLayout from "../layouts/MainLayout";
 import { ReportTable } from "../components/reports/ReportTable";
 import { CreateReportModal } from "../components/reports/CreateReportModal";
-import {
-  getAllMaintenanceReports,
-  createMaintenanceReport,
-  getSeverityLevels,
-  getAllTools,
-} from "../services/maintenanceReports";
-import {
-  QUICK_FILTERS,
-  SEVERITY_ORDER,
-  normalize,
-  getSearchBlob,
-  matchesQuickFilter,
-  sortReports,
-} from "../utils/utils";
+import { useMaintenanceReports } from "../hooks/useMaintenanceReports";
+import { useMaintenanceFilters } from "../hooks/useMaintenanceFilters";
+import { QUICK_FILTERS } from "../utils/utils";
 
 export function MaintenancePage() {
-  const [reports, setReports] = useState([]);
-  const [severityLevels, setSeverityLevels] = useState([]);
-  const [availableTools, setAvailableTools] = useState([]);
-  const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState("date_desc");
-  const [quickFilter, setQuickFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
-
   const navigate = useNavigate();
 
-  const fetchReports = async ({ silent = false } = {}) => {
-    if (silent) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
+  const {
+    reports,
+    severityLevels,
+    availableTools,
+    loading,
+    refreshing,
+    fetchReports,
+    handleCreate,
+  } = useMaintenanceReports();
 
-    const result = await getAllMaintenanceReports();
-
-    if (result.success) {
-      setReports(result.data);
-    } else {
-      toast.error(result.message ?? "Failed to fetch maintenance reports.");
-    }
-
-    setLoading(false);
-    setRefreshing(false);
-  };
-
-  useEffect(() => {
-    fetchReports();
-
-    getSeverityLevels().then((result) => {
-      if (result.success) setSeverityLevels(result.data);
-    });
-
-    getAllTools().then((result) => {
-      if (result.success) setAvailableTools(result.data);
-    });
-  }, []);
-
-  const processedReports = useMemo(() => {
-    const query = normalize(search);
-
-    const filtered = reports.filter((report) => {
-      const searchMatch = !query || getSearchBlob(report).includes(query);
-      const quickMatch = matchesQuickFilter(report, quickFilter);
-      return searchMatch && quickMatch;
-    });
-
-    return sortReports(filtered, sortKey);
-  }, [reports, search, sortKey, quickFilter]);
-
-  const activeFilterCount =
-    (search.trim() ? 1 : 0) + (quickFilter !== "all" ? 1 : 0);
-
-  const handleCreate = async (formData) => {
-    const result = await createMaintenanceReport(formData);
-
-    if (result.success) {
-      toast.success("Report created!");
-      setShowCreate(false);
-      fetchReports({ silent: true });
-    } else {
-      toast.error(result.message ?? "Failed to create report.");
-    }
-  };
-
-  const clearFilters = () => {
-    setSearch("");
-    setQuickFilter("all");
-    setSortKey("date_desc");
-  };
+  const {
+    search,
+    setSearch,
+    sortKey,
+    setSortKey,
+    quickFilter,
+    setQuickFilter,
+    processedReports,
+    activeFilterCount,
+    clearFilters,
+  } = useMaintenanceFilters(reports);
 
   return (
     <MainLayout title="Maintenance Reports">
@@ -117,7 +54,6 @@ export function MaintenancePage() {
               Track open issues, review severity, and manage report workflows.
             </p>
           </div>
-
           <button
             onClick={() => setShowCreate(true)}
             className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold transition-colors shrink-0">
@@ -179,7 +115,6 @@ export function MaintenancePage() {
           <div className="flex flex-wrap items-center gap-2">
             {QUICK_FILTERS.map((filter) => {
               const isActive = quickFilter === filter.key;
-
               return (
                 <button
                   key={filter.key}
@@ -212,7 +147,6 @@ export function MaintenancePage() {
               <div className="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400">
                 <LuFileSearch size={20} />
               </div>
-
               <div className="space-y-1">
                 <h2 className="text-sm font-semibold text-slate-200">
                   No reports found
@@ -222,7 +156,6 @@ export function MaintenancePage() {
                   maintenance report.
                 </p>
               </div>
-
               {(search || quickFilter !== "all") && (
                 <button
                   onClick={clearFilters}
@@ -251,7 +184,9 @@ export function MaintenancePage() {
         <CreateReportModal
           severityLevels={severityLevels}
           availableTools={availableTools}
-          onSubmit={handleCreate}
+          onSubmit={(formData) =>
+            handleCreate(formData, () => setShowCreate(false))
+          }
           onClose={() => setShowCreate(false)}
         />
       )}

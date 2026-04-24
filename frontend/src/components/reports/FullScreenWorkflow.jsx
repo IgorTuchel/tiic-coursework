@@ -34,7 +34,6 @@ export function ARView({
   initialPolygonData,
   onSave,
   onExit,
-  setIsArSupported,
 }) {
   return (
     <div className="fixed inset-0 z-50">
@@ -46,7 +45,6 @@ export function ARView({
           initialData={initialPolygonData}
           onSave={onSave}
           onExit={onExit}
-          setIsArSupported={setIsArSupported}
         />
       ) : (
         <div className="flex items-center justify-center h-full bg-black text-white text-sm">

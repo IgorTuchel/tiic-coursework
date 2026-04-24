@@ -80,7 +80,7 @@ function Header() {
       ? [{ to: "/app/admin", label: "Users" }]
       : []),
     ...(perms?.canViewSecurityLogs || perms?.canViewActivityLogs
-      ? [{ to: "/app/admin/logs", label: "Logs" }]
+      ? [{ to: "/app/logs", label: "Logs" }]
       : []),
   ];
 

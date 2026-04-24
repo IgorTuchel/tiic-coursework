@@ -1,25 +1,11 @@
+import { useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
-import toast from "react-hot-toast";
 import { LuArrowLeft } from "react-icons/lu";
 import MainLayout from "../layouts/MainLayout";
 import { ReportDetails } from "../components/reports/ReportDetails";
-import { getAllUsers } from "../services/getUsersService";
-import {
-  getMaintenanceReportById,
-  getAllTools,
-  getReportStatuses,
-  getSeverityLevels,
-  updateMaintenanceReport,
-  updateMaintenanceReportNote,
-  createMaintenanceReportNote,
-  assignUserToReport,
-  unassignUserFromReport,
-  addToolToReport,
-  removeToolFromReport,
-  getAssignableUsers,
-} from "../services/maintenanceReports";
 import { AuthContext } from "../context/AuthContext";
+import { useMaintenanceDetail } from "../hooks/useMaintenanceDetail";
+import { useMaintenanceActions } from "../hooks/useMaintenanceActions";
 
 export function MaintenanceDetailPage() {
   const { user } = useContext(AuthContext);
@@ -28,160 +14,22 @@ export function MaintenanceDetailPage() {
     user?.roleInfo?.canWorkOnReports ||
     false;
   const canAssign = user?.roleInfo?.canAssignReports ?? false;
+
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [report, setReport] = useState(null);
-  const [availableUsers, setAvailableUsers] = useState([]);
-  const [availableTools, setAvailableTools] = useState([]);
-  const [reportStatuses, setReportStatuses] = useState([]);
-  const [severityLevels, setSeverityLevels] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    report,
+    setReport,
+    availableUsers,
+    availableTools,
+    reportStatuses,
+    severityLevels,
+    loading,
+    isArSupported,
+  } = useMaintenanceDetail(id, canAssign);
 
-  useEffect(() => {
-    const fetchAll = async () => {
-      const [reportResult, toolsResult, statusesResult, severitiesResult] =
-        await Promise.all([
-          getMaintenanceReportById(id),
-          getAllTools(),
-          getReportStatuses(),
-          getSeverityLevels(),
-        ]);
-
-      if (reportResult.success) setReport(reportResult.data);
-      else toast.error(reportResult.message || "Failed to load report.");
-
-      if (toolsResult.success) setAvailableTools(toolsResult.data);
-      else toast.error(toolsResult.message || "Failed to load tools.");
-
-      if (statusesResult.success) setReportStatuses(statusesResult.data);
-      else toast.error(statusesResult.message || "Failed to load statuses.");
-
-      if (severitiesResult.success) setSeverityLevels(severitiesResult.data);
-      else
-        toast.error(severitiesResult.message || "Failed to load severities.");
-
-      setLoading(false);
-    };
-
-    if (canAssign) {
-      getAssignableUsers().then((res) => {
-        if (res.success) setAvailableUsers(res.data);
-        else toast.error(res.message || "Failed to load users.");
-      });
-    }
-    fetchAll();
-  }, [id, canAssign]);
-
-  const handleUpdateReportAR = async (fields) => {
-    const result = await updateMaintenanceReport(id, {
-      markerScanBlob: fields.markerScanBlob,
-    });
-    if (result.success) {
-      setReport((prev) => ({ ...prev, ...result.data }));
-      toast.success("Marker scan saved.");
-    } else {
-      toast.error(result.message || "Failed to save marker scan.");
-    }
-  };
-
-  const handleUpdateReport = async (fields) => {
-    const result = await updateMaintenanceReport(id, {
-      name: fields.name,
-      description: fields.description,
-      status: fields.reportStatusID,
-      severity: fields.severityLevelID,
-    });
-    if (result.success) {
-      setReport((prev) => ({ ...prev, ...result.data }));
-      toast.success("Report updated.");
-    } else {
-      toast.error(result.message || "Failed to update report.");
-    }
-  };
-
-  const handleCreateNote = async ({ title, content }) => {
-    const result = await createMaintenanceReportNote(id, { title, content });
-    if (result.success) {
-      setReport((prev) => ({ ...prev, notes: [...prev.notes, result.data] }));
-      toast.success("Note created.");
-    } else {
-      toast.error(result.message || "Failed to create note.");
-    }
-  };
-
-  const handleUpdateNote = async (updated) => {
-    const result = await updateMaintenanceReportNote(
-      id,
-      updated.reportNoteID,
-      updated,
-    );
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        notes: prev.notes.map((n) =>
-          n.reportNoteID === updated.reportNoteID ? result.data : n,
-        ),
-      }));
-      toast.success("Note updated.");
-    } else {
-      toast.error(result.message || "Failed to update note.");
-    }
-  };
-
-  const handleAddUser = async (user) => {
-    const result = await assignUserToReport(id, user.userID);
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        assignedUsers: [...prev.assignedUsers, user],
-      }));
-      toast.success(`${user.firstName} assigned.`);
-    } else {
-      toast.error(result.message || "Failed to assign user.");
-    }
-  };
-
-  const handleRemoveUser = async (user) => {
-    const result = await unassignUserFromReport(id, user.userID);
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        assignedUsers: prev.assignedUsers.filter(
-          (u) => u.userID !== user.userID,
-        ),
-      }));
-      toast.success(`${user.firstName} removed.`);
-    } else {
-      toast.error(result.message || "Failed to remove user.");
-    }
-  };
-
-  const handleAddTool = async (tool) => {
-    const result = await addToolToReport(id, tool.toolID);
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        toolChecks: [...prev.toolChecks, tool],
-      }));
-      toast.success(`${tool.name} added.`);
-    } else {
-      toast.error(result.message || "Failed to add tool.");
-    }
-  };
-
-  const handleRemoveTool = async (tool) => {
-    const result = await removeToolFromReport(id, tool.toolID);
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        toolChecks: prev.toolChecks.filter((t) => t.toolID !== tool.toolID),
-      }));
-      toast.success(`${tool.name} removed.`);
-    } else {
-      toast.error(result.message || "Failed to remove tool.");
-    }
-  };
+  const actions = useMaintenanceActions(id, setReport);
 
   return (
     <MainLayout>
@@ -210,16 +58,17 @@ export function MaintenanceDetailPage() {
             availableTools={availableTools}
             reportStatuses={reportStatuses}
             severityLevels={severityLevels}
-            onUpdateReportAR={handleUpdateReportAR}
-            onUpdateReport={handleUpdateReport}
-            onCreateNote={handleCreateNote}
-            onUpdateNote={handleUpdateNote}
-            onAddUser={handleAddUser}
-            onRemoveUser={handleRemoveUser}
-            onAddTool={handleAddTool}
-            onRemoveTool={handleRemoveTool}
+            onUpdateReportAR={actions.handleUpdateReportAR}
+            onUpdateReport={actions.handleUpdateReport}
+            onCreateNote={actions.handleCreateNote}
+            onUpdateNote={actions.handleUpdateNote}
+            onAddUser={actions.handleAddUser}
+            onRemoveUser={actions.handleRemoveUser}
+            onAddTool={actions.handleAddTool}
+            onRemoveTool={actions.handleRemoveTool}
             canManage={canManage}
             canAssign={canAssign}
+            isArSupported={isArSupported}
           />
         ) : (
           <p className="text-red-400">Report not found.</p>

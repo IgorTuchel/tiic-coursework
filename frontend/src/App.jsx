@@ -15,6 +15,7 @@ import { MaintenancePage } from "./pages/MaintenancePage.jsx";
 import { MaintenanceDetailPage } from "./pages/MaintenanceDetailPage.jsx";
 import { FaultPage } from "./pages/FaultPage.jsx";
 import { FaultDetailPage } from "./pages/FaultDetailPage.jsx";
+import ErrorLogsPage from "./pages/ErrorLogsPage.jsx";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
           />
           <Route path="/app/faults" element={<FaultPage />} />
           <Route path="/app/faults/:id" element={<FaultDetailPage />} />
+          <Route path="/app/logs" element={<ErrorLogsPage />} />
           <Route path="/app/admin" element={<UserManagementPage />} />
         </Route>
       </Routes>

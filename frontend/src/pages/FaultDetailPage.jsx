@@ -1,23 +1,11 @@
+import { useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
-import toast from "react-hot-toast";
 import { LuArrowLeft } from "react-icons/lu";
 import MainLayout from "../layouts/MainLayout";
 import { ReportDetails } from "../components/reports/ReportDetails";
-import {
-  getReportStatuses,
-  getSeverityLevels,
-} from "../services/maintenanceReports";
 import { AuthContext } from "../context/AuthContext";
-import {
-  assignUserToReport,
-  createFaultReportNote,
-  getAssignableUsers,
-  getFaultReportById,
-  unassignUserFromReport,
-  updateFaultReport,
-  updateFaultReportNote,
-} from "../services/faultReports";
+import { useFaultDetail } from "../hooks/useFaultDetail";
+import { useFaultActions } from "../hooks/useFaultActions";
 
 export function FaultDetailPage() {
   const { user } = useContext(AuthContext);
@@ -26,118 +14,20 @@ export function FaultDetailPage() {
     user?.roleInfo?.canSuggestFaults ||
     false;
   const canAssign = user?.roleInfo?.canAssignFaults ?? false;
+
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [report, setReport] = useState(null);
-  const [availableUsers, setAvailableUsers] = useState([]);
-  const [reportStatuses, setReportStatuses] = useState([]);
-  const [severityLevels, setSeverityLevels] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    report,
+    setReport,
+    availableUsers,
+    reportStatuses,
+    severityLevels,
+    loading,
+  } = useFaultDetail(id, canAssign);
 
-  useEffect(() => {
-    const fetchAll = async () => {
-      const [reportResult, statusesResult, severitiesResult] =
-        await Promise.all([
-          getFaultReportById(id),
-          getReportStatuses(),
-          getSeverityLevels(),
-        ]);
-
-      if (reportResult.success) setReport(reportResult.data);
-      else toast.error(reportResult.message || "Failed to load report.");
-
-      if (statusesResult.success) setReportStatuses(statusesResult.data);
-      else toast.error(statusesResult.message || "Failed to load statuses.");
-
-      if (severitiesResult.success) setSeverityLevels(severitiesResult.data);
-      else
-        toast.error(severitiesResult.message || "Failed to load severities.");
-
-      setLoading(false);
-    };
-
-    if (canAssign) {
-      getAssignableUsers().then((res) => {
-        if (res.success) setAvailableUsers(res.data);
-        else toast.error(res.message || "Failed to load users.");
-      });
-    }
-    fetchAll();
-  }, [id, canAssign]);
-
-  const handleUpdateReport = async (fields) => {
-    const result = await updateFaultReport(id, {
-      name: fields.name,
-      description: fields.description,
-      status: fields.reportStatusID,
-      severity: fields.severityLevelID,
-    });
-    if (result.success) {
-      console.log("Updated report:", result.data);
-      setReport((prev) => ({ ...prev, ...result.data }));
-      toast.success("Report updated.");
-    } else {
-      toast.error(result.message || "Failed to update report.");
-    }
-  };
-
-  const handleCreateNote = async ({ title, content }) => {
-    const result = await createFaultReportNote(id, { title, content });
-    if (result.success) {
-      setReport((prev) => ({ ...prev, notes: [...prev.notes, result.data] }));
-      toast.success("Note created.");
-    } else {
-      toast.error(result.message || "Failed to create note.");
-    }
-  };
-
-  const handleUpdateNote = async (updated) => {
-    const result = await updateFaultReportNote(
-      id,
-      updated.reportNoteID,
-      updated,
-    );
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        notes: prev.notes.map((n) =>
-          n.reportNoteID === updated.reportNoteID ? result.data : n,
-        ),
-      }));
-      toast.success("Note updated.");
-    } else {
-      toast.error(result.message || "Failed to update note.");
-    }
-  };
-
-  const handleAddUser = async (user) => {
-    const result = await assignUserToReport(id, user.userID);
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        assignedUsers: [...prev.assignedUsers, user],
-      }));
-      toast.success(`${user.firstName} assigned.`);
-    } else {
-      toast.error(result.message || "Failed to assign user.");
-    }
-  };
-
-  const handleRemoveUser = async (user) => {
-    const result = await unassignUserFromReport(id, user.userID);
-    if (result.success) {
-      setReport((prev) => ({
-        ...prev,
-        assignedUsers: prev.assignedUsers.filter(
-          (u) => u.userID !== user.userID,
-        ),
-      }));
-      toast.success(`${user.firstName} removed.`);
-    } else {
-      toast.error(result.message || "Failed to remove user.");
-    }
-  };
+  const actions = useFaultActions(id, setReport);
 
   return (
     <MainLayout>
@@ -166,11 +56,11 @@ export function FaultDetailPage() {
             availableUsers={availableUsers}
             reportStatuses={reportStatuses}
             severityLevels={severityLevels}
-            onUpdateReport={handleUpdateReport}
-            onCreateNote={handleCreateNote}
-            onUpdateNote={handleUpdateNote}
-            onAddUser={handleAddUser}
-            onRemoveUser={handleRemoveUser}
+            onUpdateReport={actions.handleUpdateReport}
+            onCreateNote={actions.handleCreateNote}
+            onUpdateNote={actions.handleUpdateNote}
+            onAddUser={actions.handleAddUser}
+            onRemoveUser={actions.handleRemoveUser}
             canManage={canManage}
             canAssign={canAssign}
           />

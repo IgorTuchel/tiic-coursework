@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LuSearch,
@@ -8,99 +8,42 @@ import {
   LuFileSearch,
   LuX,
 } from "react-icons/lu";
-import toast from "react-hot-toast";
-import {
-  QUICK_FILTERS,
-  SEVERITY_ORDER,
-  normalize,
-  getSearchBlob,
-  matchesQuickFilter,
-  sortReports,
-} from "../utils/utils";
+import { QUICK_FILTERS } from "../utils/utils";
 import MainLayout from "../layouts/MainLayout";
 import { ReportTable } from "../components/reports/ReportTable";
 import { CreateReportModal } from "../components/reports/CreateReportModal";
-import { getSeverityLevels } from "../services/maintenanceReports";
-import {
-  createFaultReport,
-  getAllFaultReports,
-} from "../services/faultReports";
+import { useFaultReports } from "../hooks/useFaultReports";
+import { useMaintenanceFilters } from "../hooks/useMaintenanceFilters";
 
 export function FaultPage() {
-  const [reports, setReports] = useState([]);
-  const [severityLevels, setSeverityLevels] = useState([]);
-  const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState("date_desc");
-  const [quickFilter, setQuickFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
-
   const navigate = useNavigate();
 
-  const fetchReports = async ({ silent = false } = {}) => {
-    if (silent) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
-    }
+  const {
+    reports,
+    severityLevels,
+    loading,
+    refreshing,
+    fetchReports,
+    handleCreate,
+  } = useFaultReports();
 
-    const result = await getAllFaultReports();
-
-    if (result.success) {
-      setReports(result.data);
-    } else {
-      toast.error(result.message ?? "Failed to fetch fault reports.");
-    }
-
-    setLoading(false);
-    setRefreshing(false);
-  };
-
-  useEffect(() => {
-    fetchReports();
-
-    getSeverityLevels().then((result) => {
-      if (result.success) setSeverityLevels(result.data);
-    });
-  }, []);
-
-  const processedReports = useMemo(() => {
-    const query = normalize(search);
-
-    const filtered = reports.filter((report) => {
-      const searchMatch = !query || getSearchBlob(report).includes(query);
-      const quickMatch = matchesQuickFilter(report, quickFilter);
-      return searchMatch && quickMatch;
-    });
-
-    return sortReports(filtered, sortKey);
-  }, [reports, search, sortKey, quickFilter]);
-
-  const activeFilterCount =
-    (search.trim() ? 1 : 0) + (quickFilter !== "all" ? 1 : 0);
-
-  const handleCreate = async (formData) => {
-    const result = await createFaultReport(formData);
-
-    if (result.success) {
-      toast.success("Report created!");
-      setShowCreate(false);
-      fetchReports({ silent: true });
-    } else {
-      toast.error(result.message ?? "Failed to create report.");
-    }
-  };
-
-  const clearFilters = () => {
-    setSearch("");
-    setQuickFilter("all");
-    setSortKey("date_desc");
-  };
+  const {
+    search,
+    setSearch,
+    sortKey,
+    setSortKey,
+    quickFilter,
+    setQuickFilter,
+    processedReports,
+    activeFilterCount,
+    clearFilters,
+  } = useMaintenanceFilters(reports);
 
   return (
     <MainLayout title="Fault Reports">
       <div className="flex flex-col gap-5">
+        {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold text-slate-100">
@@ -110,7 +53,6 @@ export function FaultPage() {
               Track open issues, review severity, and manage report workflows.
             </p>
           </div>
-
           <button
             onClick={() => setShowCreate(true)}
             className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold transition-colors shrink-0">
@@ -172,7 +114,6 @@ export function FaultPage() {
           <div className="flex flex-wrap items-center gap-2">
             {QUICK_FILTERS.map((filter) => {
               const isActive = quickFilter === filter.key;
-
               return (
                 <button
                   key={filter.key}
@@ -205,17 +146,15 @@ export function FaultPage() {
               <div className="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400">
                 <LuFileSearch size={20} />
               </div>
-
               <div className="space-y-1">
                 <h2 className="text-sm font-semibold text-slate-200">
                   No reports found
                 </h2>
                 <p className="text-sm text-slate-500 max-w-md">
-                  Try adjusting your search or filters, or create a new
-                  maintenance report.
+                  Try adjusting your search or filters, or create a new fault
+                  report.
                 </p>
               </div>
-
               {(search || quickFilter !== "all") && (
                 <button
                   onClick={clearFilters}
@@ -241,7 +180,9 @@ export function FaultPage() {
       {showCreate && (
         <CreateReportModal
           severityLevels={severityLevels}
-          onSubmit={handleCreate}
+          onSubmit={(formData) =>
+            handleCreate(formData, () => setShowCreate(false))
+          }
           maintenanceOrFault="Fault"
           onClose={() => setShowCreate(false)}
         />

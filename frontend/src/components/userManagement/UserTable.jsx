@@ -21,25 +21,25 @@ export function UserTable({ users, roles, loading, onActionClick }) {
 
   return (
     <table className="w-full text-sm">
-      <thead className="bg-slate-900 border-b border-slate-800">
-        <tr>
-          <th className="text-left px-4 py-3 text-xs font-medium text-slate-400">
+      <thead>
+        <tr className="border-b border-slate-800">
+          <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">
             Name
           </th>
-          <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 hidden sm:table-cell">
+          <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">
             Email
           </th>
-          <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 hidden md:table-cell">
+          <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">
             Role
           </th>
-          <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 hidden md:table-cell">
+          <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">
             Status
           </th>
-          <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 hidden lg:table-cell">
+          <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">
             MFA
           </th>
-          <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 hidden lg:table-cell">
-            Created
+          <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">
+            Created At
           </th>
           <th className="px-4 py-3 w-10" />
         </tr>

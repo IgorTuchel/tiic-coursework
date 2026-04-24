@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LuSearch,
   LuPencil,
@@ -18,27 +18,39 @@ export function SearchByIdModal({
   openModal,
   savedState,
   onSaveState,
+  UUID = "",
 }) {
-  const [query, setQuery] = useState(savedState.query ?? "");
+  const [query, setQuery] = useState(savedState.query ?? UUID);
   const [searching, setSearching] = useState(false);
   const [result, setResult] = useState(savedState.result ?? null);
   const [error, setError] = useState(null);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const search = async (id) => {
+    if (!id?.trim()) return;
     setSearching(true);
     setResult(null);
     setError(null);
-    const res = await getUserById(query.trim());
+    const res = await getUserById(id.trim());
     if (res.success) {
       const normalised = normaliseUser(res.data);
       setResult(normalised);
-      onSaveState({ query, result: normalised });
+      onSaveState({ query: id, result: normalised });
     } else {
       setError(res.message ?? "User not found.");
     }
     setSearching(false);
+  };
+
+  useEffect(() => {
+    if (UUID?.trim()) {
+      setQuery(UUID.trim());
+      search(UUID.trim());
+    }
+  }, [UUID]);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    search(query);
   };
 
   const goBack = () => openModal("searchById");
@@ -50,7 +62,11 @@ export function SearchByIdModal({
   return (
     <Modal
       title="Lookup user by ID"
-      subtitle="Enter a UUID to fetch a specific user"
+      subtitle={
+        UUID?.trim()
+          ? `Auto-searching for ${UUID.slice(0, 8)}…`
+          : "Enter a UUID to fetch a specific user"
+      }
       onClose={onClose}
       maxWidth="max-w-sm">
       <div className="space-y-4">
@@ -125,30 +141,32 @@ export function SearchByIdModal({
                 </span>
               </span>
             </div>
-            <div className="px-3 py-2.5 border-t border-slate-700 flex flex-wrap gap-2">
-              <button
-                onClick={() => transition("edit")}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                <LuPencil className="w-3.5 h-3.5" /> Edit
-              </button>
-              <button
-                onClick={() => transition("role")}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                <LuShieldCheck className="w-3.5 h-3.5" /> Role
-              </button>
-              <button
-                onClick={() => transition("details")}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                <LuFileText className="w-3.5 h-3.5" /> Details
-              </button>
-              {!isDeactivated && (
+            {openModal && (
+              <div className="px-3 py-2.5 border-t border-slate-700 flex flex-wrap gap-2">
                 <button
-                  onClick={() => transition("deactivate")}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors">
-                  <LuUserX className="w-3.5 h-3.5" /> Deactivate
+                  onClick={() => transition("edit")}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
+                  <LuPencil className="w-3.5 h-3.5" /> Edit
                 </button>
-              )}
-            </div>
+                <button
+                  onClick={() => transition("role")}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
+                  <LuShieldCheck className="w-3.5 h-3.5" /> Role
+                </button>
+                <button
+                  onClick={() => transition("details")}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
+                  <LuFileText className="w-3.5 h-3.5" /> Details
+                </button>
+                {!isDeactivated && (
+                  <button
+                    onClick={() => transition("deactivate")}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-red-400 hover:bg-slate-700 hover:text-red-300 transition-colors">
+                    <LuUserX className="w-3.5 h-3.5" /> Deactivate
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

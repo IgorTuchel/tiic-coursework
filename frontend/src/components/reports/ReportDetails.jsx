@@ -54,6 +54,7 @@ export function ReportDetails({
   onRemoveUser,
   onAddTool,
   onRemoveTool,
+  isArSupported,
 }) {
   // Maintenance Report editing
   const [editing, setEditing] = useState(false);
@@ -69,7 +70,7 @@ export function ReportDetails({
   // AR + tool checks workflows
   const [workflowView, setWorkflowView] = useState(null); // null / "ai" / "ar"
   const [toolCheckPassed, setToolCheckPassed] = useState(false);
-  const [isArSupported, setIsArSupported] = useState(false);
+
   const markerUrl =
     maintenanceOrFault === "Maintenance"
       ? useMarkerUrl(report.maintenanceReportID)
@@ -169,7 +170,6 @@ export function ReportDetails({
       <ARView
         markerUrl={markerUrl}
         report={report}
-        setIsArSupported={setIsArSupported}
         initialPolygonData={initialPolygonData}
         onSave={handleARSave}
         onExit={() => setWorkflowView(null)}

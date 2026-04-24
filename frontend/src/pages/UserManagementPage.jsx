@@ -70,7 +70,7 @@ function UserManagementPage() {
 
         <StatsStrip users={users} roles={roles} />
 
-        {/* Search / refresh */}
+        {/* Search  refresh */}
         <div className="flex gap-3">
           <div className="relative flex-1">
             <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
