@@ -83,6 +83,7 @@ export async function handlerGetFaultReports(req, res) {
         },
         include: faultReportIncludes(),
         distinct: true,
+        subQuery: false,
         limit,
         offset,
       };
@@ -144,9 +145,17 @@ export async function handlerGetMyOpenFaultReports(req, res) {
   const { count, rows: faultReports } = await FaultReport.findAndCountAll({
     where: {
       [Op.or]: [{ createdBy: userID }, { "$assignedUsers.userID$": userID }],
+      [Op.and]: [
+        {
+          "$reportStatus.statusName$": {
+            [Op.ne]: "closed",
+          },
+        },
+      ],
     },
     include: faultReportIncludes(),
     distinct: true,
+    subQuery: false,
   });
 
   respondWithJson(res, HTTPCodes.OK, {
@@ -167,7 +176,7 @@ export async function handlerGetFaultReportCount(req, res) {
       {
         model: ReportStatus,
         as: "reportStatus",
-        where: { statusName: { [Op.ne]: "Closed" } },
+        where: { statusName: { [Op.ne]: "closed" } },
         attributes: [],
         required: true,
       },
@@ -181,6 +190,7 @@ export async function handlerGetFaultReportCount(req, res) {
     ],
     distinct: true,
     col: "faultReportID",
+    subQuery: false,
   });
 
   const countClosed = await FaultReport.count({
@@ -191,7 +201,7 @@ export async function handlerGetFaultReportCount(req, res) {
       {
         model: ReportStatus,
         as: "reportStatus",
-        where: { statusName: { [Op.eq]: "Closed" } },
+        where: { statusName: { [Op.eq]: "closed" } },
         attributes: [],
         required: true,
       },
@@ -205,6 +215,7 @@ export async function handlerGetFaultReportCount(req, res) {
     ],
     distinct: true,
     col: "faultReportID",
+    subQuery: false,
   });
 
   respondWithJson(res, HTTPCodes.OK, {
@@ -240,7 +251,7 @@ export async function handlerGetAllFaultReportCount(req, res) {
       {
         model: ReportStatus,
         as: "reportStatus",
-        where: { statusName: { [Op.ne]: "Closed" } },
+        where: { statusName: { [Op.ne]: "closed" } },
         attributes: [],
         required: true,
       },
@@ -261,7 +272,7 @@ export async function handlerGetAllFaultReportCount(req, res) {
       {
         model: ReportStatus,
         as: "reportStatus",
-        where: { statusName: { [Op.eq]: "Closed" } },
+        where: { statusName: { [Op.eq]: "closed" } },
         attributes: [],
         required: true,
       },

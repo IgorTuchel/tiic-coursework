@@ -63,6 +63,7 @@ const reportIncludes = () => [
 
 export async function handlerGetAllMaintenanceReports(req, res) {
   const requrestedUserRole = await getUserRoleByID(req.session.roleID);
+  const userID = req.session.userID;
 
   if (!requrestedUserRole.success) {
     throw new NotFoundError(req, "User role not found");
@@ -87,11 +88,12 @@ export async function handlerGetAllMaintenanceReports(req, res) {
     : {
         where: {
           [Op.or]: [
-            { createdBy: req.session.userID },
-            { "$assignedUsers.userID$": req.session.userID },
+            { createdBy: userID },
+            { "$assignedUsers.userID$": userID },
           ],
         },
         include: reportIncludes(),
+        subQuery: false,
         distinct: true,
         limit,
         offset,
@@ -123,7 +125,15 @@ export async function handlerGetMyOpenMaintenanceReports(req, res) {
     await MaintenanceReport.findAndCountAll({
       where: {
         [Op.or]: [{ createdBy: userID }, { "$assignedUsers.userID$": userID }],
+        [Op.and]: [
+          {
+            "$reportStatus.statusName$": {
+              [Op.ne]: "closed",
+            },
+          },
+        ],
       },
+      subQuery: false,
       include: reportIncludes(),
       distinct: true,
     });
@@ -146,7 +156,7 @@ export async function handlerGetMaintenanceReportCount(req, res) {
       {
         model: ReportStatus,
         as: "reportStatus",
-        where: { statusName: { [Op.ne]: "Closed" } },
+        where: { statusName: { [Op.ne]: "closed" } },
         attributes: [],
         required: true,
       },
@@ -159,6 +169,7 @@ export async function handlerGetMaintenanceReportCount(req, res) {
       },
     ],
     distinct: true,
+    subQuery: false,
     col: "maintenanceReportID",
   });
 
@@ -170,7 +181,7 @@ export async function handlerGetMaintenanceReportCount(req, res) {
       {
         model: ReportStatus,
         as: "reportStatus",
-        where: { statusName: { [Op.eq]: "Closed" } },
+        where: { statusName: { [Op.eq]: "closed" } },
         attributes: [],
         required: true,
       },
@@ -183,9 +194,11 @@ export async function handlerGetMaintenanceReportCount(req, res) {
       },
     ],
     distinct: true,
+    subQuery: false,
     col: "maintenanceReportID",
   });
-
+  console.log("Open count:", count);
+  console.log("Closed count:", countClosed);
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
     data: {
@@ -220,7 +233,7 @@ export async function handlerGetAllMaintenanceReportCount(req, res) {
       {
         model: ReportStatus,
         as: "reportStatus",
-        where: { statusName: { [Op.ne]: "Closed" } },
+        where: { statusName: { [Op.ne]: "closed" } },
         attributes: [],
         required: true,
       },
@@ -241,7 +254,7 @@ export async function handlerGetAllMaintenanceReportCount(req, res) {
       {
         model: ReportStatus,
         as: "reportStatus",
-        where: { statusName: { [Op.eq]: "Closed" } },
+        where: { statusName: { [Op.eq]: "closed" } },
         attributes: [],
         required: true,
       },
