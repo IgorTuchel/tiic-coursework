@@ -1,8 +1,11 @@
 import { getUserRoleByID } from "../../../services/cacheDb.js";
-import { NotFoundError } from "../../../middleware/errorHandler.js";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../middleware/errorHandler.js";
 import FaultReport from "../../../models/appdb/faultReport.js";
 import User from "../../../models/appdb/users.js";
-import { Op } from "sequelize";
+import { Op, fn, col } from "sequelize";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import { userAssignedToFaultReport } from "../../../services/workOnReport.js";
 import ReportNotes from "../../../models/appdb/reportNotes.js";
@@ -132,5 +135,150 @@ export async function handlerGetFaultReportByID(req, res) {
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
     data: faultReport,
+  });
+}
+
+export async function handlerGetMyOpenFaultReports(req, res) {
+  const userID = req.session.userID;
+
+  const { count, rows: faultReports } = await FaultReport.findAndCountAll({
+    where: {
+      [Op.or]: [{ createdBy: userID }, { "$assignedUsers.userID$": userID }],
+    },
+    include: faultReportIncludes(),
+    distinct: true,
+  });
+
+  respondWithJson(res, HTTPCodes.OK, {
+    success: true,
+    data: faultReports,
+    total: count,
+  });
+}
+
+export async function handlerGetFaultReportCount(req, res) {
+  const userID = req.session.userID;
+
+  const count = await FaultReport.count({
+    where: {
+      [Op.or]: [{ createdBy: userID }, { "$assignedUsers.userID$": userID }],
+    },
+    include: [
+      {
+        model: ReportStatus,
+        as: "reportStatus",
+        where: { statusName: { [Op.ne]: "Closed" } },
+        attributes: [],
+        required: true,
+      },
+      {
+        model: User,
+        as: "assignedUsers",
+        attributes: [],
+        through: { attributes: [] },
+        required: false,
+      },
+    ],
+    distinct: true,
+    col: "faultReportID",
+  });
+
+  const countClosed = await FaultReport.count({
+    where: {
+      [Op.or]: [{ createdBy: userID }, { "$assignedUsers.userID$": userID }],
+    },
+    include: [
+      {
+        model: ReportStatus,
+        as: "reportStatus",
+        where: { statusName: { [Op.eq]: "Closed" } },
+        attributes: [],
+        required: true,
+      },
+      {
+        model: User,
+        as: "assignedUsers",
+        attributes: [],
+        through: { attributes: [] },
+        required: false,
+      },
+    ],
+    distinct: true,
+    col: "faultReportID",
+  });
+
+  respondWithJson(res, HTTPCodes.OK, {
+    success: true,
+    data: { openFaultReportCount: count, closedFaultReportCount: countClosed },
+  });
+}
+
+export async function handlerGetAllFaultReportCount(req, res) {
+  const userID = req.session.userID;
+  const requestedUserRole = await getUserRoleByID(req.session.roleID);
+
+  if (!requestedUserRole.success) {
+    throw new NotFoundError(req, "User role not found");
+  }
+
+  const isPrivileged =
+    requestedUserRole.data.isAdmin ||
+    requestedUserRole.data.canManageFaults ||
+    requestedUserRole.data.canViewAllReports ||
+    requestedUserRole.data.canManageFaults ||
+    requestedUserRole.data.canViewAllFaults;
+
+  if (!isPrivileged) {
+    throw new ForbiddenError(
+      req,
+      "You do not have permission to view this data",
+    );
+  }
+
+  const count = await FaultReport.count({
+    include: [
+      {
+        model: ReportStatus,
+        as: "reportStatus",
+        where: { statusName: { [Op.ne]: "Closed" } },
+        attributes: [],
+        required: true,
+      },
+      {
+        model: User,
+        as: "assignedUsers",
+        attributes: [],
+        through: { attributes: [] },
+        required: false,
+      },
+    ],
+    distinct: true,
+    col: "faultReportID",
+  });
+
+  const countClosed = await FaultReport.count({
+    include: [
+      {
+        model: ReportStatus,
+        as: "reportStatus",
+        where: { statusName: { [Op.eq]: "Closed" } },
+        attributes: [],
+        required: true,
+      },
+      {
+        model: User,
+        as: "assignedUsers",
+        attributes: [],
+        through: { attributes: [] },
+        required: false,
+      },
+    ],
+    distinct: true,
+    col: "faultReportID",
+  });
+
+  respondWithJson(res, HTTPCodes.OK, {
+    success: true,
+    data: { openFaultReportCount: count, closedFaultReportCount: countClosed },
   });
 }

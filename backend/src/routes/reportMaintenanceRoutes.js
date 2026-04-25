@@ -3,7 +3,12 @@ import { handlerCreateMaintenanceReport } from "../handlers/reports/maintenance/
 import { protectedRoute } from "../middleware/protectedRoute.js";
 import { permissionGuard } from "../middleware/permissionGuard.js";
 import { handlerGetAllTools } from "../handlers/reports/tools/handlerGetAllTools.js";
-import { handlerGetAllMaintenanceReports } from "../handlers/reports/maintenance/handlerGetAllMaintenanceReports.js";
+import {
+  handlerGetAllMaintenanceReportCount,
+  handlerGetAllMaintenanceReports,
+  handlerGetMaintenanceReportCount,
+  handlerGetMyOpenMaintenanceReports,
+} from "../handlers/reports/maintenance/handlerGetAllMaintenanceReports.js";
 import {
   handlerAssignUserToMaintenanceReport,
   handlerUnassignUserFromMaintenanceReport,
@@ -43,6 +48,25 @@ router.get(
   protectedRoute,
   permissionGuard("canWorkOnReports"),
   handlerGetAssignableUsers,
+);
+
+router.get(
+  "/info/all",
+  protectedRoute,
+  permissionGuard("canViewAllReports"),
+  handlerGetAllMaintenanceReportCount,
+);
+router.get(
+  "/info/me",
+  protectedRoute,
+  permissionGuard("canWorkOnReports"),
+  handlerGetMaintenanceReportCount,
+);
+router.get(
+  "/info/assigned",
+  protectedRoute,
+  permissionGuard("canWorkOnReports"),
+  handlerGetMyOpenMaintenanceReports,
 );
 
 router.get(

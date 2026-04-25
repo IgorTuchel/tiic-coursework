@@ -6,6 +6,9 @@ import { permissionGuard } from "../middleware/permissionGuard.js";
 import {
   handlerGetFaultReportByID,
   handlerGetFaultReports,
+  handlerGetMyOpenFaultReports,
+  handlerGetAllFaultReportCount,
+  handlerGetFaultReportCount,
 } from "../handlers/reports/faults/handlerGetFaultReports.js";
 import {
   handlerAssignFaultReport,
@@ -36,6 +39,25 @@ router.get(
   protectedRoute,
   permissionGuard("canAssignFaults"),
   handlerGetAssignableUsers,
+);
+
+router.get(
+  "/info/all",
+  protectedRoute,
+  permissionGuard("canViewAllFaults"),
+  handlerGetAllFaultReportCount,
+);
+router.get(
+  "/info/me",
+  protectedRoute,
+  permissionGuard("canSuggestFaults"),
+  handlerGetFaultReportCount,
+);
+router.get(
+  "/info/assigned",
+  protectedRoute,
+  permissionGuard("canSuggestFaults"),
+  handlerGetMyOpenFaultReports,
 );
 
 router.get(
