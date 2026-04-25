@@ -1,152 +1,198 @@
-// src/pages/DashboardPage.jsx
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { LuRefreshCcw } from "react-icons/lu";
 import MainLayout from "../layouts/MainLayout";
+import { AuthContext } from "../context/AuthContext";
+import { StatCard } from "../components/dashboard/StatCard";
+import { AssignedTable } from "../components/dashboard/AssignedTable";
+import { useDashboardPermissions } from "../hooks/useDashboardPermissions";
+import {
+  useDashboardData,
+  getOpen,
+  getClosed,
+} from "../hooks/useDashboardData";
 
 function DashboardPage() {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const {
+    canSeeFaults,
+    canSeeAllFaults,
+    canSeeReports,
+    canSeeAllReports,
+    isPrivileged,
+  } = useDashboardPermissions();
+
+  const {
+    loading,
+    fetchData,
+    myFaults,
+    allFaults,
+    myMaintenance,
+    allMaintenance,
+    assignedFaults,
+    assignedMaintenance,
+    assignedTotal,
+  } = useDashboardData({
+    canSeeFaults,
+    canSeeAllFaults,
+    canSeeReports,
+    canSeeAllReports,
+  });
+
+  const tableColClass =
+    canSeeFaults && canSeeReports ? "md:grid-cols-2" : "md:grid-cols-1";
+
   return (
     <MainLayout title="Dashboard">
-      {/* Top Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 cursor-default group">
-          <div className="text-xs font-medium text-slate-400 mb-1 group-hover:text-sky-400 transition-colors">
-            Active faults
-          </div>
-          <div className="text-3xl font-bold text-slate-100 mb-1">12</div>
-          <div className="text-xs text-amber-400">
-            +3 today · high on markers 21 & 42
-          </div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-lg font-semibold text-slate-100">
+            Welcome back, {user?.firstName}
+          </h1>
+          <p className="text-sm text-slate-400 mt-0.5">
+            Here's an overview of your current reports.
+          </p>
         </div>
-
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 cursor-default group">
-          <div className="text-xs font-medium text-slate-400 mb-1 group-hover:text-sky-400 transition-colors">
-            Tools ready
-          </div>
-          <div className="text-3xl font-bold text-slate-100 mb-1">94%</div>
-          <div className="text-xs text-amber-300">
-            3 kits missing calibration
-          </div>
-        </div>
-
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 cursor-default group">
-          <div className="text-xs font-medium text-slate-400 mb-1 group-hover:text-sky-400 transition-colors">
-            Open alerts
-          </div>
-          <div className="text-3xl font-bold text-slate-100 mb-1">5</div>
-          <div className="text-xs text-rose-300">1 critical, 4 warning</div>
-        </div>
+        <button
+          onClick={fetchData}
+          title="Refresh"
+          className="rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-2 text-slate-300 transition-colors">
+          <LuRefreshCcw size={16} />
+        </button>
       </div>
 
-      {/* Main Content */}
-      <div className="grid gap-6 md:grid-cols-[2fr,1.2fr]">
-        {/* Fault List */}
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 min-w-0">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-slate-100">Fault List</h2>
-            <span className="text-xs text-slate-500">
-              Live feed from AR markers
-            </span>
-          </div>
-
-          <div className="overflow-x-auto w-full pb-2">
-            <table className="w-full text-sm whitespace-nowrap">
-              <thead className="text-slate-400 border-b border-slate-800">
-                <tr>
-                  <th className="text-left py-2 pr-4 font-medium">Marker</th>
-                  <th className="text-left py-2 pr-4 font-medium">Location</th>
-                  <th className="text-left py-2 pr-4 font-medium">Severity</th>
-                  <th className="text-left py-2 pr-4 font-medium">Detected</th>
-                  <th className="text-left py-2 font-medium">Status</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-800">
-                <tr className="hover:bg-slate-800/50 transition-colors">
-                  <td className="py-2.5 pr-4 font-mono text-sky-300">#21</td>
-                  <td className="py-2.5 pr-4 text-slate-200">
-                    Line A · Station 4
-                  </td>
-                  <td className="py-2.5 pr-4 text-rose-400 font-medium">
-                    High
-                  </td>
-                  <td className="py-2.5 pr-4 text-slate-400">Today · 09:14</td>
-                  <td className="py-2.5">
-                    <span className="inline-flex rounded-full bg-rose-500/15 text-rose-300 px-2.5 py-0.5 text-[11px] font-medium tracking-wide">
-                      Awaiting intervention
-                    </span>
-                  </td>
-                </tr>
-
-                <tr className="hover:bg-slate-800/50 transition-colors">
-                  <td className="py-2.5 pr-4 font-mono text-sky-300">#42</td>
-                  <td className="py-2.5 pr-4 text-slate-200">
-                    Line B · Station 2
-                  </td>
-                  <td className="py-2.5 pr-4 text-amber-300 font-medium">
-                    Medium
-                  </td>
-                  <td className="py-2.5 pr-4 text-slate-400">Today · 08:51</td>
-                  <td className="py-2.5">
-                    <span className="inline-flex rounded-full bg-amber-500/15 text-amber-200 px-2.5 py-0.5 text-[11px] font-medium tracking-wide">
-                      Technician dispatched
-                    </span>
-                  </td>
-                </tr>
-
-                <tr className="hover:bg-slate-800/50 transition-colors">
-                  <td className="py-2.5 pr-4 font-mono text-sky-300">#07</td>
-                  <td className="py-2.5 pr-4 text-slate-200">
-                    Line A · Station 1
-                  </td>
-                  <td className="py-2.5 pr-4 text-emerald-300 font-medium">
-                    Low
-                  </td>
-                  <td className="py-2.5 pr-4 text-slate-400">
-                    Yesterday · 17:03
-                  </td>
-                  <td className="py-2.5">
-                    <span className="inline-flex rounded-full bg-emerald-500/15 text-emerald-200 px-2.5 py-0.5 text-[11px] font-medium tracking-wide">
-                      Resolved
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* AR Marker Activity Chart */}
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col shadow-sm hover:shadow-lg hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-sm font-semibold text-slate-100">
-              Marker Activity
+      {isPrivileged ? (
+        <div className="space-y-6 mb-6">
+          <div>
+            <h2 className="text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-3">
+              System overview
             </h2>
-            <span className="text-xs text-slate-500">Last 7 Days</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {canSeeAllFaults && (
+                <StatCard
+                  label="Open fault reports"
+                  open={getOpen(allFaults, "fault")}
+                  closed={getClosed(allFaults, "fault")}
+                  loading={loading}
+                />
+              )}
+              {canSeeAllReports && (
+                <StatCard
+                  label="Open maintenance reports"
+                  open={getOpen(allMaintenance, "maintenance")}
+                  closed={getClosed(allMaintenance, "maintenance")}
+                  loading={loading}
+                />
+              )}
+              <StatCard
+                label="Assigned to me"
+                open={assignedTotal}
+                closed={null}
+                loading={loading}
+              />
+            </div>
           </div>
 
-          <div className="h-48 w-full flex items-end justify-between gap-2 border-b border-slate-800">
-            {[40, 70, 45, 90, 65, 30, 80].map((height, i) => (
-              <div
-                key={i}
-                className="w-full max-w-[2.5rem] bg-sky-500/20 hover:bg-sky-500/40 border-t border-x border-sky-500/30 rounded-t-md transition-all duration-300 relative group"
-                style={{ height: `${height}%` }}>
-                {/* Tooltip */}
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-slate-200 text-xs px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                  {height} alerts
-                </div>
+          {(canSeeFaults || canSeeReports) && (
+            <div>
+              <h2 className="text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-3">
+                My reports
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {canSeeFaults && (
+                  <StatCard
+                    label="My open fault reports"
+                    open={getOpen(myFaults, "fault")}
+                    closed={getClosed(myFaults, "fault")}
+                    loading={loading}
+                  />
+                )}
+                {canSeeReports && (
+                  <StatCard
+                    label="My open maintenance reports"
+                    open={getOpen(myMaintenance, "maintenance")}
+                    closed={getClosed(myMaintenance, "maintenance")}
+                    loading={loading}
+                  />
+                )}
               </div>
-            ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        (canSeeFaults || canSeeReports) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {canSeeFaults && (
+              <StatCard
+                label="My open fault reports"
+                open={getOpen(myFaults, "fault")}
+                closed={getClosed(myFaults, "fault")}
+                loading={loading}
+              />
+            )}
+            {canSeeReports && (
+              <StatCard
+                label="My open maintenance reports"
+                open={getOpen(myMaintenance, "maintenance")}
+                closed={getClosed(myMaintenance, "maintenance")}
+                loading={loading}
+              />
+            )}
+            <StatCard
+              label="Assigned to me"
+              open={assignedTotal}
+              closed={null}
+              loading={loading}
+            />
           </div>
+        )
+      )}
 
-          <div className="flex justify-between w-full mt-3 text-xs text-slate-500 font-medium px-1 sm:px-3">
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
-          </div>
-        </section>
-      </div>
+      {(canSeeFaults || canSeeReports) && (
+        <div className={`grid gap-6 ${tableColClass}`}>
+          {canSeeFaults && (
+            <section className="rounded-xl border border-slate-800 overflow-hidden bg-slate-900/20">
+              <div className="flex items-center justify-between px-4 pt-4 pb-3">
+                <h2 className="text-sm font-semibold text-slate-100">
+                  Assigned Fault Reports
+                </h2>
+                <button
+                  onClick={() => navigate("/app/faults")}
+                  className="text-xs text-sky-400 hover:text-sky-300 transition-colors">
+                  View all →
+                </button>
+              </div>
+              <AssignedTable
+                reports={assignedFaults}
+                loading={loading}
+                type="fault"
+              />
+            </section>
+          )}
+
+          {canSeeReports && (
+            <section className="rounded-xl border border-slate-800 overflow-hidden bg-slate-900/20">
+              <div className="flex items-center justify-between px-4 pt-4 pb-3">
+                <h2 className="text-sm font-semibold text-slate-100">
+                  Assigned Maintenance Reports
+                </h2>
+                <button
+                  onClick={() => navigate("/app/maintenance")}
+                  className="text-xs text-sky-400 hover:text-sky-300 transition-colors">
+                  View all →
+                </button>
+              </div>
+              <AssignedTable
+                reports={assignedMaintenance}
+                loading={loading}
+                type="maintenance"
+              />
+            </section>
+          )}
+        </div>
+      )}
     </MainLayout>
   );
 }

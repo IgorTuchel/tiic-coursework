@@ -31,10 +31,6 @@ export async function handlerGetErrorLogs(req, res) {
     if (req.query.to && isValidDate(req.query.to)) {
       where.timestamp[Op.lte] = new Date(`${req.query.to}T23:59:59.999Z`);
     }
-    console.log("Date filter:", {
-      from: where.timestamp?.[Op.gte],
-      to: where.timestamp?.[Op.lte],
-    });
   }
 
   if (req.query.httpStatusRange) {

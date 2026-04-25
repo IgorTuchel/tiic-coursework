@@ -61,7 +61,7 @@ function MfaStep({
         <button
           type="submit"
           disabled={loading || form.mfaCode.length !== 6}
-          className="w-full inline-flex items-center justify-center rounded-md bg-sky-500 hover:bg-sky-600 disabled:opacity-60 px-3 py-2 text-sm font-medium text-slate-950 transition-colors">
+          className="w-full inline-flex items-center justify-center rounded-md bg-sky-500 hover:bg-sky-600 disabled:opacity-60 px-3 py-2 text-sm font-medium text-slate-950 transition-colors enabled:hover:cursor-pointer">
           {loading ? (
             <>
               <LuLoader className="animate-spin w-4 h-4 mr-2" />
@@ -75,7 +75,7 @@ function MfaStep({
         <button
           type="button"
           onClick={handleBackToLogin}
-          className="w-full inline-flex items-center justify-center rounded-md border border-slate-700 hover:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-300 transition-colors">
+          className="w-full inline-flex items-center justify-center rounded-md border border-slate-700 hover:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-300 transition-colors enabled:hover:cursor-pointer">
           <LuChevronLeft className="w-4 h-4 mr-1" />
           Back to sign in
         </button>
@@ -131,7 +131,7 @@ function LoginStep({
             </label>
             <Link
               to="/reset-password"
-              className="text-xs text-sky-400 hover:text-sky-300">
+              className="text-xs text-sky-400 hover:text-sky-300 enabled:hover:cursor-pointer transition-colors">
               Forgot password?
             </Link>
           </div>
@@ -149,7 +149,7 @@ function LoginStep({
             <button
               type="button"
               onClick={() => setVisiblePass((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors enabled:hover:cursor-pointer">
               {visiblePass ? (
                 <LuEyeOff className="w-4 h-4" />
               ) : (
@@ -162,7 +162,7 @@ function LoginStep({
         <button
           type="submit"
           disabled={loading}
-          className="w-full inline-flex items-center justify-center rounded-md bg-sky-500 hover:bg-sky-600 disabled:opacity-60 px-3 py-2 text-sm font-medium text-slate-950 transition-colors">
+          className="w-full inline-flex items-center justify-center rounded-md bg-sky-500 hover:bg-sky-600 disabled:opacity-60 px-3 py-2 text-sm font-medium text-slate-950 transition-colors enabled:hover:cursor-pointer">
           {loading ? (
             <>
               <LuLoader className="animate-spin w-4 h-4 mr-2" />
@@ -179,7 +179,7 @@ function LoginStep({
           New user?{" "}
           <Link
             to="/activate-account"
-            className="text-sky-400 hover:text-sky-300 transition-colors">
+            className="text-sky-400 hover:text-sky-300 enabled:hover:cursor-pointer transition-colors">
             Activate your account
           </Link>
         </p>

@@ -44,7 +44,6 @@ export async function handlerUpdateFaultReport(req, res) {
     !requestedUserRole.data.isAdmin &&
     !requestedUserRole.data.canManageFaults
   ) {
-    console.log(requestedUserRole.data);
     throw new ForbiddenError(
       req,
       "You do not have permission to update this fault report",

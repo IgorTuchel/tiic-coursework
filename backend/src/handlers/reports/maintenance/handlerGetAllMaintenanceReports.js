@@ -197,8 +197,7 @@ export async function handlerGetMaintenanceReportCount(req, res) {
     subQuery: false,
     col: "maintenanceReportID",
   });
-  console.log("Open count:", count);
-  console.log("Closed count:", countClosed);
+
   respondWithJson(res, HTTPCodes.OK, {
     success: true,
     data: {

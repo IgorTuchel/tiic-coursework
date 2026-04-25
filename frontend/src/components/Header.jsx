@@ -68,7 +68,11 @@ function Header() {
 
   const navLinks = [
     { to: "/app/dashboard", label: "Dashboard" },
-    { to: "/app/maintenance", label: "Maintenance Reports" },
+    ...(perms?.canWorkOnReports ||
+    perms?.canViewAllReports ||
+    perms?.canManageReports
+      ? [{ to: "/app/maintenance", label: "Maintenance Reports" }]
+      : []),
     ...(perms?.canWorkOnReports ||
     perms?.canViewAllReports ||
     perms?.canSuggestFaults ||
@@ -95,7 +99,6 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 bg-slate-900 border-b border-slate-800">
       <div className="px-4 sm:px-6 py-3 flex items-center justify-between gap-6">
-        {/* Logo */}
         <Link
           to="/app/dashboard"
           className="flex items-center gap-2.5 group shrink-0">
@@ -105,7 +108,6 @@ function Header() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
         <nav
           className="hidden sm:flex items-center gap-5 text-sm flex-1"
           aria-label="Main">
@@ -116,9 +118,7 @@ function Header() {
           ))}
         </nav>
 
-        {/* Right controls */}
         <div className="flex items-center gap-1">
-          {/* Desktop profile dropdown */}
           <div className="hidden sm:block relative" ref={profileRef}>
             <button
               onClick={() => setProfileOpen((p) => !p)}
@@ -173,7 +173,6 @@ function Header() {
             )}
           </div>
 
-          {/* Mobile hamburger + floating menu */}
           <div className="sm:hidden relative" ref={mobileRef}>
             <button
               onClick={() => setMobileOpen((p) => !p)}
@@ -189,7 +188,6 @@ function Header() {
 
             {mobileOpen && (
               <div className={`${dropdownCard} w-72`}>
-                {/* User strip */}
                 <div className="px-4 py-3 border-b border-slate-700 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-sky-700 flex items-center justify-center text-xs font-semibold text-white shrink-0">
                     {initials}
@@ -204,8 +202,6 @@ function Header() {
                     {user?.role}
                   </span>
                 </div>
-
-                {/* Nav links */}
                 <nav className="py-1 text-sm" aria-label="Mobile">
                   {navLinks.map(({ to, label }) => (
                     <NavLink
@@ -224,7 +220,6 @@ function Header() {
                   ))}
                 </nav>
 
-                {/* Actions */}
                 <div className="border-t border-slate-700 py-1 text-sm">
                   <button
                     onClick={() => setTextSizeLevel((p) => (p + 1) % 3)}

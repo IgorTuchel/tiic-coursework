@@ -22,7 +22,6 @@ export async function handlerGetUserById(req, res) {
   }
 
   const user = await getUserByID(id);
-  console.log(user);
   if (!user.success) {
     throw new BadRequestError(req, "User not found");
   }
