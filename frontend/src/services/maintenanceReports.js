@@ -1,9 +1,15 @@
 import api from "../lib/api";
 
-export const getAllMaintenanceReports = async () => {
+export const getAllMaintenanceReports = async (page = 1, limit = 20) => {
   try {
-    const response = await api.get("/reports/maintenance");
-    return { success: true, data: response.data.data };
+    const response = await api.get("/reports/maintenance", {
+      params: { page, limit },
+    });
+    return {
+      success: true,
+      data: response.data.data,
+      pagination: response.data.pagination,
+    };
   } catch (error) {
     return {
       success: false,

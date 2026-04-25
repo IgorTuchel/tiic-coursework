@@ -21,12 +21,16 @@ export function MaintenancePage() {
 
   const {
     reports,
+    pagination,
+    limit,
     severityLevels,
     availableTools,
     loading,
     refreshing,
     fetchReports,
     handleCreate,
+    handlePageChange,
+    handleLimitChange,
   } = useMaintenanceReports();
 
   const {
@@ -132,10 +136,23 @@ export function MaintenancePage() {
 
           <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
             <span>
-              Showing {processedReports.length} of {reports.length} reports
+              Showing{" "}
+              <span className="text-slate-300">{processedReports.length}</span>{" "}
+              of{" "}
+              <span className="text-slate-300">
+                {pagination?.total ?? reports.length}
+              </span>{" "}
+              reports
+              {(search || quickFilter !== "all") && (
+                <span className="text-slate-400 ml-1">(filtered)</span>
+              )}
             </span>
             {(search || quickFilter !== "all") && (
-              <span className="text-slate-400">Filtered results</span>
+              <button
+                onClick={clearFilters}
+                className="text-sky-400 hover:text-sky-300 transition-colors">
+                Reset filters
+              </button>
             )}
           </div>
         </div>
@@ -170,10 +187,12 @@ export function MaintenancePage() {
             <ReportTable
               loading={loading}
               reports={processedReports}
+              pagination={pagination}
+              limit={limit}
+              onPageChange={handlePageChange}
+              onLimitChange={handleLimitChange}
               onActionClick={(report) =>
-                navigate(
-                  `/app/maintenance/${report.maintenanceReportID || report.reportID}`,
-                )
+                navigate(`/app/maintenance/${report.maintenanceReportID}`)
               }
             />
           </div>

@@ -1,9 +1,20 @@
 import api from "../lib/api";
 
-export const getAllFaultReports = async () => {
+export const getAllFaultReports = async (page = 1, limit = 20) => {
   try {
-    const response = await api.get("/reports/faults");
-    return { success: true, data: response.data.data };
+    const response = await api.get("/reports/faults", {
+      params: { page, limit },
+    });
+    const p = response.data.pagination;
+    return {
+      success: true,
+      data: response.data.data,
+      pagination: {
+        ...p,
+        hasPrev: p.hasPrevPage,
+        hasNext: p.hasNextPage,
+      },
+    };
   } catch (error) {
     return {
       success: false,

@@ -21,11 +21,15 @@ export function FaultPage() {
 
   const {
     reports,
+    pagination,
+    limit,
     severityLevels,
     loading,
     refreshing,
     fetchReports,
     handleCreate,
+    handlePageChange,
+    handleLimitChange,
   } = useFaultReports();
 
   const {
@@ -69,7 +73,7 @@ export function FaultPage() {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by title, description, creator, status, severity, or tool..."
+                placeholder="Search by title, description, creator, status, or severity..."
                 className="w-full rounded-md bg-slate-950 border border-slate-800 pl-9 pr-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
@@ -131,10 +135,23 @@ export function FaultPage() {
 
           <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
             <span>
-              Showing {processedReports.length} of {reports.length} reports
+              Showing{" "}
+              <span className="text-slate-300">{processedReports.length}</span>{" "}
+              of{" "}
+              <span className="text-slate-300">
+                {pagination?.total ?? reports.length}
+              </span>{" "}
+              reports
+              {(search || quickFilter !== "all") && (
+                <span className="text-slate-400 ml-1">(filtered)</span>
+              )}
             </span>
             {(search || quickFilter !== "all") && (
-              <span className="text-slate-400">Filtered results</span>
+              <button
+                onClick={clearFilters}
+                className="text-sky-400 hover:text-sky-300 transition-colors">
+                Reset filters
+              </button>
             )}
           </div>
         </div>
@@ -169,6 +186,10 @@ export function FaultPage() {
             <ReportTable
               loading={loading}
               reports={processedReports}
+              pagination={pagination}
+              limit={limit}
+              onPageChange={handlePageChange}
+              onLimitChange={handleLimitChange}
               onActionClick={(report) =>
                 navigate(`/app/faults/${report.faultReportID}`)
               }

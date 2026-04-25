@@ -61,8 +61,8 @@ export async function handlerGetErrorLogs(req, res) {
         page,
         limit,
         totalPages: Math.ceil(count / limit),
-        hasNext: page < Math.ceil(count / limit),
-        hasPrev: page > 1,
+        hasNextPage: page < Math.ceil(count / limit),
+        hasPrevPage: page > 1,
       },
     },
   });

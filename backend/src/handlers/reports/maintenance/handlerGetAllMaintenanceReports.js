@@ -9,8 +9,7 @@ import { Op } from "sequelize";
 import SeverityLevel from "../../../models/appdb/severityLevel.js";
 import ReportStatus from "../../../models/appdb/reportStatus.js";
 
-// Shared includes for both query branches
-const reportIncludes = (includeAssigned = true) => [
+const reportIncludes = () => [
   {
     model: User,
     as: "createdByUser",
@@ -34,7 +33,7 @@ const reportIncludes = (includeAssigned = true) => [
     as: "assignedUsers",
     attributes: ["userID", "firstName", "lastName", "email"],
     through: { attributes: [] },
-    required: includeAssigned ? false : false,
+    required: false,
   },
   {
     model: ReportNotes,

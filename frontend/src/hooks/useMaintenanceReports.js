@@ -9,6 +9,9 @@ import {
 
 export function useMaintenanceReports() {
   const [reports, setReports] = useState([]);
+  const [pagination, setPagination] = useState(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
   const [severityLevels, setSeverityLevels] = useState([]);
   const [availableTools, setAvailableTools] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,10 +21,11 @@ export function useMaintenanceReports() {
     if (silent) setRefreshing(true);
     else setLoading(true);
 
-    const result = await getAllMaintenanceReports();
+    const result = await getAllMaintenanceReports(page, limit);
 
     if (result.success) {
       setReports(result.data);
+      setPagination(result.pagination);
     } else {
       toast.error(result.message ?? "Failed to fetch maintenance reports.");
     }
@@ -31,16 +35,26 @@ export function useMaintenanceReports() {
   };
 
   useEffect(() => {
-    fetchReports();
+    const fetchData = async () => {
+      await fetchReports();
+    };
+    fetchData();
+  }, [page, limit]);
 
-    getSeverityLevels().then((result) => {
-      if (result.success) setSeverityLevels(result.data);
+  useEffect(() => {
+    getSeverityLevels().then((r) => {
+      if (r.success) setSeverityLevels(r.data);
     });
-
-    getAllTools().then((result) => {
-      if (result.success) setAvailableTools(result.data);
+    getAllTools().then((r) => {
+      if (r.success) setAvailableTools(r.data);
     });
   }, []);
+
+  const handlePageChange = (newPage) => setPage(newPage);
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
 
   const handleCreate = async (formData, onSuccess) => {
     const result = await createMaintenanceReport(formData);
@@ -56,11 +70,15 @@ export function useMaintenanceReports() {
 
   return {
     reports,
+    pagination,
+    limit,
     severityLevels,
     availableTools,
     loading,
     refreshing,
     fetchReports,
     handleCreate,
+    handlePageChange,
+    handleLimitChange,
   };
 }
