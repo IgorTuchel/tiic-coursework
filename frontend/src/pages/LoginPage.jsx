@@ -214,7 +214,7 @@ function LoginPage() {
     <AuthLayout
       title="Login"
       panelHeading="Maintenance Console"
-      panelBody="Secure access for authorised maintenance staff. Monitor active faults, schedule interventions, and keep tool kits in top shape from a single pane of glass.">
+      panelBody="Secure access for authorised maintenance staff. Please sign in to continue.">
       {loading && !isAuthenticated && !mfaRequired ? (
         <div className="text-center">
           <LuLoader className="animate-spin w-12 h-12 text-sky-500 mx-auto mb-4" />

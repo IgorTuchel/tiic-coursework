@@ -51,7 +51,6 @@ function UserManagementPage() {
   return (
     <MainLayout title="User Management">
       <div className="flex flex-col gap-5">
-        {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold text-slate-100">
@@ -79,7 +78,6 @@ function UserManagementPage() {
 
         <StatsStrip users={users} roles={roles} />
 
-        {/* Search + refresh */}
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
           <div className="flex gap-3">
             <div className="relative flex-1">
@@ -118,7 +116,6 @@ function UserManagementPage() {
           </div>
         </div>
 
-        {/* Table */}
         {!loading && filtered.length === 0 ? (
           <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-10">
             <div className="flex flex-col items-center text-center gap-3">
@@ -154,7 +151,6 @@ function UserManagementPage() {
         )}
       </div>
 
-      {/* Modals — unchanged */}
       {modal === "searchById" && (
         <SearchByIdModal
           roles={roles}

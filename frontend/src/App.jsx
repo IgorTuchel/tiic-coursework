@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
@@ -15,6 +14,7 @@ import { MaintenanceDetailPage } from "./pages/MaintenanceDetailPage.jsx";
 import { FaultPage } from "./pages/FaultPage.jsx";
 import { FaultDetailPage } from "./pages/FaultDetailPage.jsx";
 import ErrorLogsPage from "./pages/ErrorLogsPage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 function App() {
   return (
@@ -52,7 +52,9 @@ function App() {
           <Route path="/app/faults/:id" element={<FaultDetailPage />} />
           <Route path="/app/logs" element={<ErrorLogsPage />} />
           <Route path="/app/admin" element={<UserManagementPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

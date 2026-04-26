@@ -28,7 +28,7 @@ function ActivateAccountPage() {
     <AuthLayout
       title="Activate Account"
       panelHeading="Welcome to the maintenance console."
-      panelBody="Your account has been created by an administrator. Set a password below to complete your setup and gain access.">
+      panelBody="Please activate your account to access the maintenance console and start managing your tasks. If you haven't received an activation email, you can request a new one below.">
       {!token ? (
         <>
           <h2 className="text-2xl font-semibold mb-1">Activate your account</h2>
