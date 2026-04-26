@@ -48,7 +48,7 @@ export function Modal({
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-white transition-colors mt-0.5 ml-4 shrink-0">
-            <LuX className="w-4 h-4" />
+            <LuX className="w-4 h-4 cursor-pointer" />
           </button>
         </div>
         <div className="px-5 py-4">{children}</div>

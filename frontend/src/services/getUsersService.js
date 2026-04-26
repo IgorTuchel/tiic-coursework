@@ -16,6 +16,26 @@ export const getAllUsers = async () => {
   }
 };
 
+export const updateSelf = async (payload) => {
+  try {
+    const response = await api.put("/users/self", payload);
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      statusCode: error.response?.data?.statusCode,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while updating user settings.",
+    };
+  }
+};
+
 export const getUserById = async (id) => {
   try {
     const response = await api.get(`/users/${id}`);
