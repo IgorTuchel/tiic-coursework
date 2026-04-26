@@ -1,11 +1,11 @@
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
-import { SecurityLogTable } from "../components/logs/SecurityLogTable";
-import { LogDetailsModal } from "../components/logs/LogDetailsModal";
+import { SecurityLogTable } from "../components/logReports/SecurityLogTable";
+import { LogDetailsModal } from "../components/logReports/LogDetailsModal";
 import { SearchByIdModal } from "../components/userManagement";
-import { ErrorLogControls } from "../components/logs/ErrorLogControls";
-import { ErrorLogEmptyState } from "../components/logs/ErrorLogEmptyState";
-import { ErrorLogPagination } from "../components/logs/ErrorLogPagination";
+import { ErrorLogControls } from "../components/logReports/ErrorLogControls";
+import { ErrorLogEmptyState } from "../components/logReports/ErrorLogEmptyState";
+import { ErrorLogPagination } from "../components/logReports/ErrorLogPagination";
 import { useErrorLogs } from "../hooks/useErrorLogs";
 import {
   useErrorLogFilters,

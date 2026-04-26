@@ -1,7 +1,7 @@
 import { LuChevronRight } from "react-icons/lu";
 import { Badge } from "./ReportDetailsHelpers";
 import { SEVERITY_STYLES, STATUS_STYLES } from "../../utils/styles";
-import { ErrorLogPagination } from "../logs/ErrorLogPagination";
+import { ErrorLogPagination } from "../logReports/ErrorLogPagination";
 
 function SkeletonRow() {
   return (
