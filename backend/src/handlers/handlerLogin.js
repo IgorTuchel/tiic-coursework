@@ -14,6 +14,11 @@ import {
   getUserRoleByID,
   getUserStatusByID,
 } from "../services/cacheDb.js";
+import {
+  getAccountIsLocked,
+  lockAccount,
+  resetFailedLoginAttempts,
+} from "../services/accountLock.js";
 
 export async function handlerLogin(req, res) {
   const { email, password, mfaCode = "" } = req.body;
@@ -57,6 +62,15 @@ export async function handlerLogin(req, res) {
       true,
     );
   }
+  const isAccountLocked = await getAccountIsLocked(dbUser.data.userID);
+  if (isAccountLocked.success && isAccountLocked.data) {
+    throw new ForbiddenError(
+      req,
+      `Account is locked due to multiple failed login attempts. Please try again later or contact support.`,
+      StatusCodes.LOGIN_FAILURE_ACCOUNT_LOCKED,
+      true,
+    );
+  }
 
   if (!password) {
     throw new BadRequestError(
@@ -73,6 +87,15 @@ export async function handlerLogin(req, res) {
     dbUser.data.passwordHash,
   );
   if (!passwordMatch) {
+    const lock = await lockAccount(dbUser.data.userID); // Increment failed login attempts and lock account if necessary
+    if (lock.success && lock.data) {
+      throw new ForbiddenError(
+        req,
+        `Account is locked due to multiple failed login attempts. Please try again later or contact support.`,
+        StatusCodes.LOGIN_FAILURE_ACCOUNT_LOCKED,
+        true,
+      );
+    }
     throw new UnauthorizedError(
       req,
       "Invalid email or password",
@@ -152,7 +175,7 @@ export async function handlerLogin(req, res) {
 
   req.session.userID = dbUser.data.userID;
   req.session.roleID = dbUser.data.roleID;
-
+  await resetFailedLoginAttempts(dbUser.data.userID); // Reset failed login attempts after successful login
   return respondWithJson(res, HTTPCodes.OK, {
     message: "Login successful",
     data: {
