@@ -1,3 +1,8 @@
+/**
+ * @file handlerUpdateFaultReport.js
+ * @description Handler for updating a fault report. Validates user permissions to ensure they are either the creator, an assigned user, or have appropriate roles to update the fault report. Validates the provided severity level and report status before updating the fault report in the database. Responds with the updated fault report details if the update is successful.
+ * @module handlers/reports/faults/handlerUpdateFaultReport
+ */
 import {
   BadRequestError,
   ForbiddenError,
@@ -17,6 +22,17 @@ import ReportStatus from "../../../models/appdb/reportStatus.js";
 import SeverityLevel from "../../../models/appdb/severityLevel.js";
 import ReportNotes from "../../../models/appdb/reportNotes.js";
 
+/**
+ * Handler for updating a fault report. Validates user permissions to ensure they are either the creator, an assigned user, or have appropriate roles to update the fault report. Validates the provided severity level and report status before updating the fault report in the database. Responds with the updated fault report details if the update is successful.
+ *
+ * @async
+ * @function handlerUpdateFaultReport
+ * @param {Object} req - The request object containing the fault report ID in the URL parameters and the updated details in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if required fields are missing or if invalid severity level or report status is provided.
+ * @throws {ForbiddenError} Throws an error if the user does not have permission to update the fault report.
+ * @throws {NotFoundError} Throws an error if the user's role is not found or if the fault report is not found.
+ */
 export async function handlerUpdateFaultReport(req, res) {
   const { id } = req.params;
   const { name, description, status, severity } = req.body;

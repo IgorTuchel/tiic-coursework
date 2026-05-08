@@ -1,3 +1,8 @@
+/**
+ * @file handlerCreateFaultReport.js
+ * @description Handler for creating new fault reports. Validates the input data, retrieves necessary reference data (report statuses and severity levels), and creates a new fault report in the database. Responds with the details of the newly created fault report upon success.
+ * @module handlers/reports/faults/handlerCreateFaultReport
+ */
 import { respondWithJson } from "../../../utils/json.js";
 import { HTTPCodes } from "../../../utils/json.js";
 import {
@@ -10,6 +15,16 @@ import {
   getSeverityLevelByID,
 } from "../../../services/cacheDb.js";
 
+/**
+ * Handler for creating a new fault report. Validates the input data, retrieves necessary reference data (report statuses and severity levels), and creates a new fault report in the database. Responds with the details of the newly created fault report upon success.
+ *
+ * @async
+ * @function handlerCreateFaultReport
+ * @param {Object} req - The request object containing the fault report details in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if required fields are missing or if invalid severity level is provided.
+ * @throws {InternalServerError} Throws an error if there is a failure in retrieving reference data or creating the fault report.
+ */
 export async function handlerCreateFaultReport(req, res) {
   const { name, description, severity } = req.body;
 

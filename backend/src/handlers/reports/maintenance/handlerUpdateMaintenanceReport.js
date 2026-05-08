@@ -1,3 +1,8 @@
+/**
+ * @file handlerUpdateMaintenanceReport.js
+ * @description Handler for updating a maintenance report. Validates user permissions to ensure they have the appropriate roles to update the report. Responds with the updated maintenance report data if successful.
+ * @module handlers/reports/maintenance/handlerUpdateMaintenanceReport
+ */
 import { Sequelize } from "sequelize";
 import { BadRequestError } from "../../../middleware/errorHandler.js";
 import { getSeverityLevelByID } from "../../../services/cacheDb.js";
@@ -16,6 +21,17 @@ import ToolCheck from "../../../models/appdb/toolCheck.js";
 import SeverityLevel from "../../../models/appdb/severityLevel.js";
 import ReportStatus from "../../../models/appdb/reportStatus.js";
 
+/**
+ * Handler for updating a maintenance report. Validates user permissions to ensure they have the appropriate roles to update the report. Responds with the updated maintenance report data if successful.
+ *
+ * @async
+ * @function handlerUpdateMaintenanceReport
+ * @param {Object} req - The request object containing the maintenance report ID in the URL parameters and the updated details in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if required fields are missing or if invalid severity level or report status is provided.
+ * @throws {ForbiddenError} Throws an error if the user does not have permission to update the maintenance report.
+ * @throws {NotFoundError} Throws an error if the user's role is not found or if the maintenance report is not found.
+ */
 export async function handlerUpdateMaintenanceReport(req, res) {
   const { id } = req.params;
   const { name, description, status, severity, markerScanBlob } = req.body;

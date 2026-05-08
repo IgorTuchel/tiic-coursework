@@ -1,3 +1,8 @@
+/**
+ * @file handlerManageToolsForMaintenanceReport.js
+ * @description Handlers for managing tools associated with maintenance reports. Includes functions to add and remove tools from a maintenance report, with validation of tool IDs and maintenance report existence.
+ * @module handlers/reports/tools/handlerManageToolsForMaintenanceReport
+ */
 import { getTools } from "../../../services/cacheDb.js";
 import {
   BadRequestError,
@@ -8,6 +13,17 @@ import { HTTPCodes, respondWithJson } from "../../../utils/json.js";
 import MaintenanceReport from "../../../models/appdb/maintenanceReport.js";
 import MaintenanceReportToolCheck from "../../../models/appdb/maintenanceReportToolCheck.js";
 
+/**
+ * Handler for removing tools from a maintenance report. Validates the existence of the maintenance report and the validity of the tool IDs.
+ *
+ * @async
+ * @function handlerRemoveToolsFromMaintenanceReport
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if toolIDs is invalid.
+ * @throws {NotFoundError} Throws an error if the maintenance report is not found.
+ * @throws {InternalServerError} Throws an error if there is a failure in removing tools from the maintenance report.
+ */
 export async function handlerRemoveToolsFromMaintenanceReport(req, res) {
   const { id } = req.params;
   const { toolIDs } = req.body;
@@ -55,6 +71,17 @@ export async function handlerRemoveToolsFromMaintenanceReport(req, res) {
   });
 }
 
+/**
+ * Handler for adding tools to a maintenance report. Validates the existence of the maintenance report and the validity of the tool IDs.
+ *
+ * @async
+ * @function handlerAddToolsToMaintenanceReport
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if toolIDs is invalid.
+ * @throws {NotFoundError} Throws an error if the maintenance report is not found.
+ * @throws {InternalServerError} Throws an error if there is a failure in adding tools to the maintenance report.
+ */
 export async function handlerAddToolsToMaintenanceReport(req, res) {
   const { id } = req.params;
   const { toolIDs } = req.body;

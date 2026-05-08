@@ -1,3 +1,8 @@
+/**
+ * @file handlerGetAllMaintenanceReports.js
+ * @description Handlers for retrieving maintenance reports. Includes functionality to get all maintenance reports with pagination, get open maintenance reports assigned to the user, and get counts of open and closed maintenance reports. Validates user permissions to ensure they have the appropriate roles to view the requested data. Responds with the requested maintenance report data or counts if successful.
+ * @module handlers/reports/maintenance/handlerGetAllMaintenanceReports
+ */
 import User from "../../../models/appdb/users.js";
 import MaintenanceReport from "../../../models/appdb/maintenanceReport.js";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
@@ -12,6 +17,12 @@ import { Op } from "sequelize";
 import SeverityLevel from "../../../models/appdb/severityLevel.js";
 import ReportStatus from "../../../models/appdb/reportStatus.js";
 
+/**
+ * Helper function to define the include options for retrieving maintenance reports with related data such as createdBy user, severity level, report status, assigned users, notes, and tool checks.
+ *
+ * @function reportIncludes
+ * @returns {Array} An array of Sequelize include options for retrieving related data with maintenance reports.
+ */
 const reportIncludes = () => [
   {
     model: User,
@@ -61,6 +72,16 @@ const reportIncludes = () => [
   },
 ];
 
+/**
+ * Handler for retrieving all maintenance reports with pagination. Validates user permissions to ensure they have the appropriate roles to view the reports. If the user has privileged roles, they can view all reports; otherwise, they can only view reports they created or are assigned to. Responds with the requested maintenance report data and pagination information if successful.
+ *
+ * @async
+ * @function handlerGetAllMaintenanceReports
+ * @param {Object} req - The request object containing query parameters for pagination.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {NotFoundError} Throws an error if the user's role is not found.
+ * @throws {ForbiddenError} Throws an error if the user does not have permission to view the reports.
+ */
 export async function handlerGetAllMaintenanceReports(req, res) {
   const requrestedUserRole = await getUserRoleByID(req.session.roleID);
   const userID = req.session.userID;
@@ -118,6 +139,16 @@ export async function handlerGetAllMaintenanceReports(req, res) {
   });
 }
 
+/**
+ * Handler for retrieving open maintenance reports assigned to the user. Validates user permissions to ensure they have the appropriate roles to view the reports. Responds with the requested maintenance report data if successful.
+ *
+ * @async
+ * @function handlerGetMyOpenMaintenanceReports
+ * @param {Object} req - The request object containing query parameters for pagination.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {NotFoundError} Throws an error if the user's role is not found.
+ * @throws {ForbiddenError} Throws an error if the user does not have permission to view the reports.
+ */
 export async function handlerGetMyOpenMaintenanceReports(req, res) {
   const userID = req.session.userID;
 
@@ -145,6 +176,16 @@ export async function handlerGetMyOpenMaintenanceReports(req, res) {
   });
 }
 
+/**
+ * Handler for retrieving counts of open and closed maintenance reports. Validates user permissions to ensure they have the appropriate roles to view the counts. Responds with the counts of open and closed maintenance reports if successful.
+ *
+ * @async
+ * @function handlerGetMaintenanceReportCount
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {NotFoundError} Throws an error if the user's role is not found.
+ * @throws {ForbiddenError} Throws an error if the user does not have permission to view the counts.
+ */
 export async function handlerGetMaintenanceReportCount(req, res) {
   const userID = req.session.userID;
 
@@ -207,6 +248,16 @@ export async function handlerGetMaintenanceReportCount(req, res) {
   });
 }
 
+/**
+ * Handler for retrieving counts of open and closed maintenance reports. Validates user permissions to ensure they have the appropriate roles to view the counts. Responds with the counts of open and closed maintenance reports if successful.
+ *
+ * @async
+ * @function handlerGetAllMaintenanceReportCount
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {NotFoundError} Throws an error if the user's role is not found.
+ * @throws {ForbiddenError} Throws an error if the user does not have permission to view the counts.
+ */
 export async function handlerGetAllMaintenanceReportCount(req, res) {
   const userID = req.session.userID;
   const requestedUserRole = await getUserRoleByID(req.session.roleID);

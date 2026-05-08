@@ -1,3 +1,8 @@
+/**
+ * @file handlerCreateFaultReportNote.js
+ * @description Handler for adding notes to existing fault reports. Validates the input data, checks user permissions, and creates a new note linked to the specified fault report in the database. Responds with the details of the newly created note upon success.
+ * @module handlers/reports/faults/handlerCreateFaultReportNote
+ */
 import {
   BadRequestError,
   InternalServerError,
@@ -10,6 +15,17 @@ import FaultReportNotes from "../../../models/appdb/faultReportNotes.js";
 import { userAssignedToFaultReport } from "../../../services/workOnReport.js";
 import { getUserByID, getUserRoleByID } from "../../../services/cacheDb.js";
 
+/**
+ * Handler for adding a note to an existing fault report. Validates the input data, checks user permissions, and creates a new note linked to the specified fault report in the database. Responds with the details of the newly created note upon success.
+ *
+ * @async
+ * @function handlerCreateFaultReportNote
+ * @param {Object} req - The request object containing the fault report ID in the URL parameters and the note details in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if required fields are missing or if the user does not have permission to add notes to the fault report.
+ * @throws {InternalServerError} Throws an error if there is a failure in creating the note or linking it to the fault report.
+ * @throws {NotFoundError} Throws an error if the specified fault report or user role is not found.
+ */
 export async function handlerCreateFaultReportNote(req, res) {
   const { id } = req.params;
   const { title, content } = req.body;

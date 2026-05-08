@@ -1,3 +1,8 @@
+/**
+ * @file handlerGetMarkerQr.js
+ * @description Handlers for retrieving the QR code and PDF marker for a maintenance report. Validates user permissions to ensure they have the appropriate roles to view the marker. Responds with the requested QR code image or PDF file if successful.
+ * @module handlers/reports/maintenance/handlerGetMarkerQr
+ */
 import {
   ForbiddenError,
   NotFoundError,
@@ -11,6 +16,16 @@ import { userAssignedToMaintenanceReport } from "../../../services/workOnReport.
 import QRCode from "qrcode";
 import PDFDocument from "pdfkit";
 
+/**
+ * Handler for retrieving the QR code marker for a maintenance report. Validates user permissions to ensure they have the appropriate roles to view the marker. Responds with the requested QR code image if successful.
+ *
+ * @async
+ * @function handlerGetMarkerQr
+ * @param {Object} req - The request object containing the maintenance report ID in the URL parameters.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if the user does not have permission to view the maintenance report's marker QR code.
+ * @throws {NotFoundError} Throws an error if the maintenance report is not found or if the user's role is not found.
+ */
 export async function handlerGetMarkerQr(req, res) {
   const { id } = req.params;
 
@@ -53,6 +68,15 @@ export async function handlerGetMarkerQr(req, res) {
   res.send(buffer);
 }
 
+/**
+ * Handler for retrieving the PDF marker for a maintenance report. Validates user permissions to ensure they have the appropriate roles to view the marker. Responds with the requested PDF file if successful.
+ * @async
+ * @function handlerGetMarkerPdf
+ * @param {Object} req - The request object containing the maintenance report ID in the URL parameters.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if the user does not have permission to view the maintenance report's marker PDF.
+ * @throws {NotFoundError} Throws an error if the maintenance report is not found or if the user's role is not found.
+ */
 export async function handlerGetMarkerPdf(req, res) {
   const { id } = req.params;
 

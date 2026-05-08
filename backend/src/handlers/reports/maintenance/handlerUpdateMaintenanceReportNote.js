@@ -1,3 +1,8 @@
+/**
+ * @file handlerUpdateMaintenanceReportNote.js
+ * @description Handler for updating a note on a maintenance report. Validates user permissions to ensure they have the appropriate roles to update the note. Responds with the updated note data if successful.
+ * @module handlers/reports/maintenance/handlerUpdateMaintenanceReportNote
+ */
 import MaintenanceReport from "../../../models/appdb/maintenanceReport.js";
 import ReportNotes from "../../../models/appdb/reportNotes.js";
 import {
@@ -10,6 +15,16 @@ import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import { Sequelize } from "sequelize";
 import User from "../../../models/appdb/users.js";
 
+/**
+ * Handler for updating a note on a maintenance report. Validates user permissions to ensure they have the appropriate roles to update the note. Responds with the updated note data if successful.
+ *
+ * @async
+ * @function handlerUpdateMaintenanceReportNote
+ * @param {Object} req - The request object containing the maintenance report ID and note ID in the URL parameters and the updated note details in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if required fields are missing or if the user does not have permission to update the note.
+ * @throws {NotFoundError} Throws an error if the specified maintenance report, note, or user role is not found.
+ */
 export async function handlerUpdateMaintenanceReportNote(req, res) {
   const { id, noteID } = req.params;
   const { title, content } = req.body;

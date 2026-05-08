@@ -1,3 +1,8 @@
+/**
+ * @file handlerAssignFaultReport.js
+ * @description Handler for assigning and unassigning users to fault reports. Provides endpoints to assign a user to a specific fault report and to unassign a user from a fault report. Validates the existence of the user and the fault report before performing the assignment or unassignment operation.
+ * @module handlers/reports/faults/handlerAssignFaultReport
+ */
 import { BadRequestError } from "../../../middleware/errorHandler.js";
 import FaultReport from "../../../models/appdb/faultReport.js";
 import { getUserByID } from "../../../services/cacheDb.js";
@@ -7,6 +12,15 @@ import {
 } from "../../../services/workOnReport.js";
 import { HTTPCodes, respondWithJson } from "../../../utils/json.js";
 
+/**
+ * Handler for assigning a user to a fault report. Validates the existence of the user and the fault report before performing the assignment operation.
+ *
+ * @async
+ * @function handlerAssignFaultReport
+ * @param {Object} req - The request object containing the fault report ID in the URL parameters and the user ID in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if the user or fault report is not found, or if the assignment operation fails.
+ */
 export async function handlerAssignFaultReport(req, res) {
   const { id } = req.params;
   const { userID } = req.body;
@@ -34,6 +48,15 @@ export async function handlerAssignFaultReport(req, res) {
   });
 }
 
+/**
+ * Handler for unassigning a user from a fault report. Validates the existence of the user and the fault report before performing the unassignment operation.
+ *
+ * @async
+ * @function handlerUnassignFaultReport
+ * @param {Object} req - The request object containing the fault report ID in the URL parameters and the user ID in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if the user or fault report is not found, or if the unassignment operation fails.
+ */
 export async function handlerUnassignFaultReport(req, res) {
   const { id } = req.params;
   const { userID } = req.body;

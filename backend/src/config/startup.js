@@ -1,3 +1,8 @@
+/**
+ * @file startup.js
+ * @description Service startup script that performs integrity checks on all critical services (database, Redis, Resend API) before starting the application. If any service fails its integrity check, the script logs the error details to a file and exits the process to prevent the application from running in an unstable state.
+ * @module config/startup
+ */
 import cfg from "./config.js";
 import { appendToErrorLog } from "../utils/errorWriter.js";
 import { verifyResendConnection } from "./resend.js";
@@ -27,6 +32,13 @@ const successMessage = `
 
 let errorLog = [];
 
+/**
+ * Performs startup integrity checks for all critical services (database, Redis, Resend API). If any service fails its integrity check, logs the error details to a file and exits the process. If all checks pass, logs a success message.
+ *
+ * @async
+ * @function startup
+ * @returns {Promise<void>} Resolves if all services start successfully, otherwise logs errors and exits the process.
+ */
 export async function startup() {
   console.log(startupMessage);
   await registerHooks();
@@ -47,20 +59,20 @@ export async function startup() {
   }
   console.log(dbMessage);
 
-  // let {
-  //   message: resendMessage,
-  //   successful: resendSuccessful,
-  //   data: resendData,
-  // } = await verifyResendConnection();
-  // if (!resendSuccessful) {
-  //   errorLog.push(
-  //     "Startup error: " +
-  //       resendMessage +
-  //       "\nResend API Error:\n" +
-  //       JSON.stringify(resendData.error, null, 2),
-  //   );
-  // }
-  // console.log(resendMessage);
+  let {
+    message: resendMessage,
+    successful: resendSuccessful,
+    data: resendData,
+  } = await verifyResendConnection();
+  if (!resendSuccessful) {
+    errorLog.push(
+      "Startup error: " +
+        resendMessage +
+        "\nResend API Error:\n" +
+        JSON.stringify(resendData.error, null, 2),
+    );
+  }
+  console.log(resendMessage);
 
   let {
     message: redisMessage,

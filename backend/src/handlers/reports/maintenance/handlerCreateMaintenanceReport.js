@@ -1,3 +1,8 @@
+/**
+ * @file handlerCreateMaintenanceReport.js
+ * @description Handler for creating a maintenance report. Validates the required fields in the request body, retrieves necessary data such as report statuses and severity levels, and creates a new maintenance report in the database. Also associates the specified tools with the maintenance report. Responds with the details of the created maintenance report if successful.
+ * @module handlers/reports/maintenance/handlerCreateMaintenanceReport
+ */
 import {
   BadRequestError,
   InternalServerError,
@@ -8,6 +13,16 @@ import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import { getSeverityLevelByID } from "../../../services/cacheDb.js";
 import MaintenanceReportToolCheck from "../../../models/appdb/maintenanceReportToolCheck.js";
 
+/**
+ * Handler for creating a new maintenance report. Validates the required fields in the request body, retrieves necessary data such as report statuses and severity levels, and creates a new maintenance report in the database. Also associates the specified tools with the maintenance report. Responds with the details of the created maintenance report if successful.
+ *
+ * @async
+ * @function handlerCreateMaintenanceReport
+ * @param {Object} req - The request object containing the maintenance report details in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if required fields are missing or if invalid severity level is provided.
+ * @throws {InternalServerError} Throws an error if there is a failure in retrieving reference data, creating the maintenance report, or associating tools with the report.
+ */
 export async function handlerCreateMaintenanceReport(req, res) {
   const { name, description, severity, markerScanBlob, tools } = req.body;
 

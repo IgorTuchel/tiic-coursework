@@ -1,3 +1,8 @@
+/**
+ * @file handlerUpdateFaultReportNote.js
+ * @description Handler for updating a note on a fault report. Validates user permissions to ensure they are either the creator of the note, an assigned user of the fault report, or have appropriate roles to update the note. Validates that the fault report is not closed before allowing updates to the note. Responds with the updated note details if the update is successful.
+ * @module handlers/reports/faults/handlerUpdateFaultReportNote
+ */
 import {
   ForbiddenError,
   NotFoundError,
@@ -15,6 +20,17 @@ import { userAssignedToFaultReport } from "../../../services/workOnReport.js";
 import { respondWithJson, HTTPCodes } from "../../../utils/json.js";
 import { Sequelize } from "sequelize";
 
+/**
+ * Handler for updating a note on a fault report. Validates user permissions to ensure they are either the creator of the note, an assigned user of the fault report, or have appropriate roles to update the note. Validates that the fault report is not closed before allowing updates to the note. Responds with the updated note details if the update is successful.
+ *
+ * @async
+ * @function handlerUpdateFaultReportNote
+ * @param {Object} req - The request object containing the fault report ID and note ID in the URL parameters and the updated note details in the request body.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if required fields are missing or if the user does not have permission to update the note.
+ * @throws {ForbiddenError} Throws an error if the user does not have permission to update the note.
+ * @throws {NotFoundError} Throws an error if the specified fault report, note, or user role is not found.
+ */
 export async function handlerUpdateFaultReportNote(req, res) {
   const { id, noteID } = req.params;
   const { title, content } = req.body;
