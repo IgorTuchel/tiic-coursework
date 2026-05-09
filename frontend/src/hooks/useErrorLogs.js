@@ -18,6 +18,7 @@ export function useErrorLogs(filterParams) {
     ipFilter,
     dateFrom,
     dateTo,
+    statusCode,
   } = filterParams;
 
   const fetchLogs = useCallback(
@@ -34,6 +35,7 @@ export function useErrorLogs(filterParams) {
       }
 
       if (errorNameFilter) params.errorName = errorNameFilter;
+      if (statusCode) params.statusCode = statusCode;
       if (methodFilter) params.method = methodFilter;
       if (userIDFilter.trim()) params.userID = userIDFilter.trim();
       if (ipFilter.trim()) params.ipAddress = ipFilter.trim();
@@ -62,6 +64,7 @@ export function useErrorLogs(filterParams) {
       ipFilter,
       dateFrom,
       dateTo,
+      statusCode,
     ],
   );
 

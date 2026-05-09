@@ -44,7 +44,10 @@ export function SecurityLogTable({
                 {title}
               </th>
             ))}
-            <th className="px-4 py-3 w-10" />
+            <th
+              className="px-4 py-3 w-10"
+              aria-label="click to enter details"
+            />
           </tr>
         </thead>
 
@@ -105,13 +108,16 @@ export function SecurityLogTable({
                   </td>
 
                   <td className="px-4 py-3.5 whitespace-nowrap">
-                    <span className="font-mono text-xs text-slate-300">
+                    <span
+                      className="font-mono text-xs text-slate-300"
+                      aria-label="HTTP status">
                       {log.httpStatusCode ?? "—"}
                     </span>
                   </td>
 
                   <td className="px-4 py-3.5 whitespace-nowrap">
                     <button
+                      aria-label="view HTTP request details"
                       onClick={(e) => {
                         e.stopPropagation();
                         onDetailsClick(log);
@@ -149,6 +155,7 @@ export function SecurityLogTable({
                     <LuChevronRight
                       size={16}
                       className="text-slate-600 group-hover:text-slate-300 transition-colors ml-auto"
+                      aria-label="Go to log details"
                     />
                   </td>
                 </tr>

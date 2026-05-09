@@ -41,7 +41,7 @@ export function UserTable({ users, roles, loading, onActionClick }) {
           <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap">
             Created At
           </th>
-          <th className="px-4 py-3 w-10" />
+          <th className="px-4 py-3 w-10" aria-label="User Actions Button" />
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-800 bg-slate-950">

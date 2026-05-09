@@ -11,6 +11,7 @@ export function useErrorLogFilters() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [httpFilter, setHttpFilter] = useState("all");
   const [errorNameFilter, setErrorName] = useState("");
+  const [statusCode, setStatusCode] = useState("");
   const [methodFilter, setMethodFilter] = useState("");
   const [userIDFilter, setUserIDFilter] = useState("");
   const [ipFilter, setIpFilter] = useState("");
@@ -32,6 +33,7 @@ export function useErrorLogFilters() {
     setSearch("");
     setHttpFilter("all");
     setErrorName("");
+    setStatusCode("");
     setMethodFilter("");
     setUserIDFilter("");
     setIpFilter("");
@@ -44,6 +46,7 @@ export function useErrorLogFilters() {
     search.trim(),
     httpFilter !== "all",
     errorNameFilter,
+    statusCode,
     methodFilter,
     userIDFilter.trim(),
     ipFilter.trim(),
@@ -55,6 +58,7 @@ export function useErrorLogFilters() {
     page,
     pageSize,
     httpFilter,
+    statusCode,
     errorNameFilter,
     methodFilter,
     userIDFilter,
@@ -72,10 +76,12 @@ export function useErrorLogFilters() {
     setSearch,
     httpFilter,
     errorNameFilter,
+    statusCode,
     methodFilter,
     userIDFilter,
     setUserIDFilter,
     ipFilter,
+    setStatusCode,
     dateFrom,
     dateTo,
     activeFilterCount,

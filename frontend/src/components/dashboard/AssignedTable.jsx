@@ -38,7 +38,7 @@ export function AssignedTable({ reports, loading, type }) {
                 {h}
               </th>
             ))}
-            <th className="px-4 py-3 w-10" />
+            <th className="px-4 py-3 w-10" aria-label="go-to-action" />
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-800/60">

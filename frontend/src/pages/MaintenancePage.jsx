@@ -74,6 +74,7 @@ export function MaintenancePage() {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                aria-label="Search across reports"
                 placeholder="Search by title, description, creator, status, severity, or tool..."
                 className="w-full rounded-md bg-slate-950 border border-slate-800 pl-9 pr-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
               />

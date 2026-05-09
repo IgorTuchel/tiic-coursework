@@ -18,12 +18,23 @@ const ERROR_NAMES = [
   "ForbiddenError",
   "NotFoundError",
   "InternalServerError",
-  "JSONParseError",
-  "RunTimeError",
-  "UnknownError",
 ];
 
 const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE"];
+
+const STATUS_CODES = [
+  "LOGIN_FAILURE",
+  "LOGIN_FAILURE_MFA_REQUIRED",
+  "LOGIN_FAILURE_ACCOUNT_LOCKED",
+  "LOGIN_FAILURE_ACCOUNT_NOT_SETUP",
+  "ACTION_REQUIRE_MFA",
+  "UNAUTHORIZED",
+  "BAD_REQUEST",
+  "FORBIDDEN",
+  "INTERNAL_SERVER_ERROR",
+  "NOT_FOUND",
+  "RUN_TIME_ERROR",
+];
 
 export function ErrorLogControls({
   filters,
@@ -44,6 +55,7 @@ export function ErrorLogControls({
           <input
             value={filters.search}
             onChange={(e) => filters.setSearch(e.target.value)}
+            aria-label="Search bar log filter"
             placeholder="Search name, message, URL, IP, user ID…"
             className="w-full rounded-md bg-slate-950 border border-slate-800 pl-9 pr-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
           />
@@ -123,6 +135,22 @@ export function ErrorLogControls({
             </select>
           </div>
 
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-slate-500">Status Code</label>
+            <select
+              value={filters.statusCode}
+              onChange={(e) =>
+                filters.applyFilter(filters.setStatusCode)(e.target.value)
+              }
+              className="rounded-md bg-slate-950 border border-slate-800 px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="">All codes</option>
+              {STATUS_CODES.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-slate-500">HTTP method</label>
             <select

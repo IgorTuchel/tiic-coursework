@@ -31,6 +31,7 @@ export function Modal({
             {onBack && (
               <button
                 onClick={onBack}
+                aria-label="Go back"
                 className="text-slate-400 hover:text-white transition-colors shrink-0 -ml-1"
                 aria-label="Go back">
                 <LuArrowLeft className="w-4 h-4" />
@@ -47,6 +48,7 @@ export function Modal({
           </div>
           <button
             onClick={onClose}
+            aria-label="Close Popup"
             className="text-slate-400 hover:text-white transition-colors mt-0.5 ml-4 shrink-0">
             <LuX className="w-4 h-4 cursor-pointer" />
           </button>

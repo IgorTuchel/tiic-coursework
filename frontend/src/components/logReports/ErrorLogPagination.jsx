@@ -38,6 +38,7 @@ export function ErrorLogPagination({
             <span>Page</span>
             <input
               type="number"
+              aria-label="Current Page"
               min={1}
               max={totalPages}
               value={page}
@@ -56,13 +57,13 @@ export function ErrorLogPagination({
             onClick={() => onPageChange(page - 1)}
             disabled={!pagination.hasPrevPage}
             className="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-            <LuChevronLeft className="w-4 h-4" />
+            <LuChevronLeft className="w-4 h-4" aria-label="Previous Page" />
           </button>
           <button
             onClick={() => onPageChange(page + 1)}
             disabled={!pagination.hasNextPage}
             className="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-            <LuChevronRight className="w-4 h-4" />
+            <LuChevronRight className="w-4 h-4" aria-label="Next Page" />
           </button>
         </div>
       )}

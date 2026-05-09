@@ -30,6 +30,7 @@ function SettingsModal({ open, onClose, user, setUser }) {
             </label>
             <input
               type="text"
+              aria-label="First Name Input"
               value={form.firstName}
               onChange={(e) => updateField("firstName", e.target.value)}
               className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-sky-500 transition-colors"
@@ -43,6 +44,7 @@ function SettingsModal({ open, onClose, user, setUser }) {
             </label>
             <input
               type="text"
+              aria-label="Last Name Input"
               value={form.lastName}
               onChange={(e) => updateField("lastName", e.target.value)}
               className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-sky-500 transition-colors"
@@ -54,14 +56,18 @@ function SettingsModal({ open, onClose, user, setUser }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-slate-300 mb-1.5">Email</label>
-            <div className="w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-400">
+            <div
+              className="w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-400"
+              aria-label="User Email">
               {user?.email || "—"}
             </div>
           </div>
 
           <div>
             <label className="block text-sm text-slate-300 mb-1.5">Role</label>
-            <div className="w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-400">
+            <div
+              className="w-full rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-400"
+              aria-label="User Role">
               {user?.role || "—"}
             </div>
           </div>

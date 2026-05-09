@@ -50,7 +50,7 @@ export function ReportTable({
                   {h}
                 </th>
               ))}
-              <th className="px-4 py-3 w-10" />
+              <th className="px-4 py-3 w-10" aria-label="go-to-report" />
             </tr>
           </thead>
 
