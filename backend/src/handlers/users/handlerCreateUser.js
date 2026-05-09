@@ -1,3 +1,8 @@
+/**
+ * @file handlerCreateUser.js
+ * @description Handler for creating a new user. Validates input data, checks for existing email, assigns pending status, and creates the user in the database. Responds with the created user's information if successful.
+ * @module handlers/users/handlerCreateUser
+ */
 import User from "../../models/appdb/users.js";
 import {
   BadRequestError,
@@ -10,6 +15,16 @@ import Status from "../../models/appdb/status.js";
 import Roles from "../../models/appdb/roles.js";
 import { getUserRoleByID } from "../../services/cacheDb.js";
 
+/**
+ * Handler for creating a new user. Validates input data, checks for existing email, assigns pending status, and creates the user in the database. Responds with the created user's information if successful.
+ *
+ * @async
+ * @function handlerCreateUser
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object used to send the result of the operation.
+ * @throws {BadRequestError} Throws an error if required fields are missing or invalid.
+ * @throws {InternalServerError} Throws an error if there is a failure in creating the user or registering the new account.
+ */
 export async function handlerCreateUser(req, res) {
   const { firstName, lastName, email, mfaEnabled, roleID } = req.body;
 

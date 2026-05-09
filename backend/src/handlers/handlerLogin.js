@@ -88,14 +88,15 @@ export async function handlerLogin(req, res) {
   );
   if (!passwordMatch) {
     const lock = await lockAccount(dbUser.data.userID); // Increment failed login attempts and lock account if necessary
-    if (lock.success && lock.data) {
+    if (lock.success) {
       throw new ForbiddenError(
         req,
-        `Account is locked due to multiple failed login attempts. Please try again later or contact support.`,
+        `Account (${dbUser.data.email}) is locked due to multiple failed login attempts. Please try again later or contact support.`,
         StatusCodes.LOGIN_FAILURE_ACCOUNT_LOCKED,
         true,
       );
     }
+    console.log(lock.data.attempts);
     throw new UnauthorizedError(
       req,
       "Invalid email or password",

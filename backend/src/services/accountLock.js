@@ -48,7 +48,7 @@ async function setAccountLockStatus(userID, isLocked) {
  */
 async function incrementFailedLoginAttempts(userID) {
   const storedAttempts = await redisClient.get(`failedLoginAttempts:${userID}`);
-  let attempts = parseInt(storedAttempts);
+  let attempts = storedAttempts ? parseInt(storedAttempts) : 0;
   attempts += 1;
   await redisClient.setEx(
     `failedLoginAttempts:${userID}`,
@@ -90,6 +90,9 @@ export async function lockAccount(userID) {
   }
   return {
     success: false,
-    message: `Failed login attempts for user ${userID} incremented to ${incrementd.data}`,
+    data: {
+      message: `Failed login attempt ${incrementd.data} for user ${userID}. Account will be locked after 10 failed attempts.`,
+      attempts: incrementd.data,
+    },
   };
 }
