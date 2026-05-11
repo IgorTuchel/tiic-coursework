@@ -30,19 +30,18 @@ import { HTTPCodes } from "../utils/json.js";
  * }
  */
 async function createVerificationCode(userID, email) {
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  await redisClient.setEx(`mfa_${userID}`, 300, code); // Code valid for 5 minutes
-  console.log(`Generated MFA code for user ${userID}: ${code}`);
-  const { success, data } = await sendEmailWithResend(
-    email,
-    cfg.resendSender,
-    "Your Verification Code for Inspectra",
-    emailTemplates.verification.replace("{{CODE}}", code),
-  );
-  if (!success) {
-    return { success: false, data: data };
-  }
-  return { success: true };
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    await redisClient.setEx(`mfa_${userID}`, 300, code); // Code valid for 5 minutes
+    const { success, data } = await sendEmailWithResend(
+        email,
+        cfg.resendSender,
+        "Your Verification Code for Inspectra",
+        emailTemplates.verification.replace("{{CODE}}", code),
+    );
+    if (!success) {
+        return { success: false, data: data };
+    }
+    return { success: true };
 }
 
 /**
@@ -64,16 +63,16 @@ async function createVerificationCode(userID, email) {
  * }
  */
 async function verifyCode(userID, code) {
-  const storedCode = await redisClient.get(`mfa_${userID}`);
-  if (!storedCode) {
-    return false;
-  }
+    const storedCode = await redisClient.get(`mfa_${userID}`);
+    if (!storedCode) {
+        return false;
+    }
 
-  if (storedCode === code) {
-    await redisClient.del(`mfa_${userID}`);
-    return true;
-  }
-  return false;
+    if (storedCode === code) {
+        await redisClient.del(`mfa_${userID}`);
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -112,47 +111,47 @@ async function verifyCode(userID, code) {
  * }
  */
 export async function handleMFA(mfaCode, userID, email) {
-  if (mfaCode) {
-    if (mfaCode.length !== 6) {
-      return {
-        success: false,
-        data: {
-          code: HTTPCodes.BAD_REQUEST,
-          message: "MFA code must be 6 digits.",
-        },
-      };
+    if (mfaCode) {
+        if (mfaCode.length !== 6) {
+            return {
+                success: false,
+                data: {
+                    code: HTTPCodes.BAD_REQUEST,
+                    message: "MFA code must be 6 digits.",
+                },
+            };
+        }
+        const success = await verifyCode(userID, mfaCode);
+        if (!success) {
+            return {
+                success: false,
+                data: {
+                    code: HTTPCodes.BAD_REQUEST,
+                    message: "Invalid MFA code, code might have expired.",
+                },
+            };
+        }
+        return {
+            success: true,
+        };
     }
-    const success = await verifyCode(userID, mfaCode);
+
+    const { success, _ } = await createVerificationCode(userID, email);
     if (!success) {
-      return {
+        return {
+            success: false,
+            data: {
+                code: HTTPCodes.BAD_REQUEST,
+                message: "Failed to send verification code.",
+            },
+        };
+    }
+
+    return {
         success: false,
         data: {
-          code: HTTPCodes.BAD_REQUEST,
-          message: "Invalid MFA code, code might have expired.",
+            code: HTTPCodes.FORBIDDEN,
+            message: "Verification code sent to email.",
         },
-      };
-    }
-    return {
-      success: true,
     };
-  }
-
-  const { success, _ } = await createVerificationCode(userID, email);
-  if (!success) {
-    return {
-      success: false,
-      data: {
-        code: HTTPCodes.BAD_REQUEST,
-        message: "Failed to send verification code.",
-      },
-    };
-  }
-
-  return {
-    success: false,
-    data: {
-      code: HTTPCodes.FORBIDDEN,
-      message: "Verification code sent to email.",
-    },
-  };
 }

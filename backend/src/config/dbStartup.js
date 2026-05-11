@@ -20,32 +20,35 @@ import { hashPassword } from "../utils/hashPassword.js";
  * @description This function is designed to be called during the application startup process to ensure both databases are operational and synchronized before proceeding.
  */
 export async function verifyDbIntegrity() {
-  let { dbStatus, logDbStatus } = await verifyConnections();
-  if (!dbStatus || !logDbStatus) {
+    let { dbStatus, logDbStatus } = await verifyConnections();
+    if (!dbStatus || !logDbStatus) {
+        return {
+            message: "Database connection failed",
+            successful: false,
+            data: { dbStatus: dbStatus, logDbStatus: logDbStatus },
+        };
+    }
+    let { dbSyncStatus, logDbSyncStatus } = await syncDb();
+    if (!dbSyncStatus || !logDbSyncStatus) {
+        return {
+            message: "Database synchronization failed",
+            successful: false,
+            data: {
+                dbSyncStatus: dbSyncStatus,
+                logDbSyncStatus: logDbSyncStatus,
+            },
+        };
+    }
     return {
-      message: "Database connection failed",
-      successful: false,
-      data: { dbStatus: dbStatus, logDbStatus: logDbStatus },
+        message: "Database integrity verified",
+        successful: true,
+        data: {
+            dbStatus: dbStatus,
+            logDbStatus: logDbStatus,
+            dbSyncStatus: dbSyncStatus,
+            logDbSyncStatus: logDbSyncStatus,
+        },
     };
-  }
-  let { dbSyncStatus, logDbSyncStatus } = await syncDb();
-  if (!dbSyncStatus || !logDbSyncStatus) {
-    return {
-      message: "Database synchronization failed",
-      successful: false,
-      data: { dbSyncStatus: dbSyncStatus, logDbSyncStatus: logDbSyncStatus },
-    };
-  }
-  return {
-    message: "Database integrity verified",
-    successful: true,
-    data: {
-      dbStatus: dbStatus,
-      logDbStatus: logDbStatus,
-      dbSyncStatus: dbSyncStatus,
-      logDbSyncStatus: logDbSyncStatus,
-    },
-  };
 }
 
 /**
@@ -55,17 +58,17 @@ export async function verifyDbIntegrity() {
  * @returns {Promise<{dbStatus: boolean, logDbStatus: boolean}>} An object indicating the connection status of both databases.
  */
 async function verifyConnections() {
-  let logDbStatus = false;
-  let dbStatus = false;
-  try {
-    await db.authenticate();
-    dbStatus = true;
-    await logDb.authenticate();
-    logDbStatus = true;
-    return { dbStatus, logDbStatus };
-  } catch (err) {
-    return { dbStatus, logDbStatus };
-  }
+    let logDbStatus = false;
+    let dbStatus = false;
+    try {
+        await db.authenticate();
+        dbStatus = true;
+        await logDb.authenticate();
+        logDbStatus = true;
+        return { dbStatus, logDbStatus };
+    } catch (err) {
+        return { dbStatus, logDbStatus };
+    }
 }
 
 /**
@@ -75,18 +78,18 @@ async function verifyConnections() {
  * @returns {Promise<{dbSyncStatus: boolean, logDbSyncStatus: boolean}>} An object indicating the synchronization status of both databases.
  */
 async function syncDb() {
-  let logDbSyncStatus = false;
-  let dbSyncStatus = false;
-  try {
-    await db.sync();
-    dbSyncStatus = true;
-    await logDb.sync();
-    logDbSyncStatus = true;
-    return { dbSyncStatus, logDbSyncStatus };
-  } catch (err) {
-    console.error("Error during database synchronization:", err);
-    return { dbSyncStatus, logDbSyncStatus };
-  }
+    let logDbSyncStatus = false;
+    let dbSyncStatus = false;
+    try {
+        await db.sync();
+        dbSyncStatus = true;
+        await logDb.sync();
+        logDbSyncStatus = true;
+        return { dbSyncStatus, logDbSyncStatus };
+    } catch (err) {
+        console.error("Error during database synchronization:", err);
+        return { dbSyncStatus, logDbSyncStatus };
+    }
 }
 
 /**
@@ -96,72 +99,99 @@ async function syncDb() {
  * This function should be called during the application startup process before synchronizing the database to ensure that the necessary hooks are in place.
  */
 export async function registerHooks() {
-  db.addHook("afterBulkSync", async () => {
-    const adminRole = await Roles.findOne({ where: { roleName: "Admin" } });
-    if (!adminRole) {
-      throw new Error("Admin role not found during database initialization");
-    }
-    const userStatus = await Status.findOne({
-      where: { statusName: "active" },
+    db.addHook("afterBulkSync", async () => {
+        const adminRole = await Roles.findOne({ where: { roleName: "Admin" } });
+        if (!adminRole) {
+            throw new Error(
+                "Admin role not found during database initialization",
+            );
+        }
+        const userStatus = await Status.findOne({
+            where: { statusName: "active" },
+        });
+        if (!userStatus) {
+            throw new Error(
+                "Active status not found during database initialization",
+            );
+        }
+        const [courseworkUser, courseworkCreated] = await User.findOrCreate({
+            where: { email: cfg.courseworkEmail },
+            defaults: {
+                firstName: "Coursework",
+                lastName: "User",
+                email: cfg.courseworkEmail,
+                passwordHash: await hashPassword("CourseworkPassword123!"),
+                roleID: adminRole.roleID,
+                statusID: userStatus.statusID,
+                mfaEnabled: false,
+            },
+        });
+        if (courseworkCreated) {
+            console.log(
+                "Created Coursework User:",
+                courseworkUser.email,
+                " with ID:",
+                courseworkUser.userID,
+            );
+        }
+
+        const [newUser, created] = await User.findOrCreate({
+            where: { email: cfg.adminEmail },
+            defaults: {
+                firstName: "Admin",
+                lastName: "User",
+                email: cfg.adminEmail,
+                passwordHash: await hashPassword("AdminPassword123!"),
+                roleID: adminRole.roleID,
+                statusID: userStatus.statusID,
+                mfaEnabled: false,
+            },
+        });
+        if (created) {
+            console.log(
+                "Created Admin User:",
+                newUser.email,
+                " with ID:",
+                newUser.userID,
+                " and RoleID:",
+                newUser.roleID,
+                " and StatusID:",
+                newUser.statusID,
+                " and Password AdminPassword123!",
+            );
+        }
+        const engineerRole = await Roles.findOne({
+            where: { roleName: "Engineer" },
+        });
+        if (!engineerRole) {
+            throw new Error(
+                "Engineer role not found during database initialization",
+            );
+        }
+        const [newEngineerUser, engineerCreated] = await User.findOrCreate({
+            where: { email: cfg.engineerEmail },
+            defaults: {
+                firstName: "Engineer",
+                lastName: "User",
+                email: cfg.engineerEmail,
+                passwordHash: await hashPassword("Password123!"),
+                roleID: engineerRole.roleID,
+                statusID: userStatus.statusID,
+                mfaEnabled: false,
+            },
+        });
+        if (engineerCreated) {
+            console.log(
+                "Created Engineer User:",
+                newEngineerUser.email,
+                " with ID:",
+                newEngineerUser.userID,
+                " and RoleID:",
+                newEngineerUser.roleID,
+                " and StatusID:",
+                newEngineerUser.statusID,
+                " and Password Password123!",
+            );
+        }
     });
-    if (!userStatus) {
-      throw new Error("Active status not found during database initialization");
-    }
-    const [newUser, created] = await User.findOrCreate({
-      where: { email: cfg.adminEmail },
-      defaults: {
-        firstName: "Admin",
-        lastName: "User",
-        email: cfg.adminEmail,
-        passwordHash: await hashPassword("AdminPassword123!"),
-        roleID: adminRole.roleID,
-        statusID: userStatus.statusID,
-        mfaEnabled: false,
-      },
-    });
-    if (created) {
-      console.log(
-        "Created Admin User:",
-        newUser.email,
-        " with ID:",
-        newUser.userID,
-        " and RoleID:",
-        newUser.roleID,
-        " and StatusID:",
-        newUser.statusID,
-        " and Password AdminPassword123!",
-      );
-    }
-    const engineerRole = await Roles.findOne({
-      where: { roleName: "Engineer" },
-    });
-    if (!engineerRole) {
-      throw new Error("Engineer role not found during database initialization");
-    }
-    const [newEngineerUser, engineerCreated] = await User.findOrCreate({
-      where: { email: cfg.engineerEmail },
-      defaults: {
-        firstName: "Engineer",
-        lastName: "User",
-        email: cfg.engineerEmail,
-        passwordHash: await hashPassword("Password123!"),
-        roleID: engineerRole.roleID,
-        statusID: userStatus.statusID,
-        mfaEnabled: false,
-      },
-    });
-    if (engineerCreated) {
-      console.log(
-        "Created Engineer User:",
-        newEngineerUser.email,
-        " with ID:",
-        newEngineerUser.userID,
-        " and RoleID:",
-        newEngineerUser.roleID,
-        " and StatusID:",
-        newEngineerUser.statusID,
-        " and Password Password123!",
-      );
-    }
-  });
 }

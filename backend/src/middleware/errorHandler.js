@@ -12,14 +12,14 @@ import { HTTPCodes, respondWithErrorJson } from "../utils/json.js";
  * @type {Set<string>}
  */
 const SENSITIVE_HEADERS = new Set([
-  "authorization",
-  "cookie",
-  "set-cookie",
-  "x-api-key",
-  "x-auth-token",
-  "x-access-token",
-  "proxy-authorization",
-  "token",
+    "authorization",
+    "cookie",
+    "set-cookie",
+    "x-api-key",
+    "x-auth-token",
+    "x-access-token",
+    "proxy-authorization",
+    "token",
 ]);
 
 /**
@@ -29,88 +29,87 @@ const SENSITIVE_HEADERS = new Set([
  * @type {{LOGIN_FAILURE: string, LOGIN_FAILURE_MFA_REQUIRED: string, LOGIN_FAILURE_ACCOUNT_LOCKED: string, LOGIN_FAILURE_ACCOUNT_NOT_SETUP: string, UNAUTHORIZED: string, BAD_REQUEST: string, FORBIDDEN: string, INTERNAL_SERVER_ERROR: string, NOT_FOUND: string, RUN_TIME_ERROR: string, ACTION_REQUIRE_MFA: string}}
  */
 export const StatusCodes = {
-  LOGIN_FAILURE: "LOGIN_FAILURE",
-  LOGIN_FAILURE_MFA_REQUIRED: "LOGIN_FAILURE_MFA_REQUIRED",
-  LOGIN_FAILURE_ACCOUNT_LOCKED: "LOGIN_FAILURE_ACCOUNT_LOCKED",
-  LOGIN_FAILURE_ACCOUNT_NOT_SETUP: "LOGIN_FAILURE_ACCOUNT_NOT_SETUP",
-  ACTION_REQUIRE_MFA: "ACTION_REQUIRE_MFA",
-  UNAUTHORIZED: "UNAUTHORIZED",
-  BAD_REQUEST: "BAD_REQUEST",
-  FORBIDDEN: "FORBIDDEN",
-  INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
-  NOT_FOUND: "NOT_FOUND",
-  RUN_TIME_ERROR: "RUN_TIME_ERROR",
+    LOGIN_FAILURE: "LOGIN_FAILURE",
+    LOGIN_FAILURE_MFA_REQUIRED: "LOGIN_FAILURE_MFA_REQUIRED",
+    LOGIN_FAILURE_ACCOUNT_LOCKED: "LOGIN_FAILURE_ACCOUNT_LOCKED",
+    LOGIN_FAILURE_ACCOUNT_NOT_SETUP: "LOGIN_FAILURE_ACCOUNT_NOT_SETUP",
+    ACTION_REQUIRE_MFA: "ACTION_REQUIRE_MFA",
+    UNAUTHORIZED: "UNAUTHORIZED",
+    BAD_REQUEST: "BAD_REQUEST",
+    FORBIDDEN: "FORBIDDEN",
+    INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+    NOT_FOUND: "NOT_FOUND",
+    RUN_TIME_ERROR: "RUN_TIME_ERROR",
 };
 
 export function errorHandlingMiddleware(err, req, res, next) {
-  console.error("Error caught by middleware:", err);
-  if (err instanceof HTTPRequestError) {
+    if (err instanceof HTTPRequestError) {
+        logError({
+            errorName: err?.name,
+            statusCode: err?.statusCode,
+            httpStatusCode: err?.httpStatusCode,
+            message: err?.message,
+            stackTrace: err?.stack,
+            ipAddress: err?.ip,
+            userAgent: err?.user_agent,
+            method: err?.method,
+            url: err?.url,
+            headers: err?.headers,
+            body: err?.body,
+            userID: req?.session?.userID ?? null,
+        });
+        return respondWithErrorJson(
+            res,
+            err.httpStatusCode,
+            err.message,
+            err.statusCode,
+        );
+    }
+
+    if (err?.type === "entity.parse.failed") {
+        logError({
+            errorName: "JSONParseError",
+            statusCode: StatusCodes.BAD_REQUEST,
+            httpStatusCode: HTTPCodes.BAD_REQUEST,
+            message: "Invalid JSON payload",
+            stackTrace: err?.stack ?? null,
+            ipAddress: req?.ip ?? null,
+            userAgent: req?.headers?.["user-agent"] ?? null,
+            method: req?.method ?? null,
+            url: req?.originalUrl ?? null,
+            headers: sanitizeHeaders(req?.headers),
+            body: null,
+            userID: req?.session?.userID ?? null,
+        });
+        return respondWithErrorJson(
+            res,
+            HTTPCodes.BAD_REQUEST,
+            "Invalid JSON payload",
+            StatusCodes.BAD_REQUEST,
+        );
+    }
+
     logError({
-      errorName: err?.name,
-      statusCode: err?.statusCode,
-      httpStatusCode: err?.httpStatusCode,
-      message: err?.message,
-      stackTrace: err?.stack,
-      ipAddress: err?.ip,
-      userAgent: err?.user_agent,
-      method: err?.method,
-      url: err?.url,
-      headers: err?.headers,
-      body: err?.body,
-      userID: req?.session?.userID ?? null,
+        errorName: err?.name || "UnknownError",
+        statusCode: err?.statusCode || "UNKNOWN_ERROR",
+        message: err?.message || "An unexpected error occurred",
+        httpStatusCode: HTTPCodes.INTERNAL_SERVER_ERROR,
+        stackTrace: err?.stack ?? null,
+        ipAddress: req?.ip ?? req?.socket?.remoteAddress ?? null,
+        userAgent: req?.headers?.["user-agent"] ?? null,
+        method: req?.method ?? null,
+        url: req?.originalUrl ?? null,
+        headers: sanitizeHeaders(req?.headers),
+        body: req?.body ?? null,
+        userID: req?.session?.userID ?? null,
     });
+
     return respondWithErrorJson(
-      res,
-      err.httpStatusCode,
-      err.message,
-      err.statusCode,
+        res,
+        HTTPCodes.INTERNAL_SERVER_ERROR,
+        "An unexpected error occurred",
+        StatusCodes.INTERNAL_SERVER_ERROR,
     );
-  }
-
-  if (err?.type === "entity.parse.failed") {
-    logError({
-      errorName: "JSONParseError",
-      statusCode: StatusCodes.BAD_REQUEST,
-      httpStatusCode: HTTPCodes.BAD_REQUEST,
-      message: "Invalid JSON payload",
-      stackTrace: err?.stack ?? null,
-      ipAddress: req?.ip ?? null,
-      userAgent: req?.headers?.["user-agent"] ?? null,
-      method: req?.method ?? null,
-      url: req?.originalUrl ?? null,
-      headers: sanitizeHeaders(req?.headers),
-      body: null,
-      userID: req?.session?.userID ?? null,
-    });
-    return respondWithErrorJson(
-      res,
-      HTTPCodes.BAD_REQUEST,
-      "Invalid JSON payload",
-      StatusCodes.BAD_REQUEST,
-    );
-  }
-
-  logError({
-    errorName: err?.name || "UnknownError",
-    statusCode: err?.statusCode || "UNKNOWN_ERROR",
-    message: err?.message || "An unexpected error occurred",
-    httpStatusCode: HTTPCodes.INTERNAL_SERVER_ERROR,
-    stackTrace: err?.stack ?? null,
-    ipAddress: req?.ip ?? req?.socket?.remoteAddress ?? null,
-    userAgent: req?.headers?.["user-agent"] ?? null,
-    method: req?.method ?? null,
-    url: req?.originalUrl ?? null,
-    headers: sanitizeHeaders(req?.headers),
-    body: req?.body ?? null,
-    userID: req?.session?.userID ?? null,
-  });
-
-  return respondWithErrorJson(
-    res,
-    HTTPCodes.INTERNAL_SERVER_ERROR,
-    "An unexpected error occurred",
-    StatusCodes.INTERNAL_SERVER_ERROR,
-  );
 }
 
 /**
@@ -123,13 +122,13 @@ export function errorHandlingMiddleware(err, req, res, next) {
  * @param {string} statusCode - A standardized status code representing the error condition.
  */
 class AppError extends Error {
-  constructor(name, message, statusCode) {
-    super(message);
-    this.message = message;
-    this.name = name;
-    this.statusCode = statusCode;
-    this.timestamp = new Date().toISOString();
-  }
+    constructor(name, message, statusCode) {
+        super(message);
+        this.message = message;
+        this.name = name;
+        this.statusCode = statusCode;
+        this.timestamp = new Date().toISOString();
+    }
 }
 
 /**
@@ -145,18 +144,18 @@ class AppError extends Error {
  * @param {boolean} sanitise - If true, sensitive request information (method, URL, headers, body) will not be captured to avoid logging sensitive data.
  */
 class HTTPRequestError extends AppError {
-  constructor(req, name, message, statusCode, httpStatusCode, sanitise) {
-    super(name, message, statusCode);
-    this.ip = req?.ip ?? req?.socket?.remoteAddress ?? null;
-    this.user_agent = req?.headers["user-agent"] ?? null;
-    this.httpStatusCode = httpStatusCode;
-    if (!sanitise) {
-      this.method = req?.method ?? null;
-      this.url = req?.originalUrl ?? null;
-      this.headers = sanitizeHeaders(req?.headers);
-      this.body = req?.body ?? null;
+    constructor(req, name, message, statusCode, httpStatusCode, sanitise) {
+        super(name, message, statusCode);
+        this.ip = req?.ip ?? req?.socket?.remoteAddress ?? null;
+        this.user_agent = req?.headers["user-agent"] ?? null;
+        this.httpStatusCode = httpStatusCode;
+        if (!sanitise) {
+            this.method = req?.method ?? null;
+            this.url = req?.originalUrl ?? null;
+            this.headers = sanitizeHeaders(req?.headers);
+            this.body = req?.body ?? null;
+        }
     }
-  }
 }
 
 /**
@@ -170,21 +169,21 @@ class HTTPRequestError extends AppError {
  * @param {boolean} sanitise - If true, sensitive request information will not be captured in the error object.
  */
 export class BadRequestError extends HTTPRequestError {
-  constructor(
-    req,
-    message,
-    statusCode = StatusCodes.BAD_REQUEST,
-    sanitise = false,
-  ) {
-    super(
-      req,
-      "BadRequestError",
-      message,
-      statusCode,
-      HTTPCodes.BAD_REQUEST,
-      sanitise,
-    );
-  }
+    constructor(
+        req,
+        message,
+        statusCode = StatusCodes.BAD_REQUEST,
+        sanitise = false,
+    ) {
+        super(
+            req,
+            "BadRequestError",
+            message,
+            statusCode,
+            HTTPCodes.BAD_REQUEST,
+            sanitise,
+        );
+    }
 }
 
 /**
@@ -198,21 +197,21 @@ export class BadRequestError extends HTTPRequestError {
  * @param {boolean} sanitise - If true, sensitive request information will not be captured in the error object.
  */
 export class UnauthorizedError extends HTTPRequestError {
-  constructor(
-    req,
-    message,
-    statusCode = StatusCodes.UNAUTHORIZED,
-    sanitise = false,
-  ) {
-    super(
-      req,
-      "UnauthorizedError",
-      message,
-      statusCode,
-      HTTPCodes.UNAUTHORIZED,
-      sanitise,
-    );
-  }
+    constructor(
+        req,
+        message,
+        statusCode = StatusCodes.UNAUTHORIZED,
+        sanitise = false,
+    ) {
+        super(
+            req,
+            "UnauthorizedError",
+            message,
+            statusCode,
+            HTTPCodes.UNAUTHORIZED,
+            sanitise,
+        );
+    }
 }
 
 /**
@@ -226,21 +225,21 @@ export class UnauthorizedError extends HTTPRequestError {
  * @param {boolean} sanitise - If true, sensitive request information will not be captured in the error object.
  */
 export class ForbiddenError extends HTTPRequestError {
-  constructor(
-    req,
-    message,
-    statusCode = StatusCodes.FORBIDDEN,
-    sanitise = false,
-  ) {
-    super(
-      req,
-      "ForbiddenError",
-      message,
-      statusCode,
-      HTTPCodes.FORBIDDEN,
-      sanitise,
-    );
-  }
+    constructor(
+        req,
+        message,
+        statusCode = StatusCodes.FORBIDDEN,
+        sanitise = false,
+    ) {
+        super(
+            req,
+            "ForbiddenError",
+            message,
+            statusCode,
+            HTTPCodes.FORBIDDEN,
+            sanitise,
+        );
+    }
 }
 
 /**
@@ -254,21 +253,21 @@ export class ForbiddenError extends HTTPRequestError {
  * @param {boolean} sanitise - If true, sensitive request information will not be captured in the error object.
  */
 export class NotFoundError extends HTTPRequestError {
-  constructor(
-    req,
-    message,
-    statusCode = StatusCodes.NOT_FOUND,
-    sanitise = false,
-  ) {
-    super(
-      req,
-      "NotFoundError",
-      message,
-      statusCode,
-      HTTPCodes.NOT_FOUND,
-      sanitise,
-    );
-  }
+    constructor(
+        req,
+        message,
+        statusCode = StatusCodes.NOT_FOUND,
+        sanitise = false,
+    ) {
+        super(
+            req,
+            "NotFoundError",
+            message,
+            statusCode,
+            HTTPCodes.NOT_FOUND,
+            sanitise,
+        );
+    }
 }
 
 /**
@@ -282,21 +281,21 @@ export class NotFoundError extends HTTPRequestError {
  * @param {boolean} sanitise - If true, sensitive request information will not be captured in the error object.
  */
 export class InternalServerError extends HTTPRequestError {
-  constructor(
-    req,
-    message,
-    statusCode = StatusCodes.INTERNAL_SERVER_ERROR,
-    sanitise = false,
-  ) {
-    super(
-      req,
-      "InternalServerError",
-      message,
-      statusCode,
-      HTTPCodes.INTERNAL_SERVER_ERROR,
-      sanitise,
-    );
-  }
+    constructor(
+        req,
+        message,
+        statusCode = StatusCodes.INTERNAL_SERVER_ERROR,
+        sanitise = false,
+    ) {
+        super(
+            req,
+            "InternalServerError",
+            message,
+            statusCode,
+            HTTPCodes.INTERNAL_SERVER_ERROR,
+            sanitise,
+        );
+    }
 }
 
 /**
@@ -308,10 +307,10 @@ export class InternalServerError extends HTTPRequestError {
  * @param {Error} error - The original error object that caused the runtime error, used to capture the stack trace for debugging purposes.
  */
 export class RunTimeError extends AppError {
-  constructor(message, error) {
-    super("RunTimeError", message, StatusCodes.RUN_TIME_ERROR);
-    this.stack = error?.stack || "No stack trace available";
-  }
+    constructor(message, error) {
+        super("RunTimeError", message, StatusCodes.RUN_TIME_ERROR);
+        this.stack = error?.stack || "No stack trace available";
+    }
 }
 
 /**
@@ -321,19 +320,19 @@ export class RunTimeError extends AppError {
  * @returns {Object} A new headers object with sensitive information redacted.
  */
 function sanitizeHeaders(headers) {
-  const sanitizedHeaders = {};
+    const sanitizedHeaders = {};
 
-  if (!headers || typeof headers !== "object") {
-    return sanitizedHeaders;
-  }
-
-  for (const [key, value] of Object.entries(headers || {})) {
-    if (SENSITIVE_HEADERS.has(key.toLowerCase())) {
-      sanitizedHeaders[key] = "REDACTED";
-    } else {
-      sanitizedHeaders[key] = value;
+    if (!headers || typeof headers !== "object") {
+        return sanitizedHeaders;
     }
-  }
 
-  return sanitizedHeaders;
+    for (const [key, value] of Object.entries(headers || {})) {
+        if (SENSITIVE_HEADERS.has(key.toLowerCase())) {
+            sanitizedHeaders[key] = "REDACTED";
+        } else {
+            sanitizedHeaders[key] = value;
+        }
+    }
+
+    return sanitizedHeaders;
 }

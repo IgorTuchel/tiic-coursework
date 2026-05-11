@@ -19,14 +19,14 @@ dotenv.config();
  * @throws {Error} Throws an error immediately if the variable is undefined or empty.
  */
 function getFromEnv(key) {
-  const val = process.env[key];
-  console.log(
-    colors.yellow + `Loading environment variable: ${key}` + colors.reset,
-  );
-  if (!val) {
-    throw new Error(`Environment variable ${key} is not set`);
-  }
-  return val;
+    const val = process.env[key];
+    console.log(
+        colors.yellow + `Loading environment variable: ${key}` + colors.reset,
+    );
+    if (!val) {
+        throw new Error(`Environment variable ${key} is not set`);
+    }
+    return val;
 }
 
 /**
@@ -36,26 +36,28 @@ function getFromEnv(key) {
  * @type {Object}
  */
 const cfg = {
-  port: getFromEnv("PORT"),
-  nodeEnv: getFromEnv("NODE_ENV"),
+    port: getFromEnv("PORT"),
+    nodeEnv: getFromEnv("NODE_ENV"),
 
-  jwtSecret: getFromEnv("JWT_SECRET"),
-  jwtIss: getFromEnv("JWT_ISS"),
-  jwtExpiresIn: getFromEnv("JWT_EXPIRES_IN"),
+    jwtSecret: getFromEnv("JWT_SECRET"),
+    jwtIss: getFromEnv("JWT_ISS"),
+    jwtExpiresIn: getFromEnv("JWT_EXPIRES_IN"),
 
-  resendApiKey: getFromEnv("RESEND_API_KEY"),
-  resendSender: getFromEnv("RESEND_SENDER"),
-  sessionSecret: getFromEnv("SESSION_SECRET"),
+    resendApiKey: getFromEnv("RESEND_API_KEY"),
+    resendSender: getFromEnv("RESEND_SENDER"),
+    sessionSecret: getFromEnv("SESSION_SECRET"),
 
-  resetPasswordUrl: getFromEnv("RESET_PASSWORD_URL"),
-  activateAccountUrl: getFromEnv("ACTIVATE_ACCOUNT_URL"),
+    resetPasswordUrl: getFromEnv("RESET_PASSWORD_URL"),
+    activateAccountUrl: getFromEnv("ACTIVATE_ACCOUNT_URL"),
 
-  redisHost: getFromEnv("REDIS_HOST"),
-  redisPort: getFromEnv("REDIS_PORT"),
-  engineerEmail: getFromEnv("ENGINEER_EMAIL"),
+    redisHost: getFromEnv("REDIS_HOST"),
+    redisPort: getFromEnv("REDIS_PORT"),
+    engineerEmail: getFromEnv("ENGINEER_EMAIL"),
 
-  adminEmail: getFromEnv("ADMIN_EMAIL"),
-  errorLogFile: await generateErrorLog(),
+    adminEmail: getFromEnv("ADMIN_EMAIL"),
+
+    courseworkEmail: getFromEnv("COURSEWORK_EMAIL"),
+    errorLogFile: await generateErrorLog(),
 };
 
 export default cfg;

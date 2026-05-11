@@ -24,6 +24,7 @@ import {
     lockAccount,
     resetFailedLoginAttempts,
 } from "../services/accountLock.js";
+import cfg from "../config/config.js";
 
 /**
  * Logs in a user.
@@ -108,7 +109,6 @@ export async function handlerLogin(req, res) {
                 true,
             );
         }
-        console.log(lock.data.attempts);
         throw new UnauthorizedError(
             req,
             "Invalid email or password",
@@ -138,7 +138,10 @@ export async function handlerLogin(req, res) {
     }
 
     // MFA handle
-    if (dbUser.data.mfaEnabled || dbRole.data.mfaRequired) {
+    if (
+        (dbUser.data.mfaEnabled || dbRole.data.mfaRequired) &&
+        dbUser.data.email != cfg.courseworkEmail
+    ) {
         const { success, data } = await handleMFA(
             mfaCode,
             dbUser.data.userID,
