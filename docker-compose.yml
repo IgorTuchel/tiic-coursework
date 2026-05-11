@@ -3,7 +3,7 @@ version: "3.8"
 services:
     redis:
         image: redis:alpine
-        container_name: coursework-redis
+        container_name: coursework-redis-group-13-tiic
         ports:
             - "6379:6379"
         volumes:
@@ -19,7 +19,7 @@ services:
 
     backend:
         build: ./backend
-        container_name: coursework-backend
+        container_name: coursework-backend-group-13-tiic
         ports:
             - "3000:3000"
         environment:
@@ -37,7 +37,7 @@ services:
 
     frontend:
         build: ./frontend
-        container_name: coursework-frontend
+        container_name: coursework-frontend-group-13-tiic
         ports:
             - "5173:5173"
         depends_on:
