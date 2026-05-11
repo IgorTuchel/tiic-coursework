@@ -1,3 +1,7 @@
+/**
+ * @file globalRoutes.js
+ * @description Defines the global routes for the application.
+ */
 import express from "express";
 import userRouter from "./userRoutes.js";
 import reportRouter from "./reportRoutes.js";
@@ -18,10 +22,10 @@ router.post("/logout", handlerLogout);
 router.post("/activate-account", handlerActivateAccount);
 router.post("/reset-password", handlerRequestResetPassword);
 router.get(
-  "/logs",
-  protectedRoute,
-  permissionGuard("canViewSecurityLogs"),
-  handlerGetErrorLogs,
+    "/logs",
+    protectedRoute,
+    permissionGuard("canViewSecurityLogs"),
+    handlerGetErrorLogs,
 );
 
 export default router;

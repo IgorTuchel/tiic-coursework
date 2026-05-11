@@ -1,7 +1,12 @@
+/**
+ * @file handlerActivateAccount.js
+ * @description Handler for activating a user's account.
+ * @module handlers/handlerActivateAccount.js
+ */
 import {
-  BadRequestError,
-  StatusCodes,
-  InternalServerError,
+    BadRequestError,
+    StatusCodes,
+    InternalServerError,
 } from "../middleware/errorHandler.js";
 import { HTTPCodes, respondWithJson } from "../utils/json.js";
 import { verifyNewUser } from "../services/newAccount.js";
@@ -10,91 +15,98 @@ import { hashPassword } from "../utils/hashPassword.js";
 import User from "../models/appdb/users.js";
 import { getUserStatuses, invalidateUserCache } from "../services/cacheDb.js";
 
+/**
+ * Activates a user's account.
+ * @async
+ * @function handlerActivateAccount
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 export async function handlerActivateAccount(req, res) {
-  const { id } = req.query;
-  if (!id) {
-    throw new BadRequestError(
-      req,
-      "Missing activation code",
-      StatusCodes.BAD_REQUEST,
-      true,
+    const { id } = req.query;
+    if (!id) {
+        throw new BadRequestError(
+            req,
+            "Missing activation code",
+            StatusCodes.BAD_REQUEST,
+            true,
+        );
+    }
+
+    const { password } = req.body;
+    if (!password) {
+        throw new BadRequestError(
+            req,
+            "Missing password",
+            StatusCodes.BAD_REQUEST,
+            true,
+        );
+    }
+
+    const { valid, reason } = evaulatePassword(password);
+    if (!valid) {
+        throw new BadRequestError(req, reason, StatusCodes.BAD_REQUEST, true);
+    }
+
+    const { success, message, userID } = await verifyNewUser(id);
+    if (!success) {
+        throw new BadRequestError(req, message, StatusCodes.BAD_REQUEST, true);
+    }
+
+    const dbUser = await User.findByPk(userID);
+    if (!dbUser) {
+        throw new InternalServerError(
+            req,
+            "User not found during activation",
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            true,
+        );
+    }
+
+    const pendingStatus = await getUserStatuses()
+        .then((res) => {
+            if (!res.success) {
+                throw new InternalServerError(req, res.message);
+            }
+            return res.data.find((status) => status.statusName === "pending");
+        })
+        .catch((err) => {
+            throw new InternalServerError(req, err.message);
+        });
+    if (dbUser.statusID !== pendingStatus.statusID) {
+        throw new BadRequestError(
+            req,
+            "Account already activated",
+            StatusCodes.BAD_REQUEST,
+            true,
+        );
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const activeStatus = await getUserStatuses()
+        .then((res) => {
+            if (!res.success) {
+                throw new InternalServerError(req, res.message);
+            }
+            return res.data.find((status) => status.statusName === "active");
+        })
+        .catch((err) => {
+            throw new InternalServerError(req, err.message);
+        });
+
+    const updatedUser = await User.update(
+        { passwordHash: hashedPassword, statusID: activeStatus.statusID },
+        { where: { userID } },
     );
-  }
 
-  const { password } = req.body;
-  if (!password) {
-    throw new BadRequestError(
-      req,
-      "Missing password",
-      StatusCodes.BAD_REQUEST,
-      true,
-    );
-  }
+    if (!updatedUser) {
+        throw new InternalServerError(req, "Failed to activate account");
+    }
 
-  const { valid, reason } = evaulatePassword(password);
-  if (!valid) {
-    throw new BadRequestError(req, reason, StatusCodes.BAD_REQUEST, true);
-  }
+    await invalidateUserCache(userID);
 
-  const { success, message, userID } = await verifyNewUser(id);
-  if (!success) {
-    throw new BadRequestError(req, message, StatusCodes.BAD_REQUEST, true);
-  }
-
-  const dbUser = await User.findByPk(userID);
-  if (!dbUser) {
-    throw new InternalServerError(
-      req,
-      "User not found during activation",
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      true,
-    );
-  }
-
-  const pendingStatus = await getUserStatuses()
-    .then((res) => {
-      if (!res.success) {
-        throw new InternalServerError(req, res.message);
-      }
-      return res.data.find((status) => status.statusName === "pending");
-    })
-    .catch((err) => {
-      throw new InternalServerError(req, err.message);
+    respondWithJson(res, HTTPCodes.OK, {
+        message: "Account activated successfully",
     });
-  if (dbUser.statusID !== pendingStatus.statusID) {
-    throw new BadRequestError(
-      req,
-      "Account already activated",
-      StatusCodes.BAD_REQUEST,
-      true,
-    );
-  }
-
-  const hashedPassword = await hashPassword(password);
-
-  const activeStatus = await getUserStatuses()
-    .then((res) => {
-      if (!res.success) {
-        throw new InternalServerError(req, res.message);
-      }
-      return res.data.find((status) => status.statusName === "active");
-    })
-    .catch((err) => {
-      throw new InternalServerError(req, err.message);
-    });
-
-  const updatedUser = await User.update(
-    { passwordHash: hashedPassword, statusID: activeStatus.statusID },
-    { where: { userID } },
-  );
-
-  if (!updatedUser) {
-    throw new InternalServerError(req, "Failed to activate account");
-  }
-
-  await invalidateUserCache(userID);
-
-  respondWithJson(res, HTTPCodes.OK, {
-    message: "Account activated successfully",
-  });
 }

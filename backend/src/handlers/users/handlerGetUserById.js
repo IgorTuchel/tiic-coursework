@@ -1,55 +1,67 @@
+/**
+ * @file handlerGetUserById.js
+ * @description Handler for retrieving a user by their ID.
+ * @module handlers/users/handlerGetUserById.js
+ */
 import {
-  BadRequestError,
-  InternalServerError,
-  UnauthorizedError,
+    BadRequestError,
+    InternalServerError,
+    UnauthorizedError,
 } from "../../middleware/errorHandler.js";
 import {
-  getUserByID,
-  getUserRoleByID,
-  getUserStatusByID,
+    getUserByID,
+    getUserRoleByID,
+    getUserStatusByID,
 } from "../../services/cacheDb.js";
 import { HTTPCodes, respondWithJson } from "../../utils/json.js";
 
+/**
+ * Retrieves a user by their ID.
+ * @async
+ * @function handlerGetUserById
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
 export async function handlerGetUserById(req, res) {
-  const { id } = req.params;
-  if (!id) {
-    throw new BadRequestError(req, "User ID is required");
-  }
+    const { id } = req.params;
+    if (!id) {
+        throw new BadRequestError(req, "User ID is required");
+    }
 
-  const userRole = await getUserRoleByID(req.session.roleID);
-  if (!userRole.success) {
-    throw new UnauthorizedError(req, "User role not found");
-  }
+    const userRole = await getUserRoleByID(req.session.roleID);
+    if (!userRole.success) {
+        throw new UnauthorizedError(req, "User role not found");
+    }
 
-  const user = await getUserByID(id);
-  if (!user.success) {
-    throw new BadRequestError(req, "User not found");
-  }
+    const user = await getUserByID(id);
+    if (!user.success) {
+        throw new BadRequestError(req, "User not found");
+    }
 
-  const targetUserRole = await getUserRoleByID(user.data.roleID);
-  if (!targetUserRole.success) {
-    throw new InternalServerError(req, targetUserRole.message);
-  }
+    const targetUserRole = await getUserRoleByID(user.data.roleID);
+    if (!targetUserRole.success) {
+        throw new InternalServerError(req, targetUserRole.message);
+    }
 
-  const targetUserStatus = await getUserStatusByID(user.data.statusID);
-  if (!targetUserStatus.success) {
-    throw new InternalServerError(req, targetUserStatus.message);
-  }
+    const targetUserStatus = await getUserStatusByID(user.data.statusID);
+    if (!targetUserStatus.success) {
+        throw new InternalServerError(req, targetUserStatus.message);
+    }
 
-  respondWithJson(res, HTTPCodes.OK, {
-    success: true,
-    data: {
-      userID: user.data.userID,
-      email: user.data.email,
-      role: [targetUserRole.data.roleName, targetUserRole.data.roleID],
-      firstName: user.data.firstName,
-      lastName: user.data.lastName,
-      status: [
-        targetUserStatus.data.statusName,
-        targetUserStatus.data.statusID,
-      ],
-      mfaEnabled: user.data.mfaEnabled,
-      createdAt: user.data.createdAt,
-    },
-  });
+    respondWithJson(res, HTTPCodes.OK, {
+        success: true,
+        data: {
+            userID: user.data.userID,
+            email: user.data.email,
+            role: [targetUserRole.data.roleName, targetUserRole.data.roleID],
+            firstName: user.data.firstName,
+            lastName: user.data.lastName,
+            status: [
+                targetUserStatus.data.statusName,
+                targetUserStatus.data.statusID,
+            ],
+            mfaEnabled: user.data.mfaEnabled,
+            createdAt: user.data.createdAt,
+        },
+    });
 }
